@@ -1,0 +1,272 @@
+[
+  {
+    "id": 1610612737,
+    "abbreviation": "ATL",
+    "nickname": "Hawks",
+    "year_founded": 1949,
+    "city": "Atlanta",
+    "full_name": "Atlanta Hawks",
+    "state": "Georgia"
+  },
+  {
+    "id": 1610612738,
+    "abbreviation": "BOS",
+    "nickname": "Celtics",
+    "year_founded": 1946,
+    "city": "Boston",
+    "full_name": "Boston Celtics",
+    "state": "Massachusetts"
+  },
+  {
+    "id": 1610612739,
+    "abbreviation": "CLE",
+    "nickname": "Cavaliers",
+    "year_founded": 1970,
+    "city": "Cleveland",
+    "full_name": "Cleveland Cavaliers",
+    "state": "Ohio"
+  },
+  {
+    "id": 1610612740,
+    "abbreviation": "NOP",
+    "nickname": "Pelicans",
+    "year_founded": 2002,
+    "city": "New Orleans",
+    "full_name": "New Orleans Pelicans",
+    "state": "Louisiana"
+  },
+  {
+    "id": 1610612741,
+    "abbreviation": "CHI",
+    "nickname": "Bulls",
+    "year_founded": 1966,
+    "city": "Chicago",
+    "full_name": "Chicago Bulls",
+    "state": "Illinois"
+  },
+  {
+    "id": 1610612742,
+    "abbreviation": "DAL",
+    "nickname": "Mavericks",
+    "year_founded": 1980,
+    "city": "Dallas",
+    "full_name": "Dallas Mavericks",
+    "state": "Texas"
+  },
+  {
+    "id": 1610612743,
+    "abbreviation": "DEN",
+    "nickname": "Nuggets",
+    "year_founded": 1976,
+    "city": "Denver",
+    "full_name": "Denver Nuggets",
+    "state": "Colorado"
+  },
+  {
+    "id": 1610612744,
+    "abbreviation": "GSW",
+    "nickname": "Warriors",
+    "year_founded": 1946,
+    "city": "Golden State",
+    "full_name": "Golden State Warriors",
+    "state": "California"
+  },
+  {
+    "id": 1610612745,
+    "abbreviation": "HOU",
+    "nickname": "Rockets",
+    "year_founded": 1967,
+    "city": "Houston",
+    "full_name": "Houston Rockets",
+    "state": "Texas"
+  },
+  {
+    "id": 1610612746,
+    "abbreviation": "LAC",
+    "nickname": "Clippers",
+    "year_founded": 1970,
+    "city": "Los Angeles",
+    "full_name": "Los Angeles Clippers",
+    "state": "California"
+  },
+  {
+    "id": 1610612747,
+    "abbreviation": "LAL",
+    "nickname": "Lakers",
+    "year_founded": 1948,
+    "city": "Los Angeles",
+    "full_name": "Los Angeles Lakers",
+    "state": "California"
+  },
+  {
+    "id": 1610612748,
+    "abbreviation": "MIA",
+    "nickname": "Heat",
+    "year_founded": 1988,
+    "city": "Miami",
+    "full_name": "Miami Heat",
+    "state": "Florida"
+  },
+  {
+    "id": 1610612749,
+    "abbreviation": "MIL",
+    "nickname": "Bucks",
+    "year_founded": 1968,
+    "city": "Milwaukee",
+    "full_name": "Milwaukee Bucks",
+    "state": "Wisconsin"
+  },
+  {
+    "id": 1610612750,
+    "abbreviation": "MIN",
+    "nickname": "Timberwolves",
+    "year_founded": 1989,
+    "city": "Minnesota",
+    "full_name": "Minnesota Timberwolves",
+    "state": "Minnesota"
+  },
+  {
+    "id": 1610612751,
+    "abbreviation": "BKN",
+    "nickname": "Nets",
+    "year_founded": 1976,
+    "city": "Brooklyn",
+    "full_name": "Brooklyn Nets",
+    "state": "New York"
+  },
+  {
+    "id": 1610612752,
+    "abbreviation": "NYK",
+    "nickname": "Knicks",
+    "year_founded": 1946,
+    "city": "New York",
+    "full_name": "New York Knicks",
+    "state": "New York"
+  },
+  {
+    "id": 1610612753,
+    "abbreviation": "ORL",
+    "nickname": "Magic",
+    "year_founded": 1989,
+    "city": "Orlando",
+    "full_name": "Orlando Magic",
+    "state": "Florida"
+  },
+  {
+    "id": 1610612754,
+    "abbreviation": "IND",
+    "nickname": "Pacers",
+    "year_founded": 1976,
+    "city": "Indiana",
+    "full_name": "Indiana Pacers",
+    "state": "Indiana"
+  },
+  {
+    "id": 1610612755,
+    "abbreviation": "PHI",
+    "nickname": "76ers",
+    "year_founded": 1949,
+    "city": "Philadelphia",
+    "full_name": "Philadelphia 76ers",
+    "state": "Pennsylvania"
+  },
+  {
+    "id": 1610612756,
+    "abbreviation": "PHX",
+    "nickname": "Suns",
+    "year_founded": 1968,
+    "city": "Phoenix",
+    "full_name": "Phoenix Suns",
+    "state": "Arizona"
+  },
+  {
+    "id": 1610612757,
+    "abbreviation": "POR",
+    "nickname": "Trail Blazers",
+    "year_founded": 1970,
+    "city": "Portland",
+    "full_name": "Portland Trail Blazers",
+    "state": "Oregon"
+  },
+  {
+    "id": 1610612758,
+    "abbreviation": "SAC",
+    "nickname": "Kings",
+    "year_founded": 1948,
+    "city": "Sacramento",
+    "full_name": "Sacramento Kings",
+    "state": "California"
+  },
+  {
+    "id": 1610612759,
+    "abbreviation": "SAS",
+    "nickname": "Spurs",
+    "year_founded": 1976,
+    "city": "San Antonio",
+    "full_name": "San Antonio Spurs",
+    "state": "Texas"
+  },
+  {
+    "id": 1610612760,
+    "abbreviation": "OKC",
+    "nickname": "Thunder",
+    "year_founded": 1967,
+    "city": "Oklahoma City",
+    "full_name": "Oklahoma City Thunder",
+    "state": "Oklahoma"
+  },
+  {
+    "id": 1610612761,
+    "abbreviation": "TOR",
+    "nickname": "Raptors",
+    "year_founded": 1995,
+    "city": "Toronto",
+    "full_name": "Toronto Raptors",
+    "state": "Ontario"
+  },
+  {
+    "id": 1610612762,
+    "abbreviation": "UTA",
+    "nickname": "Jazz",
+    "year_founded": 1974,
+    "city": "Utah",
+    "full_name": "Utah Jazz",
+    "state": "Utah"
+  },
+  {
+    "id": 1610612763,
+    "abbreviation": "MEM",
+    "nickname": "Grizzlies",
+    "year_founded": 1995,
+    "city": "Memphis",
+    "full_name": "Memphis Grizzlies",
+    "state": "Tennessee"
+  },
+  {
+    "id": 1610612764,
+    "abbreviation": "WAS",
+    "nickname": "Wizards",
+    "year_founded": 1961,
+    "city": "Washington",
+    "full_name": "Washington Wizards",
+    "state": "District of Columbia"
+  },
+  {
+    "id": 1610612765,
+    "abbreviation": "DET",
+    "nickname": "Pistons",
+    "year_founded": 1948,
+    "city": "Detroit",
+    "full_name": "Detroit Pistons",
+    "state": "Michigan"
+  },
+  {
+    "id": 1610612766,
+    "abbreviation": "CHA",
+    "nickname": "Hornets",
+    "year_founded": 1988,
+    "city": "Charlotte",
+    "full_name": "Charlotte Hornets",
+    "state": "North Carolina"
+  }
+]
