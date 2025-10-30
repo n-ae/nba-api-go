@@ -254,12 +254,19 @@ func (p PerMode) Validate() error {
 - [x] Real-time data tests
 
 #### Phase 4: Remaining Stats Endpoints (Week 6-8) 🔄 IN PROGRESS
-- [ ] Code generation tooling (in progress)
+- [x] Code generation tooling (completed)
 - [x] PlayerGameLog endpoint (completed)
 - [x] CommonPlayerInfo endpoint (completed)
 - [x] LeagueLeaders endpoint (completed)
 - [x] TeamGameLog endpoint (completed)
-- [ ] Generate remaining 134 endpoints
+- [x] TeamInfoCommon endpoint (completed)
+- [x] BoxScoreSummaryV2 endpoint (completed)
+- [x] ShotChartDetail endpoint (completed)
+- [x] TeamYearByYearStats endpoint (completed)
+- [x] PlayerDashboardByGeneralSplits endpoint (completed)
+- [x] TeamDashboardByGeneralSplits endpoint (completed)
+- [x] PlayByPlayV2 endpoint (completed)
+- [ ] Generate remaining 127 endpoints
 - [x] Integration test framework (completed)
 - [x] Benchmark tests (completed)
 - [ ] Documentation (in progress)

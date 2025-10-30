@@ -1,0 +1,37 @@
+[
+  {
+    "name": "TeamYearByYearStats",
+    "endpoint": "teamyearbyyearstats",
+    "parameters": [
+      {
+        "name": "TeamID",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "LeagueID",
+        "type": "LeagueID",
+        "required": false,
+        "default": "00"
+      },
+      {
+        "name": "PerMode",
+        "type": "PerMode",
+        "required": false,
+        "default": "PerGame"
+      },
+      {
+        "name": "SeasonType",
+        "type": "SeasonType",
+        "required": false,
+        "default": "Regular Season"
+      }
+    ],
+    "result_sets": [
+      {
+        "name": "TeamStats",
+        "fields": ["TEAM_ID", "TEAM_CITY", "TEAM_NAME", "YEAR", "GP", "WINS", "LOSSES", "WIN_PCT", "CONF_RANK", "DIV_RANK", "PO_WINS", "PO_LOSSES", "CONF_COUNT", "DIV_COUNT", "NBA_FINALS_APPEARANCE", "FGM", "FGA", "FG_PCT", "FG3M", "FG3A", "FG3_PCT", "FTM", "FTA", "FT_PCT", "OREB", "DREB", "REB", "AST", "PF", "STL", "TOV", "BLK", "PTS", "PTS_RANK"]
+      }
+    ]
+  }
+]

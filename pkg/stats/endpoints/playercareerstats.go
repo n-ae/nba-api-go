@@ -84,14 +84,6 @@ type PlayerCareerStatsRequest struct {
 	LeagueID parameters.LeagueID
 }
 
-type rawStatsResponse struct {
-	ResultSets []struct {
-		Name    string          `json:"name"`
-		Headers []string        `json:"headers"`
-		RowSet  [][]interface{} `json:"rowSet"`
-	} `json:"resultSets"`
-}
-
 func PlayerCareerStats(ctx context.Context, client *stats.Client, req PlayerCareerStatsRequest) (*models.Response[*PlayerCareerStatsResponse], error) {
 	if req.PlayerID == "" {
 		return nil, fmt.Errorf("%w: PlayerID is required", models.ErrInvalidRequest)

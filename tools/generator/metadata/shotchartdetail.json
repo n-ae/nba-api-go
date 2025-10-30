@@ -1,0 +1,190 @@
+[
+  {
+    "name": "ShotChartDetail",
+    "endpoint": "shotchartdetail",
+    "parameters": [
+      {
+        "name": "PlayerID",
+        "type": "string",
+        "required": false,
+        "default": "0"
+      },
+      {
+        "name": "TeamID",
+        "type": "string",
+        "required": false,
+        "default": "0"
+      },
+      {
+        "name": "GameID",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "Season",
+        "type": "Season",
+        "required": true
+      },
+      {
+        "name": "SeasonType",
+        "type": "SeasonType",
+        "required": true
+      },
+      {
+        "name": "LeagueID",
+        "type": "LeagueID",
+        "required": false,
+        "default": "00"
+      },
+      {
+        "name": "ContextMeasure",
+        "type": "string",
+        "required": false,
+        "default": "FGA"
+      },
+      {
+        "name": "DateFrom",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "DateTo",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "OpponentTeamID",
+        "type": "string",
+        "required": false,
+        "default": "0"
+      },
+      {
+        "name": "Period",
+        "type": "string",
+        "required": false,
+        "default": "0"
+      },
+      {
+        "name": "RookieYear",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "VsConference",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "VsDivision",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "Position",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "GameSegment",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "LastNGames",
+        "type": "string",
+        "required": false,
+        "default": "0"
+      },
+      {
+        "name": "Location",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "Month",
+        "type": "string",
+        "required": false,
+        "default": "0"
+      },
+      {
+        "name": "Outcome",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "SeasonSegment",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "AheadBehind",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "ClutchTime",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "PointDiff",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "RangeType",
+        "type": "string",
+        "required": false,
+        "default": "0"
+      },
+      {
+        "name": "StartPeriod",
+        "type": "string",
+        "required": false,
+        "default": "0"
+      },
+      {
+        "name": "EndPeriod",
+        "type": "string",
+        "required": false,
+        "default": "0"
+      },
+      {
+        "name": "StartRange",
+        "type": "string",
+        "required": false,
+        "default": "0"
+      },
+      {
+        "name": "EndRange",
+        "type": "string",
+        "required": false,
+        "default": "0"
+      }
+    ],
+    "result_sets": [
+      {
+        "name": "Shot_Chart_Detail",
+        "fields": ["GRID_TYPE", "GAME_ID", "GAME_EVENT_ID", "PLAYER_ID", "PLAYER_NAME", "TEAM_ID", "TEAM_NAME", "PERIOD", "MINUTES_REMAINING", "SECONDS_REMAINING", "EVENT_TYPE", "ACTION_TYPE", "SHOT_TYPE", "SHOT_ZONE_BASIC", "SHOT_ZONE_AREA", "SHOT_ZONE_RANGE", "SHOT_DISTANCE", "LOC_X", "LOC_Y", "SHOT_ATTEMPTED_FLAG", "SHOT_MADE_FLAG", "GAME_DATE", "HTM", "VTM"]
+      },
+      {
+        "name": "LeagueAverages",
+        "fields": ["GRID_TYPE", "SHOT_ZONE_BASIC", "SHOT_ZONE_AREA", "SHOT_ZONE_RANGE", "FGA", "FGM", "FG_PCT"]
+      }
+    ]
+  }
+]

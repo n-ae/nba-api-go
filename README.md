@@ -4,13 +4,14 @@ A Go client library for accessing NBA.com APIs. This is a Go implementation insp
 
 ## Features
 
-- **Stats API** - Access to NBA official stats (stats.nba.com)
+- **Stats API** - Access to NBA official stats (stats.nba.com) with 12 endpoints implemented
 - **Live API** - Real-time game data and scoreboards
-- **Static Data** - Pre-loaded player and team datasets with search functionality
+- **Static Data** - Pre-loaded player and team datasets with search functionality (5,135 players, 30 teams)
 - **Type Safety** - Strongly typed requests and responses
 - **Middleware Support** - Rate limiting, retry logic, logging, and custom headers
 - **Context Support** - Full support for cancellation and timeouts
 - **No External Dependencies** - Uses only Go standard library and golang.org/x packages
+- **Code Generation** - Tooling to generate endpoint code from metadata
 
 ## Installation
 

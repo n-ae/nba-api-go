@@ -1,0 +1,78 @@
+package endpoints
+
+import (
+	"context"
+	"fmt"
+	"net/url"
+
+	"github.com/username/nba-api-go/pkg/models"
+	"github.com/username/nba-api-go/pkg/stats"
+{{- if .HasParameterTypes}}
+	"github.com/username/nba-api-go/pkg/stats/parameters"
+{{- end}}
+)
+
+// {{.Name}}Request contains parameters for the {{.Name}} endpoint
+type {{.Name}}Request struct {
+{{- range .Parameters}}
+	{{.Name}} {{if .Required}}{{.Type}}{{else}}*{{.Type}}{{end}}
+{{- end}}
+}
+
+{{range $idx, $rs := .ResultSets}}
+// {{$.Name}}{{$rs.Name}} represents the {{$rs.Name}} result set for {{$.Name}}
+type {{$.Name}}{{$rs.Name}} struct {
+{{- range $rs.Fields}}
+	{{.}} interface{}
+{{- end}}
+}
+{{end}}
+
+// {{.Name}}Response contains the response data from the {{.Name}} endpoint
+type {{.Name}}Response struct {
+{{- range .ResultSets}}
+	{{.Name}} []{{$.Name}}{{.Name}}
+{{- end}}
+}
+
+// Get{{.Name}} retrieves data from the {{.Endpoint}} endpoint
+func Get{{.Name}}(ctx context.Context, client *stats.Client, req {{.Name}}Request) (*models.Response[*{{.Name}}Response], error) {
+	params := url.Values{}
+
+{{- range .Parameters}}
+{{- if .Required}}
+	if req.{{.Name}} == "" {
+		return nil, fmt.Errorf("{{.Name}} is required")
+	}
+	params.Set("{{.Name}}", string(req.{{.Name}}))
+{{- else}}
+	if req.{{.Name}} != nil {
+		params.Set("{{.Name}}", string(*req.{{.Name}}))
+	}
+{{- end}}
+{{- end}}
+
+	var rawResp rawStatsResponse
+	if err := client.GetJSON(ctx, "/{{.Endpoint}}", params, &rawResp); err != nil {
+		return nil, err
+	}
+
+	response := &{{.Name}}Response{}
+
+{{- range $idx, $rs := .ResultSets}}
+	if len(rawResp.ResultSets) > {{$idx}} {
+		response.{{$rs.Name}} = make([]{{$.Name}}{{$rs.Name}}, len(rawResp.ResultSets[{{$idx}}].RowSet))
+		for i, row := range rawResp.ResultSets[{{$idx}}].RowSet {
+			if len(row) >= {{len $rs.Fields}} {
+				response.{{$rs.Name}}[i] = {{$.Name}}{{$rs.Name}}{
+{{- range $fidx, $field := $rs.Fields}}
+					{{$field}}: row[{{$fidx}}],
+{{- end}}
+				}
+			}
+		}
+	}
+{{- end}}
+
+	return models.NewResponse(response, 200, "", nil), nil
+}

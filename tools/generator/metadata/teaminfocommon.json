@@ -1,0 +1,35 @@
+[
+  {
+    "name": "TeamInfoCommon",
+    "endpoint": "teaminfocommon",
+    "parameters": [
+      {
+        "name": "TeamID",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "LeagueID",
+        "type": "LeagueID",
+        "required": false,
+        "default": "00"
+      },
+      {
+        "name": "SeasonType",
+        "type": "SeasonType",
+        "required": false,
+        "default": "Regular Season"
+      }
+    ],
+    "result_sets": [
+      {
+        "name": "TeamInfoCommon",
+        "fields": ["TEAM_ID", "SEASON_YEAR", "TEAM_CITY", "TEAM_NAME", "TEAM_ABBREVIATION", "TEAM_CONFERENCE", "TEAM_DIVISION", "W", "L", "PCT", "MIN_YEAR", "MAX_YEAR"]
+      },
+      {
+        "name": "TeamSeasonRanks",
+        "fields": ["LEAGUE_ID", "SEASON_ID", "TEAM_ID", "PTS_RANK", "PTS_PG", "REB_RANK", "REB_PG", "AST_RANK", "AST_PG", "OPP_PTS_RANK", "OPP_PTS_PG"]
+      }
+    ]
+  }
+]
