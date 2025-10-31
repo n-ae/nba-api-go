@@ -4,14 +4,15 @@ A Go client library for accessing NBA.com APIs. This is a Go implementation insp
 
 ## Features
 
-- **Stats API** - Access to NBA official stats (stats.nba.com) with 12 endpoints implemented
+- **Stats API** - Access to NBA official stats (stats.nba.com) with 15/139 endpoints implemented (10.8%)
 - **Live API** - Real-time game data and scoreboards
 - **Static Data** - Pre-loaded player and team datasets with search functionality (5,135 players, 30 teams)
-- **Type Safety** - Strongly typed requests and responses
+- **Type Safety** - Strongly typed requests and responses with automatic type inference
+- **Automatic Type Inference** - Generator infers proper Go types (int, float64, string) from field names
 - **Middleware Support** - Rate limiting, retry logic, logging, and custom headers
 - **Context Support** - Full support for cancellation and timeouts
 - **No External Dependencies** - Uses only Go standard library and golang.org/x packages
-- **Code Generation** - Tooling to generate endpoint code from metadata
+- **Code Generation** - Advanced tooling to generate type-safe endpoint code from metadata
 
 ## Installation
 
@@ -281,12 +282,12 @@ See [BENCHMARKS.md](./docs/BENCHMARKS.md) for detailed performance analysis.
 Based on the [ADR](./docs/adr/001-go-replication-strategy.md), the library is being developed in phases:
 
 - [x] Phase 1: Foundation (HTTP client, middleware, models)
-- [x] Phase 2: Core Stats API (5 endpoints implemented)
+- [x] Phase 2: Core Stats API (initial endpoints)
 - [x] Phase 3: Live API (Scoreboard endpoint)
-- [x] Phase 4: Additional Endpoints (4/139 stats, benchmarks, integration tests) - IN PROGRESS
+- [x] Phase 4: Additional Endpoints (15/139 stats endpoints = 10.8% complete) - IN PROGRESS
 - [x] Phase 5: Performance Optimization (benchmarks complete) - IN PROGRESS
-- [ ] Phase 6: Code generation tooling
-- [ ] Phase 7: CLI tool
+- [x] Code generation tooling (completed)
+- [ ] CLI tool (optional)
 
 ## Contributing
 

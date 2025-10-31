@@ -2,7 +2,9 @@ package endpoints
 
 import (
 	"context"
+{{- if .HasRequiredParams}}
 	"fmt"
+{{- end}}
 	"net/url"
 
 	"github.com/username/nba-api-go/pkg/models"
@@ -22,8 +24,8 @@ type {{.Name}}Request struct {
 {{range $idx, $rs := .ResultSets}}
 // {{$.Name}}{{$rs.Name}} represents the {{$rs.Name}} result set for {{$.Name}}
 type {{$.Name}}{{$rs.Name}} struct {
-{{- range $rs.Fields}}
-	{{.}} interface{}
+{{- range $rs.FieldTypes}}
+	{{.Name}} {{.GoType}} `json:"{{.JSONTag}}"`
 {{- end}}
 }
 {{end}}
@@ -61,14 +63,21 @@ func Get{{.Name}}(ctx context.Context, client *stats.Client, req {{.Name}}Reques
 
 {{- range $idx, $rs := .ResultSets}}
 	if len(rawResp.ResultSets) > {{$idx}} {
-		response.{{$rs.Name}} = make([]{{$.Name}}{{$rs.Name}}, len(rawResp.ResultSets[{{$idx}}].RowSet))
-		for i, row := range rawResp.ResultSets[{{$idx}}].RowSet {
-			if len(row) >= {{len $rs.Fields}} {
-				response.{{$rs.Name}}[i] = {{$.Name}}{{$rs.Name}}{
-{{- range $fidx, $field := $rs.Fields}}
-					{{$field}}: row[{{$fidx}}],
+		response.{{$rs.Name}} = make([]{{$.Name}}{{$rs.Name}}, 0, len(rawResp.ResultSets[{{$idx}}].RowSet))
+		for _, row := range rawResp.ResultSets[{{$idx}}].RowSet {
+			if len(row) >= {{len $rs.FieldTypes}} {
+				item := {{$.Name}}{{$rs.Name}}{
+{{- range $fidx, $fieldType := $rs.FieldTypes}}
+{{- if eq $fieldType.GoType "int"}}
+					{{$fieldType.Name}}: toInt(row[{{$fidx}}]),
+{{- else if eq $fieldType.GoType "float64"}}
+					{{$fieldType.Name}}: toFloat(row[{{$fidx}}]),
+{{- else}}
+					{{$fieldType.Name}}: toString(row[{{$fidx}}]),
+{{- end}}
 {{- end}}
 				}
+				response.{{$rs.Name}} = append(response.{{$rs.Name}}, item)
 			}
 		}
 	}

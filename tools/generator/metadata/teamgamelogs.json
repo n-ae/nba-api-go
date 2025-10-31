@@ -1,0 +1,48 @@
+[
+  {
+    "name": "TeamGameLogs",
+    "endpoint": "teamgamelogs",
+    "parameters": [
+      {
+        "name": "Season",
+        "type": "Season",
+        "required": true
+      },
+      {
+        "name": "SeasonType",
+        "type": "SeasonType",
+        "required": true
+      },
+      {
+        "name": "LeagueID",
+        "type": "LeagueID",
+        "required": false,
+        "default": "00"
+      },
+      {
+        "name": "TeamID",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "DateFrom",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "DateTo",
+        "type": "string",
+        "required": false,
+        "default": ""
+      }
+    ],
+    "result_sets": [
+      {
+        "name": "TeamGameLogs",
+        "fields": ["SEASON_YEAR", "TEAM_ID", "TEAM_ABBREVIATION", "TEAM_NAME", "GAME_ID", "GAME_DATE", "MATCHUP", "WL", "MIN", "FGM", "FGA", "FG_PCT", "FG3M", "FG3A", "FG3_PCT", "FTM", "FTA", "FT_PCT", "OREB", "DREB", "REB", "AST", "TOV", "STL", "BLK", "BLKA", "PF", "PFD", "PTS", "PLUS_MINUS", "NBA_FANTASY_PTS", "DD2", "TD3"]
+      }
+    ]
+  }
+]

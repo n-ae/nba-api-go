@@ -46,41 +46,41 @@ type ShotChartDetailRequest struct {
 
 // ShotChartDetailShot_Chart_Detail represents the Shot_Chart_Detail result set for ShotChartDetail
 type ShotChartDetailShot_Chart_Detail struct {
-	GRID_TYPE interface{}
-	GAME_ID interface{}
-	GAME_EVENT_ID interface{}
-	PLAYER_ID interface{}
-	PLAYER_NAME interface{}
-	TEAM_ID interface{}
-	TEAM_NAME interface{}
-	PERIOD interface{}
-	MINUTES_REMAINING interface{}
-	SECONDS_REMAINING interface{}
-	EVENT_TYPE interface{}
-	ACTION_TYPE interface{}
-	SHOT_TYPE interface{}
-	SHOT_ZONE_BASIC interface{}
-	SHOT_ZONE_AREA interface{}
-	SHOT_ZONE_RANGE interface{}
-	SHOT_DISTANCE interface{}
-	LOC_X interface{}
-	LOC_Y interface{}
-	SHOT_ATTEMPTED_FLAG interface{}
-	SHOT_MADE_FLAG interface{}
-	GAME_DATE interface{}
-	HTM interface{}
-	VTM interface{}
+	GRID_TYPE           string  `json:"GRID_TYPE"`
+	GAME_ID             string  `json:"GAME_ID"`
+	GAME_EVENT_ID       int     `json:"GAME_EVENT_ID"`
+	PLAYER_ID           int     `json:"PLAYER_ID"`
+	PLAYER_NAME         string  `json:"PLAYER_NAME"`
+	TEAM_ID             int     `json:"TEAM_ID"`
+	TEAM_NAME           string  `json:"TEAM_NAME"`
+	PERIOD              int     `json:"PERIOD"`
+	MINUTES_REMAINING   int     `json:"MINUTES_REMAINING"`
+	SECONDS_REMAINING   int     `json:"SECONDS_REMAINING"`
+	EVENT_TYPE          string  `json:"EVENT_TYPE"`
+	ACTION_TYPE         string  `json:"ACTION_TYPE"`
+	SHOT_TYPE           string  `json:"SHOT_TYPE"`
+	SHOT_ZONE_BASIC     string  `json:"SHOT_ZONE_BASIC"`
+	SHOT_ZONE_AREA      string  `json:"SHOT_ZONE_AREA"`
+	SHOT_ZONE_RANGE     string  `json:"SHOT_ZONE_RANGE"`
+	SHOT_DISTANCE       float64 `json:"SHOT_DISTANCE"`
+	LOC_X               float64 `json:"LOC_X"`
+	LOC_Y               float64 `json:"LOC_Y"`
+	SHOT_ATTEMPTED_FLAG int     `json:"SHOT_ATTEMPTED_FLAG"`
+	SHOT_MADE_FLAG      int     `json:"SHOT_MADE_FLAG"`
+	GAME_DATE           string  `json:"GAME_DATE"`
+	HTM                 string  `json:"HTM"`
+	VTM                 string  `json:"VTM"`
 }
 
 // ShotChartDetailLeagueAverages represents the LeagueAverages result set for ShotChartDetail
 type ShotChartDetailLeagueAverages struct {
-	GRID_TYPE interface{}
-	SHOT_ZONE_BASIC interface{}
-	SHOT_ZONE_AREA interface{}
-	SHOT_ZONE_RANGE interface{}
-	FGA interface{}
-	FGM interface{}
-	FG_PCT interface{}
+	GRID_TYPE       string  `json:"GRID_TYPE"`
+	SHOT_ZONE_BASIC string  `json:"SHOT_ZONE_BASIC"`
+	SHOT_ZONE_AREA  string  `json:"SHOT_ZONE_AREA"`
+	SHOT_ZONE_RANGE string  `json:"SHOT_ZONE_RANGE"`
+	FGA             int     `json:"FGA"`
+	FGM             int     `json:"FGM"`
+	FG_PCT          float64 `json:"FG_PCT"`
 }
 
 
@@ -190,51 +190,53 @@ func GetShotChartDetail(ctx context.Context, client *stats.Client, req ShotChart
 
 	response := &ShotChartDetailResponse{}
 	if len(rawResp.ResultSets) > 0 {
-		response.Shot_Chart_Detail = make([]ShotChartDetailShot_Chart_Detail, len(rawResp.ResultSets[0].RowSet))
-		for i, row := range rawResp.ResultSets[0].RowSet {
+		response.Shot_Chart_Detail = make([]ShotChartDetailShot_Chart_Detail, 0, len(rawResp.ResultSets[0].RowSet))
+		for _, row := range rawResp.ResultSets[0].RowSet {
 			if len(row) >= 24 {
-				response.Shot_Chart_Detail[i] = ShotChartDetailShot_Chart_Detail{
-					GRID_TYPE: row[0],
-					GAME_ID: row[1],
-					GAME_EVENT_ID: row[2],
-					PLAYER_ID: row[3],
-					PLAYER_NAME: row[4],
-					TEAM_ID: row[5],
-					TEAM_NAME: row[6],
-					PERIOD: row[7],
-					MINUTES_REMAINING: row[8],
-					SECONDS_REMAINING: row[9],
-					EVENT_TYPE: row[10],
-					ACTION_TYPE: row[11],
-					SHOT_TYPE: row[12],
-					SHOT_ZONE_BASIC: row[13],
-					SHOT_ZONE_AREA: row[14],
-					SHOT_ZONE_RANGE: row[15],
-					SHOT_DISTANCE: row[16],
-					LOC_X: row[17],
-					LOC_Y: row[18],
-					SHOT_ATTEMPTED_FLAG: row[19],
-					SHOT_MADE_FLAG: row[20],
-					GAME_DATE: row[21],
-					HTM: row[22],
-					VTM: row[23],
+				item := ShotChartDetailShot_Chart_Detail{
+					GRID_TYPE:           toString(row[0]),
+					GAME_ID:             toString(row[1]),
+					GAME_EVENT_ID:       toInt(row[2]),
+					PLAYER_ID:           toInt(row[3]),
+					PLAYER_NAME:         toString(row[4]),
+					TEAM_ID:             toInt(row[5]),
+					TEAM_NAME:           toString(row[6]),
+					PERIOD:              toInt(row[7]),
+					MINUTES_REMAINING:   toInt(row[8]),
+					SECONDS_REMAINING:   toInt(row[9]),
+					EVENT_TYPE:          toString(row[10]),
+					ACTION_TYPE:         toString(row[11]),
+					SHOT_TYPE:           toString(row[12]),
+					SHOT_ZONE_BASIC:     toString(row[13]),
+					SHOT_ZONE_AREA:      toString(row[14]),
+					SHOT_ZONE_RANGE:     toString(row[15]),
+					SHOT_DISTANCE:       toFloat(row[16]),
+					LOC_X:               toFloat(row[17]),
+					LOC_Y:               toFloat(row[18]),
+					SHOT_ATTEMPTED_FLAG: toInt(row[19]),
+					SHOT_MADE_FLAG:      toInt(row[20]),
+					GAME_DATE:           toString(row[21]),
+					HTM:                 toString(row[22]),
+					VTM:                 toString(row[23]),
 				}
+				response.Shot_Chart_Detail = append(response.Shot_Chart_Detail, item)
 			}
 		}
 	}
 	if len(rawResp.ResultSets) > 1 {
-		response.LeagueAverages = make([]ShotChartDetailLeagueAverages, len(rawResp.ResultSets[1].RowSet))
-		for i, row := range rawResp.ResultSets[1].RowSet {
+		response.LeagueAverages = make([]ShotChartDetailLeagueAverages, 0, len(rawResp.ResultSets[1].RowSet))
+		for _, row := range rawResp.ResultSets[1].RowSet {
 			if len(row) >= 7 {
-				response.LeagueAverages[i] = ShotChartDetailLeagueAverages{
-					GRID_TYPE: row[0],
-					SHOT_ZONE_BASIC: row[1],
-					SHOT_ZONE_AREA: row[2],
-					SHOT_ZONE_RANGE: row[3],
-					FGA: row[4],
-					FGM: row[5],
-					FG_PCT: row[6],
+				item := ShotChartDetailLeagueAverages{
+					GRID_TYPE:       toString(row[0]),
+					SHOT_ZONE_BASIC: toString(row[1]),
+					SHOT_ZONE_AREA:  toString(row[2]),
+					SHOT_ZONE_RANGE: toString(row[3]),
+					FGA:             toInt(row[4]),
+					FGM:             toInt(row[5]),
+					FG_PCT:          toFloat(row[6]),
 				}
+				response.LeagueAverages = append(response.LeagueAverages, item)
 			}
 		}
 	}

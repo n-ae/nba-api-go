@@ -21,40 +21,40 @@ type TeamYearByYearStatsRequest struct {
 
 // TeamYearByYearStatsTeamStats represents the TeamStats result set for TeamYearByYearStats
 type TeamYearByYearStatsTeamStats struct {
-	TEAM_ID interface{}
-	TEAM_CITY interface{}
-	TEAM_NAME interface{}
-	YEAR interface{}
-	GP interface{}
-	WINS interface{}
-	LOSSES interface{}
-	WIN_PCT interface{}
-	CONF_RANK interface{}
-	DIV_RANK interface{}
-	PO_WINS interface{}
-	PO_LOSSES interface{}
-	CONF_COUNT interface{}
-	DIV_COUNT interface{}
-	NBA_FINALS_APPEARANCE interface{}
-	FGM interface{}
-	FGA interface{}
-	FG_PCT interface{}
-	FG3M interface{}
-	FG3A interface{}
-	FG3_PCT interface{}
-	FTM interface{}
-	FTA interface{}
-	FT_PCT interface{}
-	OREB interface{}
-	DREB interface{}
-	REB interface{}
-	AST interface{}
-	PF interface{}
-	STL interface{}
-	TOV interface{}
-	BLK interface{}
-	PTS interface{}
-	PTS_RANK interface{}
+	TEAM_ID               int     `json:"TEAM_ID"`
+	TEAM_CITY             string  `json:"TEAM_CITY"`
+	TEAM_NAME             string  `json:"TEAM_NAME"`
+	YEAR                  string  `json:"YEAR"`
+	GP                    int     `json:"GP"`
+	WINS                  int     `json:"WINS"`
+	LOSSES                int     `json:"LOSSES"`
+	WIN_PCT               float64 `json:"WIN_PCT"`
+	CONF_RANK             int     `json:"CONF_RANK"`
+	DIV_RANK              int     `json:"DIV_RANK"`
+	PO_WINS               int     `json:"PO_WINS"`
+	PO_LOSSES             int     `json:"PO_LOSSES"`
+	CONF_COUNT            int     `json:"CONF_COUNT"`
+	DIV_COUNT             int     `json:"DIV_COUNT"`
+	NBA_FINALS_APPEARANCE string  `json:"NBA_FINALS_APPEARANCE"`
+	FGM                   int     `json:"FGM"`
+	FGA                   int     `json:"FGA"`
+	FG_PCT                float64 `json:"FG_PCT"`
+	FG3M                  int     `json:"FG3M"`
+	FG3A                  int     `json:"FG3A"`
+	FG3_PCT               float64 `json:"FG3_PCT"`
+	FTM                   int     `json:"FTM"`
+	FTA                   int     `json:"FTA"`
+	FT_PCT                float64 `json:"FT_PCT"`
+	OREB                  int     `json:"OREB"`
+	DREB                  int     `json:"DREB"`
+	REB                   int     `json:"REB"`
+	AST                   int     `json:"AST"`
+	PF                    int     `json:"PF"`
+	STL                   int     `json:"STL"`
+	TOV                   int     `json:"TOV"`
+	BLK                   int     `json:"BLK"`
+	PTS                   int     `json:"PTS"`
+	PTS_RANK              int     `json:"PTS_RANK"`
 }
 
 
@@ -87,45 +87,46 @@ func GetTeamYearByYearStats(ctx context.Context, client *stats.Client, req TeamY
 
 	response := &TeamYearByYearStatsResponse{}
 	if len(rawResp.ResultSets) > 0 {
-		response.TeamStats = make([]TeamYearByYearStatsTeamStats, len(rawResp.ResultSets[0].RowSet))
-		for i, row := range rawResp.ResultSets[0].RowSet {
+		response.TeamStats = make([]TeamYearByYearStatsTeamStats, 0, len(rawResp.ResultSets[0].RowSet))
+		for _, row := range rawResp.ResultSets[0].RowSet {
 			if len(row) >= 34 {
-				response.TeamStats[i] = TeamYearByYearStatsTeamStats{
-					TEAM_ID: row[0],
-					TEAM_CITY: row[1],
-					TEAM_NAME: row[2],
-					YEAR: row[3],
-					GP: row[4],
-					WINS: row[5],
-					LOSSES: row[6],
-					WIN_PCT: row[7],
-					CONF_RANK: row[8],
-					DIV_RANK: row[9],
-					PO_WINS: row[10],
-					PO_LOSSES: row[11],
-					CONF_COUNT: row[12],
-					DIV_COUNT: row[13],
-					NBA_FINALS_APPEARANCE: row[14],
-					FGM: row[15],
-					FGA: row[16],
-					FG_PCT: row[17],
-					FG3M: row[18],
-					FG3A: row[19],
-					FG3_PCT: row[20],
-					FTM: row[21],
-					FTA: row[22],
-					FT_PCT: row[23],
-					OREB: row[24],
-					DREB: row[25],
-					REB: row[26],
-					AST: row[27],
-					PF: row[28],
-					STL: row[29],
-					TOV: row[30],
-					BLK: row[31],
-					PTS: row[32],
-					PTS_RANK: row[33],
+				item := TeamYearByYearStatsTeamStats{
+					TEAM_ID:               toInt(row[0]),
+					TEAM_CITY:             toString(row[1]),
+					TEAM_NAME:             toString(row[2]),
+					YEAR:                  toString(row[3]),
+					GP:                    toInt(row[4]),
+					WINS:                  toInt(row[5]),
+					LOSSES:                toInt(row[6]),
+					WIN_PCT:               toFloat(row[7]),
+					CONF_RANK:             toInt(row[8]),
+					DIV_RANK:              toInt(row[9]),
+					PO_WINS:               toInt(row[10]),
+					PO_LOSSES:             toInt(row[11]),
+					CONF_COUNT:            toInt(row[12]),
+					DIV_COUNT:             toInt(row[13]),
+					NBA_FINALS_APPEARANCE: toString(row[14]),
+					FGM:                   toInt(row[15]),
+					FGA:                   toInt(row[16]),
+					FG_PCT:                toFloat(row[17]),
+					FG3M:                  toInt(row[18]),
+					FG3A:                  toInt(row[19]),
+					FG3_PCT:               toFloat(row[20]),
+					FTM:                   toInt(row[21]),
+					FTA:                   toInt(row[22]),
+					FT_PCT:                toFloat(row[23]),
+					OREB:                  toInt(row[24]),
+					DREB:                  toInt(row[25]),
+					REB:                   toInt(row[26]),
+					AST:                   toInt(row[27]),
+					PF:                    toInt(row[28]),
+					STL:                   toInt(row[29]),
+					TOV:                   toInt(row[30]),
+					BLK:                   toInt(row[31]),
+					PTS:                   toInt(row[32]),
+					PTS_RANK:              toInt(row[33]),
 				}
+				response.TeamStats = append(response.TeamStats, item)
 			}
 		}
 	}

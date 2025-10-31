@@ -20,33 +20,33 @@ type TeamInfoCommonRequest struct {
 
 // TeamInfoCommonTeamInfoCommon represents the TeamInfoCommon result set for TeamInfoCommon
 type TeamInfoCommonTeamInfoCommon struct {
-	TEAM_ID interface{}
-	SEASON_YEAR interface{}
-	TEAM_CITY interface{}
-	TEAM_NAME interface{}
-	TEAM_ABBREVIATION interface{}
-	TEAM_CONFERENCE interface{}
-	TEAM_DIVISION interface{}
-	W interface{}
-	L interface{}
-	PCT interface{}
-	MIN_YEAR interface{}
-	MAX_YEAR interface{}
+	TEAM_ID           int     `json:"TEAM_ID"`
+	SEASON_YEAR       string  `json:"SEASON_YEAR"`
+	TEAM_CITY         string  `json:"TEAM_CITY"`
+	TEAM_NAME         string  `json:"TEAM_NAME"`
+	TEAM_ABBREVIATION string  `json:"TEAM_ABBREVIATION"`
+	TEAM_CONFERENCE   string  `json:"TEAM_CONFERENCE"`
+	TEAM_DIVISION     string  `json:"TEAM_DIVISION"`
+	W                 int     `json:"W"`
+	L                 int     `json:"L"`
+	PCT               float64 `json:"PCT"`
+	MIN_YEAR          string  `json:"MIN_YEAR"`
+	MAX_YEAR          string  `json:"MAX_YEAR"`
 }
 
 // TeamInfoCommonTeamSeasonRanks represents the TeamSeasonRanks result set for TeamInfoCommon
 type TeamInfoCommonTeamSeasonRanks struct {
-	LEAGUE_ID interface{}
-	SEASON_ID interface{}
-	TEAM_ID interface{}
-	PTS_RANK interface{}
-	PTS_PG interface{}
-	REB_RANK interface{}
-	REB_PG interface{}
-	AST_RANK interface{}
-	AST_PG interface{}
-	OPP_PTS_RANK interface{}
-	OPP_PTS_PG interface{}
+	LEAGUE_ID    string  `json:"LEAGUE_ID"`
+	SEASON_ID    string  `json:"SEASON_ID"`
+	TEAM_ID      int     `json:"TEAM_ID"`
+	PTS_RANK     int     `json:"PTS_RANK"`
+	PTS_PG       float64 `json:"PTS_PG"`
+	REB_RANK     int     `json:"REB_RANK"`
+	REB_PG       float64 `json:"REB_PG"`
+	AST_RANK     int     `json:"AST_RANK"`
+	AST_PG       float64 `json:"AST_PG"`
+	OPP_PTS_RANK int     `json:"OPP_PTS_RANK"`
+	OPP_PTS_PG   float64 `json:"OPP_PTS_PG"`
 }
 
 
@@ -77,43 +77,45 @@ func GetTeamInfoCommon(ctx context.Context, client *stats.Client, req TeamInfoCo
 
 	response := &TeamInfoCommonResponse{}
 	if len(rawResp.ResultSets) > 0 {
-		response.TeamInfoCommon = make([]TeamInfoCommonTeamInfoCommon, len(rawResp.ResultSets[0].RowSet))
-		for i, row := range rawResp.ResultSets[0].RowSet {
+		response.TeamInfoCommon = make([]TeamInfoCommonTeamInfoCommon, 0, len(rawResp.ResultSets[0].RowSet))
+		for _, row := range rawResp.ResultSets[0].RowSet {
 			if len(row) >= 12 {
-				response.TeamInfoCommon[i] = TeamInfoCommonTeamInfoCommon{
-					TEAM_ID: row[0],
-					SEASON_YEAR: row[1],
-					TEAM_CITY: row[2],
-					TEAM_NAME: row[3],
-					TEAM_ABBREVIATION: row[4],
-					TEAM_CONFERENCE: row[5],
-					TEAM_DIVISION: row[6],
-					W: row[7],
-					L: row[8],
-					PCT: row[9],
-					MIN_YEAR: row[10],
-					MAX_YEAR: row[11],
+				item := TeamInfoCommonTeamInfoCommon{
+					TEAM_ID:           toInt(row[0]),
+					SEASON_YEAR:       toString(row[1]),
+					TEAM_CITY:         toString(row[2]),
+					TEAM_NAME:         toString(row[3]),
+					TEAM_ABBREVIATION: toString(row[4]),
+					TEAM_CONFERENCE:   toString(row[5]),
+					TEAM_DIVISION:     toString(row[6]),
+					W:                 toInt(row[7]),
+					L:                 toInt(row[8]),
+					PCT:               toFloat(row[9]),
+					MIN_YEAR:          toString(row[10]),
+					MAX_YEAR:          toString(row[11]),
 				}
+				response.TeamInfoCommon = append(response.TeamInfoCommon, item)
 			}
 		}
 	}
 	if len(rawResp.ResultSets) > 1 {
-		response.TeamSeasonRanks = make([]TeamInfoCommonTeamSeasonRanks, len(rawResp.ResultSets[1].RowSet))
-		for i, row := range rawResp.ResultSets[1].RowSet {
+		response.TeamSeasonRanks = make([]TeamInfoCommonTeamSeasonRanks, 0, len(rawResp.ResultSets[1].RowSet))
+		for _, row := range rawResp.ResultSets[1].RowSet {
 			if len(row) >= 11 {
-				response.TeamSeasonRanks[i] = TeamInfoCommonTeamSeasonRanks{
-					LEAGUE_ID: row[0],
-					SEASON_ID: row[1],
-					TEAM_ID: row[2],
-					PTS_RANK: row[3],
-					PTS_PG: row[4],
-					REB_RANK: row[5],
-					REB_PG: row[6],
-					AST_RANK: row[7],
-					AST_PG: row[8],
-					OPP_PTS_RANK: row[9],
-					OPP_PTS_PG: row[10],
+				item := TeamInfoCommonTeamSeasonRanks{
+					LEAGUE_ID:    toString(row[0]),
+					SEASON_ID:    toString(row[1]),
+					TEAM_ID:      toInt(row[2]),
+					PTS_RANK:     toInt(row[3]),
+					PTS_PG:       toFloat(row[4]),
+					REB_RANK:     toInt(row[5]),
+					REB_PG:       toFloat(row[6]),
+					AST_RANK:     toInt(row[7]),
+					AST_PG:       toFloat(row[8]),
+					OPP_PTS_RANK: toInt(row[9]),
+					OPP_PTS_PG:   toFloat(row[10]),
 				}
+				response.TeamSeasonRanks = append(response.TeamSeasonRanks, item)
 			}
 		}
 	}

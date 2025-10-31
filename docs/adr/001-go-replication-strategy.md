@@ -255,18 +255,39 @@ func (p PerMode) Validate() error {
 
 #### Phase 4: Remaining Stats Endpoints (Week 6-8) 🔄 IN PROGRESS
 - [x] Code generation tooling (completed)
-- [x] PlayerGameLog endpoint (completed)
-- [x] CommonPlayerInfo endpoint (completed)
-- [x] LeagueLeaders endpoint (completed)
-- [x] TeamGameLog endpoint (completed)
-- [x] TeamInfoCommon endpoint (completed)
-- [x] BoxScoreSummaryV2 endpoint (completed)
-- [x] ShotChartDetail endpoint (completed)
-- [x] TeamYearByYearStats endpoint (completed)
-- [x] PlayerDashboardByGeneralSplits endpoint (completed)
-- [x] TeamDashboardByGeneralSplits endpoint (completed)
-- [x] PlayByPlayV2 endpoint (completed)
-- [ ] Generate remaining 127 endpoints
+- [x] **Type inference system** (completed - MAJOR IMPROVEMENT)
+  - Automatically infers Go types (int, float64, string) from field names
+  - Generates proper JSON tags for all fields
+  - Eliminates interface{} in generated code
+  - See [Type Inference Documentation](../TYPE_INFERENCE_IMPROVEMENT.md)
+- [x] 23 Stats endpoints implemented (16.5% complete):
+  - [x] PlayerCareerStats
+  - [x] PlayerGameLog
+  - [x] CommonPlayerInfo
+  - [x] LeagueLeaders
+  - [x] TeamGameLog
+  - [x] TeamInfoCommon
+  - [x] BoxScoreSummaryV2
+  - [x] ShotChartDetail
+  - [x] TeamYearByYearStats
+  - [x] PlayerDashboardByGeneralSplits
+  - [x] TeamDashboardByGeneralSplits
+  - [x] PlayByPlayV2
+  - [x] BoxScoreTraditionalV2
+  - [x] LeagueGameFinder
+  - [x] TeamGameLogs
+  - [x] **CommonAllPlayers** (NEW - Oct 31, 2025)
+  - [x] **CommonTeamRoster** (NEW - Oct 31, 2025)
+  - [x] **LeagueDashPlayerStats** (NEW - Oct 31, 2025)
+  - [x] **LeagueDashTeamStats** (NEW - Oct 31, 2025)
+  - [x] **ScoreboardV2** (NEW - Oct 31, 2025)
+  - [x] **PlayerProfileV2** (NEW - Oct 31, 2025)
+  - [x] **LeagueStandings** (NEW - Oct 31, 2025)
+  - [x] **BoxScoreAdvancedV2** (NEW - Oct 31, 2025)
+- [ ] Generate remaining 116 endpoints (23/139 = 16.5% complete)
+  - Generator produces production-quality type-safe code
+  - Successfully batch-generated 8 high-priority endpoints
+  - See [Endpoint Generation Summary](../../ENDPOINT_GENERATION_SUMMARY.md)
 - [x] Integration test framework (completed)
 - [x] Benchmark tests (completed)
 - [ ] Documentation (in progress)

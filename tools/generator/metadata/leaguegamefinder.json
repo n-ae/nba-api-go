@@ -1,0 +1,116 @@
+[
+  {
+    "name": "LeagueGameFinder",
+    "endpoint": "leaguegamefinder",
+    "parameters": [
+      {
+        "name": "LeagueID",
+        "type": "LeagueID",
+        "required": false,
+        "default": "00"
+      },
+      {
+        "name": "Season",
+        "type": "Season",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "SeasonType",
+        "type": "SeasonType",
+        "required": false,
+        "default": "Regular Season"
+      },
+      {
+        "name": "PlayerOrTeam",
+        "type": "string",
+        "required": false,
+        "default": "T"
+      },
+      {
+        "name": "PlayerID",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "TeamID",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "VsTeamID",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "Outcome",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "Location",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "DateFrom",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "DateTo",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "VsConference",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "VsDivision",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "GameSegment",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "Period",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "LastNGames",
+        "type": "string",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "PORound",
+        "type": "string",
+        "required": false,
+        "default": ""
+      }
+    ],
+    "result_sets": [
+      {
+        "name": "LeagueGameFinderResults",
+        "fields": ["SEASON_ID", "TEAM_ID", "TEAM_ABBREVIATION", "TEAM_NAME", "GAME_ID", "GAME_DATE", "MATCHUP", "WL", "MIN", "FGM", "FGA", "FG_PCT", "FG3M", "FG3A", "FG3_PCT", "FTM", "FTA", "FT_PCT", "OREB", "DREB", "REB", "AST", "STL", "BLK", "TOV", "PF", "PTS", "PLUS_MINUS"]
+      }
+    ]
+  }
+]

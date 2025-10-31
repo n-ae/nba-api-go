@@ -1,0 +1,57 @@
+[
+  {
+    "name": "BoxScoreTraditionalV2",
+    "endpoint": "boxscoretraditionalv2",
+    "parameters": [
+      {
+        "name": "GameID",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "StartPeriod",
+        "type": "string",
+        "required": false,
+        "default": "0"
+      },
+      {
+        "name": "EndPeriod",
+        "type": "string",
+        "required": false,
+        "default": "10"
+      },
+      {
+        "name": "StartRange",
+        "type": "string",
+        "required": false,
+        "default": "0"
+      },
+      {
+        "name": "EndRange",
+        "type": "string",
+        "required": false,
+        "default": "0"
+      },
+      {
+        "name": "RangeType",
+        "type": "string",
+        "required": false,
+        "default": "0"
+      }
+    ],
+    "result_sets": [
+      {
+        "name": "PlayerStats",
+        "fields": ["GAME_ID", "TEAM_ID", "TEAM_ABBREVIATION", "TEAM_CITY", "PLAYER_ID", "PLAYER_NAME", "NICKNAME", "START_POSITION", "COMMENT", "MIN", "FGM", "FGA", "FG_PCT", "FG3M", "FG3A", "FG3_PCT", "FTM", "FTA", "FT_PCT", "OREB", "DREB", "REB", "AST", "STL", "BLK", "TO", "PF", "PTS", "PLUS_MINUS"]
+      },
+      {
+        "name": "TeamStats",
+        "fields": ["GAME_ID", "TEAM_ID", "TEAM_NAME", "TEAM_ABBREVIATION", "TEAM_CITY", "MIN", "FGM", "FGA", "FG_PCT", "FG3M", "FG3A", "FG3_PCT", "FTM", "FTA", "FT_PCT", "OREB", "DREB", "REB", "AST", "STL", "BLK", "TO", "PF", "PTS", "PLUS_MINUS"]
+      },
+      {
+        "name": "TeamStarterBenchStats",
+        "fields": ["GAME_ID", "TEAM_ID", "TEAM_NAME", "TEAM_ABBREVIATION", "TEAM_CITY", "STARTERS_BENCH", "MIN", "FGM", "FGA", "FG_PCT", "FG3M", "FG3A", "FG3_PCT", "FTM", "FTA", "FT_PCT", "OREB", "DREB", "REB", "AST", "STL", "BLK", "TO", "PF", "PTS", "PLUS_MINUS"]
+      }
+    ]
+  }
+]
