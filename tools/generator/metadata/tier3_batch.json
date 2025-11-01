@@ -1,0 +1,748 @@
+[
+  {
+    "name": "SynergyPlayTypes",
+    "endpoint": "synergyplaytypes",
+    "parameters": [
+      {
+        "name": "Season",
+        "type": "Season",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "SeasonType",
+        "type": "SeasonType",
+        "required": false,
+        "default": "Regular Season"
+      },
+      {
+        "name": "PerMode",
+        "type": "PerMode",
+        "required": false,
+        "default": "PerGame"
+      },
+      {
+        "name": "LeagueID",
+        "type": "LeagueID",
+        "required": false,
+        "default": "00"
+      },
+      {
+        "name": "PlayerOrTeam",
+        "type": "string",
+        "required": false,
+        "default": "P"
+      },
+      {
+        "name": "PlayType",
+        "type": "string",
+        "required": false,
+        "default": "Isolation"
+      }
+    ],
+    "result_sets": [
+      {
+        "name": "SynergyPlayType",
+        "fields": [
+          "PLAYER_ID",
+          "PLAYER_NAME",
+          "TEAM_ID",
+          "TEAM_ABBREVIATION",
+          "PLAY_TYPE",
+          "TYPE_GROUPING",
+          "PERCENTILE",
+          "GP",
+          "POSS",
+          "TIME",
+          "PTS",
+          "FGM",
+          "FGA",
+          "FG_PCT",
+          "AEFG_PCT",
+          "FT_PCT",
+          "TOV",
+          "SF",
+          "PLUSONE",
+          "SCORE",
+          "EFG_PCT",
+          "PPP",
+          "POSS_PCT"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "FranchiseHistory",
+    "endpoint": "franchisehistory",
+    "parameters": [
+      {
+        "name": "LeagueID",
+        "type": "LeagueID",
+        "required": false,
+        "default": "00"
+      }
+    ],
+    "result_sets": [
+      {
+        "name": "FranchiseHistory",
+        "fields": [
+          "LEAGUE_ID",
+          "TEAM_ID",
+          "TEAM_CITY",
+          "TEAM_NAME",
+          "START_YEAR",
+          "END_YEAR",
+          "YEARS",
+          "GAMES",
+          "WINS",
+          "LOSSES",
+          "WIN_PCT",
+          "PO_APPEARANCES",
+          "DIV_TITLES",
+          "CONF_TITLES",
+          "LEAGUE_TITLES"
+        ]
+      },
+      {
+        "name": "DefunctTeams",
+        "fields": [
+          "LEAGUE_ID",
+          "TEAM_ID",
+          "TEAM_CITY",
+          "TEAM_NAME",
+          "START_YEAR",
+          "END_YEAR",
+          "YEARS",
+          "GAMES",
+          "WINS",
+          "LOSSES",
+          "WIN_PCT",
+          "PO_APPEARANCES",
+          "DIV_TITLES",
+          "CONF_TITLES",
+          "LEAGUE_TITLES"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "FranchiseLeaders",
+    "endpoint": "franchiseleaders",
+    "parameters": [
+      {
+        "name": "TeamID",
+        "type": "int",
+        "required": true,
+        "default": ""
+      },
+      {
+        "name": "LeagueID",
+        "type": "LeagueID",
+        "required": false,
+        "default": "00"
+      }
+    ],
+    "result_sets": [
+      {
+        "name": "FranchiseLeaders",
+        "fields": [
+          "TEAM_ID",
+          "PTS",
+          "PTS_PERSON_ID",
+          "PTS_PLAYER",
+          "AST",
+          "AST_PERSON_ID",
+          "AST_PLAYER",
+          "REB",
+          "REB_PERSON_ID",
+          "REB_PLAYER",
+          "BLK",
+          "BLK_PERSON_ID",
+          "BLK_PLAYER",
+          "STL",
+          "STL_PERSON_ID",
+          "STL_PLAYER"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "TeamHistoricalLeaders",
+    "endpoint": "teamhistoricalleaders",
+    "parameters": [
+      {
+        "name": "TeamID",
+        "type": "int",
+        "required": true,
+        "default": ""
+      },
+      {
+        "name": "LeagueID",
+        "type": "LeagueID",
+        "required": false,
+        "default": "00"
+      }
+    ],
+    "result_sets": [
+      {
+        "name": "CareerLeadersPTS",
+        "fields": [
+          "TEAM_ID",
+          "PLAYER_ID",
+          "PLAYER",
+          "PTS",
+          "PTS_RANK"
+        ]
+      },
+      {
+        "name": "CareerLeadersAST",
+        "fields": [
+          "TEAM_ID",
+          "PLAYER_ID",
+          "PLAYER",
+          "AST",
+          "AST_RANK"
+        ]
+      },
+      {
+        "name": "CareerLeadersREB",
+        "fields": [
+          "TEAM_ID",
+          "PLAYER_ID",
+          "PLAYER",
+          "REB",
+          "REB_RANK"
+        ]
+      },
+      {
+        "name": "CareerLeadersBLK",
+        "fields": [
+          "TEAM_ID",
+          "PLAYER_ID",
+          "PLAYER",
+          "BLK",
+          "BLK_RANK"
+        ]
+      },
+      {
+        "name": "CareerLeadersSTL",
+        "fields": [
+          "TEAM_ID",
+          "PLAYER_ID",
+          "PLAYER",
+          "STL",
+          "STL_RANK"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "AllTimeLeadersGrids",
+    "endpoint": "alltimeleadersgrids",
+    "parameters": [
+      {
+        "name": "LeagueID",
+        "type": "LeagueID",
+        "required": false,
+        "default": "00"
+      },
+      {
+        "name": "PerMode",
+        "type": "PerMode",
+        "required": false,
+        "default": "Totals"
+      },
+      {
+        "name": "SeasonType",
+        "type": "SeasonType",
+        "required": false,
+        "default": "Regular Season"
+      },
+      {
+        "name": "TopX",
+        "type": "int",
+        "required": false,
+        "default": "10"
+      }
+    ],
+    "result_sets": [
+      {
+        "name": "AllTimeLeadersPTS",
+        "fields": [
+          "PLAYER_ID",
+          "PLAYER_NAME",
+          "PTS",
+          "PTS_RANK"
+        ]
+      },
+      {
+        "name": "AllTimeLeadersAST",
+        "fields": [
+          "PLAYER_ID",
+          "PLAYER_NAME",
+          "AST",
+          "AST_RANK"
+        ]
+      },
+      {
+        "name": "AllTimeLeadersREB",
+        "fields": [
+          "PLAYER_ID",
+          "PLAYER_NAME",
+          "REB",
+          "REB_RANK"
+        ]
+      },
+      {
+        "name": "AllTimeLeadersBLK",
+        "fields": [
+          "PLAYER_ID",
+          "PLAYER_NAME",
+          "BLK",
+          "BLK_RANK"
+        ]
+      },
+      {
+        "name": "AllTimeLeadersSTL",
+        "fields": [
+          "PLAYER_ID",
+          "PLAYER_NAME",
+          "STL",
+          "STL_RANK"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "PlayerCompare",
+    "endpoint": "playercompare",
+    "parameters": [
+      {
+        "name": "PlayerIDList",
+        "type": "string",
+        "required": true,
+        "default": ""
+      },
+      {
+        "name": "Season",
+        "type": "Season",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "SeasonType",
+        "type": "SeasonType",
+        "required": false,
+        "default": "Regular Season"
+      },
+      {
+        "name": "PerMode",
+        "type": "PerMode",
+        "required": false,
+        "default": "PerGame"
+      },
+      {
+        "name": "LeagueID",
+        "type": "LeagueID",
+        "required": false,
+        "default": "00"
+      }
+    ],
+    "result_sets": [
+      {
+        "name": "OverallCompare",
+        "fields": [
+          "PLAYER_ID",
+          "PLAYER_NAME",
+          "GP",
+          "W",
+          "L",
+          "W_PCT",
+          "MIN",
+          "FGM",
+          "FGA",
+          "FG_PCT",
+          "FG3M",
+          "FG3A",
+          "FG3_PCT",
+          "FTM",
+          "FTA",
+          "FT_PCT",
+          "OREB",
+          "DREB",
+          "REB",
+          "AST",
+          "TOV",
+          "STL",
+          "BLK",
+          "BLKA",
+          "PF",
+          "PFD",
+          "PTS",
+          "PLUS_MINUS"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "TeamDashPtShots",
+    "endpoint": "teamdashptshots",
+    "parameters": [
+      {
+        "name": "TeamID",
+        "type": "int",
+        "required": true,
+        "default": ""
+      },
+      {
+        "name": "Season",
+        "type": "Season",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "SeasonType",
+        "type": "SeasonType",
+        "required": false,
+        "default": "Regular Season"
+      },
+      {
+        "name": "PerMode",
+        "type": "PerMode",
+        "required": false,
+        "default": "PerGame"
+      },
+      {
+        "name": "LeagueID",
+        "type": "LeagueID",
+        "required": false,
+        "default": "00"
+      }
+    ],
+    "result_sets": [
+      {
+        "name": "OverallShooting",
+        "fields": [
+          "TEAM_ID",
+          "TEAM_NAME",
+          "SORT_ORDER",
+          "GP",
+          "G",
+          "FGA_FREQUENCY",
+          "FGM",
+          "FGA",
+          "FG_PCT",
+          "EFG_PCT",
+          "FG2A_FREQUENCY",
+          "FG2M",
+          "FG2A",
+          "FG2_PCT",
+          "FG3A_FREQUENCY",
+          "FG3M",
+          "FG3A",
+          "FG3_PCT"
+        ]
+      },
+      {
+        "name": "GeneralShooting",
+        "fields": [
+          "TEAM_ID",
+          "TEAM_NAME",
+          "SHOT_TYPE",
+          "FGA_FREQUENCY",
+          "FGM",
+          "FGA",
+          "FG_PCT",
+          "EFG_PCT",
+          "FG2A_FREQUENCY",
+          "FG2M",
+          "FG2A",
+          "FG2_PCT",
+          "FG3A_FREQUENCY",
+          "FG3M",
+          "FG3A",
+          "FG3_PCT"
+        ]
+      },
+      {
+        "name": "ShotClockShooting",
+        "fields": [
+          "TEAM_ID",
+          "TEAM_NAME",
+          "SHOT_CLOCK_RANGE",
+          "FGA_FREQUENCY",
+          "FGM",
+          "FGA",
+          "FG_PCT",
+          "EFG_PCT",
+          "FG2A_FREQUENCY",
+          "FG2M",
+          "FG2A",
+          "FG2_PCT",
+          "FG3A_FREQUENCY",
+          "FG3M",
+          "FG3A",
+          "FG3_PCT"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "TeamDashboardByClutch",
+    "endpoint": "teamdashboardbyclutch",
+    "parameters": [
+      {
+        "name": "TeamID",
+        "type": "int",
+        "required": true,
+        "default": ""
+      },
+      {
+        "name": "MeasureType",
+        "type": "string",
+        "required": false,
+        "default": "Base"
+      },
+      {
+        "name": "PerMode",
+        "type": "PerMode",
+        "required": false,
+        "default": "PerGame"
+      },
+      {
+        "name": "PlusMinus",
+        "type": "string",
+        "required": false,
+        "default": "N"
+      },
+      {
+        "name": "PaceAdjust",
+        "type": "string",
+        "required": false,
+        "default": "N"
+      },
+      {
+        "name": "Rank",
+        "type": "string",
+        "required": false,
+        "default": "N"
+      },
+      {
+        "name": "Season",
+        "type": "Season",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "SeasonType",
+        "type": "SeasonType",
+        "required": false,
+        "default": "Regular Season"
+      },
+      {
+        "name": "LeagueID",
+        "type": "LeagueID",
+        "required": false,
+        "default": "00"
+      }
+    ],
+    "result_sets": [
+      {
+        "name": "OverallTeamDashboard",
+        "fields": [
+          "TEAM_ID",
+          "TEAM_NAME",
+          "GP",
+          "W",
+          "L",
+          "W_PCT",
+          "MIN",
+          "FGM",
+          "FGA",
+          "FG_PCT",
+          "FG3M",
+          "FG3A",
+          "FG3_PCT",
+          "FTM",
+          "FTA",
+          "FT_PCT",
+          "OREB",
+          "DREB",
+          "REB",
+          "AST",
+          "TOV",
+          "STL",
+          "BLK",
+          "BLKA",
+          "PF",
+          "PFD",
+          "PTS",
+          "PLUS_MINUS"
+        ]
+      },
+      {
+        "name": "Last5MinCloseGame5PointTeamDashboard",
+        "fields": [
+          "TEAM_ID",
+          "TEAM_NAME",
+          "CLUTCH_TIME",
+          "GP",
+          "W",
+          "L",
+          "W_PCT",
+          "MIN",
+          "FGM",
+          "FGA",
+          "FG_PCT",
+          "FG3M",
+          "FG3A",
+          "FG3_PCT",
+          "FTM",
+          "FTA",
+          "FT_PCT",
+          "OREB",
+          "DREB",
+          "REB",
+          "AST",
+          "TOV",
+          "STL",
+          "BLK",
+          "BLKA",
+          "PF",
+          "PFD",
+          "PTS",
+          "PLUS_MINUS"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "PlayerDashboardByClutch",
+    "endpoint": "playerdashboardbyclutch",
+    "parameters": [
+      {
+        "name": "PlayerID",
+        "type": "int",
+        "required": true,
+        "default": ""
+      },
+      {
+        "name": "MeasureType",
+        "type": "string",
+        "required": false,
+        "default": "Base"
+      },
+      {
+        "name": "PerMode",
+        "type": "PerMode",
+        "required": false,
+        "default": "PerGame"
+      },
+      {
+        "name": "PlusMinus",
+        "type": "string",
+        "required": false,
+        "default": "N"
+      },
+      {
+        "name": "PaceAdjust",
+        "type": "string",
+        "required": false,
+        "default": "N"
+      },
+      {
+        "name": "Rank",
+        "type": "string",
+        "required": false,
+        "default": "N"
+      },
+      {
+        "name": "Season",
+        "type": "Season",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "SeasonType",
+        "type": "SeasonType",
+        "required": false,
+        "default": "Regular Season"
+      },
+      {
+        "name": "LeagueID",
+        "type": "LeagueID",
+        "required": false,
+        "default": "00"
+      }
+    ],
+    "result_sets": [
+      {
+        "name": "OverallPlayerDashboard",
+        "fields": [
+          "PLAYER_ID",
+          "PLAYER_NAME",
+          "GP",
+          "W",
+          "L",
+          "W_PCT",
+          "MIN",
+          "FGM",
+          "FGA",
+          "FG_PCT",
+          "FG3M",
+          "FG3A",
+          "FG3_PCT",
+          "FTM",
+          "FTA",
+          "FT_PCT",
+          "OREB",
+          "DREB",
+          "REB",
+          "AST",
+          "TOV",
+          "STL",
+          "BLK",
+          "BLKA",
+          "PF",
+          "PFD",
+          "PTS",
+          "PLUS_MINUS"
+        ]
+      },
+      {
+        "name": "Last5MinCloseGame5PointPlayerDashboard",
+        "fields": [
+          "PLAYER_ID",
+          "PLAYER_NAME",
+          "CLUTCH_TIME",
+          "GP",
+          "W",
+          "L",
+          "W_PCT",
+          "MIN",
+          "FGM",
+          "FGA",
+          "FG_PCT",
+          "FG3M",
+          "FG3A",
+          "FG3_PCT",
+          "FTM",
+          "FTA",
+          "FT_PCT",
+          "OREB",
+          "DREB",
+          "REB",
+          "AST",
+          "TOV",
+          "STL",
+          "BLK",
+          "BLKA",
+          "PF",
+          "PFD",
+          "PTS",
+          "PLUS_MINUS"
+        ]
+      }
+    ]
+  }
+]
