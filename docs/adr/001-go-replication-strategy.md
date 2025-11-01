@@ -260,7 +260,7 @@ func (p PerMode) Validate() error {
   - Generates proper JSON tags for all fields
   - Eliminates interface{} in generated code
   - See [Type Inference Documentation](../TYPE_INFERENCE_IMPROVEMENT.md)
-- [x] 33 Stats endpoints implemented (23.7% complete):
+- [x] 44 Stats endpoints implemented (31.7% complete):
   - [x] PlayerCareerStats
   - [x] PlayerGameLog
   - [x] CommonPlayerInfo
@@ -276,13 +276,16 @@ func (p PerMode) Validate() error {
   - [x] BoxScoreTraditionalV2
   - [x] LeagueGameFinder
   - [x] TeamGameLogs
-  - [x] **Batch 1 (Oct 31, 2025):** CommonAllPlayers, CommonTeamRoster, LeagueDashPlayerStats, LeagueDashTeamStats, ScoreboardV2, PlayerProfileV2, LeagueStandings, BoxScoreAdvancedV2 (8 endpoints)
-  - [x] **Batch 2 (Nov 1, 2025):** LeagueGameLog, PlayerAwards, PlayoffPicture, TeamDashboardByYearOverYear, PlayerDashboardByYearOverYear, PlayerVsPlayer, TeamVsPlayer, DraftCombineStats, LeagueDashPtStats, LeagueDashLineups (10 endpoints)
-- [ ] Generate remaining 106 endpoints (33/139 = 23.7% complete)
+  - [x] **Batch 1 (Oct 31):** CommonAllPlayers, CommonTeamRoster, LeagueDashPlayerStats, LeagueDashTeamStats, ScoreboardV2, PlayerProfileV2, LeagueStandings, BoxScoreAdvancedV2 (8 endpoints, +5.7%)
+  - [x] **Batch 2 (Nov 1 AM):** LeagueGameLog, PlayerAwards, PlayoffPicture, TeamDashboardByYearOverYear, PlayerDashboardByYearOverYear, PlayerVsPlayer, TeamVsPlayer, DraftCombineStats, LeagueDashPtStats, LeagueDashLineups (10 endpoints, +7.2%)
+  - [x] **Batch 3 (Nov 1 PM):** PlayerDashPtShots, LeagueDashPlayerPtShot, PlayerDashboardByShootingSplits, TeamDashboardByShootingSplits, BoxScoreMatchupsV3, LeagueDashPtDefend, LeagueHustleStatsPlayer, LeagueHustleStatsTeam, PlayerEstimatedMetrics, LeagueDashPlayerClutch, LeagueDashTeamClutch (11 endpoints, +8.0%)
+- [ ] Generate remaining 95 endpoints (44/139 = 31.7% complete)
   - Generator produces production-quality type-safe code
-  - Successfully batch-generated 18 endpoints across 2 sessions
+  - Successfully batch-generated 29 endpoints across 3 sessions in one day
+  - Increased coverage from 16.5% to 31.7% (+15.2%)
   - See [Batch 1 Summary](../../ENDPOINT_GENERATION_SUMMARY.md)
   - See [Batch 2 Summary](../../TIER1_BATCH_SUMMARY.md)
+  - See [Batch 3 Summary](../../TIER2_BATCH_SUMMARY.md)
 - [x] Integration test framework (completed)
 - [x] Benchmark tests (completed)
 - [ ] Documentation (in progress)
