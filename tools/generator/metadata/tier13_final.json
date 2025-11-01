@@ -1,0 +1,65 @@
+[
+  {
+    "name": "LeagueDashPlayerShotLocationV2",
+    "endpoint": "leaguedashplayershotlocationv2",
+    "parameters": [
+      {
+        "name": "Season",
+        "type": "Season",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "SeasonType",
+        "type": "SeasonType",
+        "required": false,
+        "default": "Regular Season"
+      },
+      {
+        "name": "PerMode",
+        "type": "PerMode",
+        "required": false,
+        "default": "PerGame"
+      },
+      {
+        "name": "DistanceRange",
+        "type": "string",
+        "required": false,
+        "default": "5ft Range"
+      },
+      {
+        "name": "LeagueID",
+        "type": "LeagueID",
+        "required": false,
+        "default": "00"
+      }
+    ],
+    "result_sets": [
+      {
+        "name": "ShotLocationLeague",
+        "fields": [
+          "PLAYER_ID",
+          "PLAYER_NAME",
+          "TEAM_ID",
+          "TEAM_ABBREVIATION",
+          "AGE",
+          "GP",
+          "G",
+          "FGA_FREQUENCY",
+          "FGM",
+          "FGA",
+          "FG_PCT",
+          "EFG_PCT",
+          "FG2A_FREQUENCY",
+          "FG2M",
+          "FG2A",
+          "FG2_PCT",
+          "FG3A_FREQUENCY",
+          "FG3M",
+          "FG3A",
+          "FG3_PCT"
+        ]
+      }
+    ]
+  }
+]
