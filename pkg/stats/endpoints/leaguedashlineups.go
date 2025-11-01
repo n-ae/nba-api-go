@@ -13,10 +13,10 @@ import (
 type LeagueDashLineupsRequest struct {
 	Season        *parameters.Season
 	SeasonType    *parameters.SeasonType
-	PerMode       *parameters.PerMode
-	LeagueID      *parameters.LeagueID
 	MeasureType   *string
+	PerMode       *parameters.PerMode
 	GroupQuantity *string
+	LeagueID      *parameters.LeagueID
 }
 
 // LeagueDashLineupsLineups represents the Lineups result set for LeagueDashLineups
@@ -51,6 +51,9 @@ type LeagueDashLineupsLineups struct {
 	PFD               float64 `json:"PFD"`
 	PTS               float64 `json:"PTS"`
 	PLUS_MINUS        float64 `json:"PLUS_MINUS"`
+	OFF_RATING        string  `json:"OFF_RATING"`
+	DEF_RATING        string  `json:"DEF_RATING"`
+	NET_RATING        string  `json:"NET_RATING"`
 }
 
 // LeagueDashLineupsResponse contains the response data from the LeagueDashLineups endpoint
@@ -67,17 +70,17 @@ func GetLeagueDashLineups(ctx context.Context, client *stats.Client, req LeagueD
 	if req.SeasonType != nil {
 		params.Set("SeasonType", string(*req.SeasonType))
 	}
-	if req.PerMode != nil {
-		params.Set("PerMode", string(*req.PerMode))
-	}
-	if req.LeagueID != nil {
-		params.Set("LeagueID", string(*req.LeagueID))
-	}
 	if req.MeasureType != nil {
 		params.Set("MeasureType", string(*req.MeasureType))
 	}
+	if req.PerMode != nil {
+		params.Set("PerMode", string(*req.PerMode))
+	}
 	if req.GroupQuantity != nil {
 		params.Set("GroupQuantity", string(*req.GroupQuantity))
+	}
+	if req.LeagueID != nil {
+		params.Set("LeagueID", string(*req.LeagueID))
 	}
 
 	var rawResp rawStatsResponse
@@ -89,7 +92,7 @@ func GetLeagueDashLineups(ctx context.Context, client *stats.Client, req LeagueD
 	if len(rawResp.ResultSets) > 0 {
 		response.Lineups = make([]LeagueDashLineupsLineups, 0, len(rawResp.ResultSets[0].RowSet))
 		for _, row := range rawResp.ResultSets[0].RowSet {
-			if len(row) >= 30 {
+			if len(row) >= 33 {
 				item := LeagueDashLineupsLineups{
 					GROUP_ID:          toString(row[0]),
 					GROUP_NAME:        toString(row[1]),
@@ -121,6 +124,9 @@ func GetLeagueDashLineups(ctx context.Context, client *stats.Client, req LeagueD
 					PFD:               toFloat(row[27]),
 					PTS:               toFloat(row[28]),
 					PLUS_MINUS:        toFloat(row[29]),
+					OFF_RATING:        toString(row[30]),
+					DEF_RATING:        toString(row[31]),
+					NET_RATING:        toString(row[32]),
 				}
 				response.Lineups = append(response.Lineups, item)
 			}
