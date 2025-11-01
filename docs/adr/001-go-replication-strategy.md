@@ -260,7 +260,7 @@ func (p PerMode) Validate() error {
   - Generates proper JSON tags for all fields
   - Eliminates interface{} in generated code
   - See [Type Inference Documentation](../TYPE_INFERENCE_IMPROVEMENT.md)
-- [x] 23 Stats endpoints implemented (16.5% complete):
+- [x] 33 Stats endpoints implemented (23.7% complete):
   - [x] PlayerCareerStats
   - [x] PlayerGameLog
   - [x] CommonPlayerInfo
@@ -276,18 +276,13 @@ func (p PerMode) Validate() error {
   - [x] BoxScoreTraditionalV2
   - [x] LeagueGameFinder
   - [x] TeamGameLogs
-  - [x] **CommonAllPlayers** (NEW - Oct 31, 2025)
-  - [x] **CommonTeamRoster** (NEW - Oct 31, 2025)
-  - [x] **LeagueDashPlayerStats** (NEW - Oct 31, 2025)
-  - [x] **LeagueDashTeamStats** (NEW - Oct 31, 2025)
-  - [x] **ScoreboardV2** (NEW - Oct 31, 2025)
-  - [x] **PlayerProfileV2** (NEW - Oct 31, 2025)
-  - [x] **LeagueStandings** (NEW - Oct 31, 2025)
-  - [x] **BoxScoreAdvancedV2** (NEW - Oct 31, 2025)
-- [ ] Generate remaining 116 endpoints (23/139 = 16.5% complete)
+  - [x] **Batch 1 (Oct 31, 2025):** CommonAllPlayers, CommonTeamRoster, LeagueDashPlayerStats, LeagueDashTeamStats, ScoreboardV2, PlayerProfileV2, LeagueStandings, BoxScoreAdvancedV2 (8 endpoints)
+  - [x] **Batch 2 (Nov 1, 2025):** LeagueGameLog, PlayerAwards, PlayoffPicture, TeamDashboardByYearOverYear, PlayerDashboardByYearOverYear, PlayerVsPlayer, TeamVsPlayer, DraftCombineStats, LeagueDashPtStats, LeagueDashLineups (10 endpoints)
+- [ ] Generate remaining 106 endpoints (33/139 = 23.7% complete)
   - Generator produces production-quality type-safe code
-  - Successfully batch-generated 8 high-priority endpoints
-  - See [Endpoint Generation Summary](../../ENDPOINT_GENERATION_SUMMARY.md)
+  - Successfully batch-generated 18 endpoints across 2 sessions
+  - See [Batch 1 Summary](../../ENDPOINT_GENERATION_SUMMARY.md)
+  - See [Batch 2 Summary](../../TIER1_BATCH_SUMMARY.md)
 - [x] Integration test framework (completed)
 - [x] Benchmark tests (completed)
 - [ ] Documentation (in progress)
