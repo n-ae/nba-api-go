@@ -14,16 +14,14 @@ type CommonTeamYearsRequest struct {
 	LeagueID *parameters.LeagueID
 }
 
-
 // CommonTeamYearsTeamYears represents the TeamYears result set for CommonTeamYears
 type CommonTeamYearsTeamYears struct {
-	LEAGUE_ID string `json:"LEAGUE_ID"`
-	TEAM_ID int `json:"TEAM_ID"`
-	MIN_YEAR float64 `json:"MIN_YEAR"`
-	MAX_YEAR string `json:"MAX_YEAR"`
-	ABBREVIATION string `json:"ABBREVIATION"`
+	LEAGUE_ID    string  `json:"LEAGUE_ID"`
+	TEAM_ID      int     `json:"TEAM_ID"`
+	MIN_YEAR     float64 `json:"MIN_YEAR"`
+	MAX_YEAR     string  `json:"MAX_YEAR"`
+	ABBREVIATION string  `json:"ABBREVIATION"`
 }
-
 
 // CommonTeamYearsResponse contains the response data from the CommonTeamYears endpoint
 type CommonTeamYearsResponse struct {
@@ -48,10 +46,10 @@ func GetCommonTeamYears(ctx context.Context, client *stats.Client, req CommonTea
 		for _, row := range rawResp.ResultSets[0].RowSet {
 			if len(row) >= 5 {
 				item := CommonTeamYearsTeamYears{
-					LEAGUE_ID: toString(row[0]),
-					TEAM_ID: toInt(row[1]),
-					MIN_YEAR: toFloat(row[2]),
-					MAX_YEAR: toString(row[3]),
+					LEAGUE_ID:    toString(row[0]),
+					TEAM_ID:      toInt(row[1]),
+					MIN_YEAR:     toFloat(row[2]),
+					MAX_YEAR:     toString(row[3]),
 					ABBREVIATION: toString(row[4]),
 				}
 				response.TeamYears = append(response.TeamYears, item)

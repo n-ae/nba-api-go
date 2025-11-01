@@ -12,12 +12,11 @@ import (
 
 // TeamYearByYearStatsRequest contains parameters for the TeamYearByYearStats endpoint
 type TeamYearByYearStatsRequest struct {
-	TeamID string
-	LeagueID *parameters.LeagueID
-	PerMode *parameters.PerMode
+	TeamID     string
+	LeagueID   *parameters.LeagueID
+	PerMode    *parameters.PerMode
 	SeasonType *parameters.SeasonType
 }
-
 
 // TeamYearByYearStatsTeamStats represents the TeamStats result set for TeamYearByYearStats
 type TeamYearByYearStatsTeamStats struct {
@@ -56,7 +55,6 @@ type TeamYearByYearStatsTeamStats struct {
 	PTS                   int     `json:"PTS"`
 	PTS_RANK              int     `json:"PTS_RANK"`
 }
-
 
 // TeamYearByYearStatsResponse contains the response data from the TeamYearByYearStats endpoint
 type TeamYearByYearStatsResponse struct {

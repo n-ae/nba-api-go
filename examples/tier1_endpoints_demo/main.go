@@ -91,7 +91,7 @@ func main() {
 	// 6. Player vs Player
 	fmt.Println("\n6. PlayerVsPlayer - Head-to-head matchup stats")
 	pvpReq := endpoints.PlayerVsPlayerRequest{
-		PlayerID:   "2544",  // LeBron
+		PlayerID:   "2544",   // LeBron
 		VsPlayerID: "201142", // Durant
 		Season:     ptr(parameters.NewSeason(2023)),
 		SeasonType: ptr(parameters.SeasonTypeRegular),
@@ -161,7 +161,7 @@ func main() {
 	// Summary
 	fmt.Println("\n=== Demo Complete ===")
 	fmt.Println("\nAll 10 Tier 1 endpoints functional!")
-	
+
 	summary := map[string]interface{}{
 		"new_endpoints": []string{
 			"LeagueGameLog", "PlayerAwards", "PlayoffPicture",
@@ -182,7 +182,7 @@ func main() {
 			"Lineup combinations",
 		},
 	}
-	
+
 	data, _ := json.MarshalIndent(summary, "", "  ")
 	fmt.Printf("\n%s\n", string(data))
 }

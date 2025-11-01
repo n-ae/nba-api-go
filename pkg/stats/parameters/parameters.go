@@ -33,8 +33,8 @@ func (p PerMode) String() string {
 type LeagueID string
 
 const (
-	LeagueIDNBA   LeagueID = "00"
-	LeagueIDABA   LeagueID = "01"
+	LeagueIDNBA     LeagueID = "00"
+	LeagueIDABA     LeagueID = "01"
 	LeagueIDGLeague LeagueID = "20"
 )
 

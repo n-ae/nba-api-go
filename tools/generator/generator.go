@@ -38,14 +38,14 @@ type ParameterMetadata struct {
 }
 
 type ResultSetMetadata struct {
-	Name   string              `json:"name"`
-	Fields []string            `json:"fields"`
+	Name       string          `json:"name"`
+	Fields     []string        `json:"fields"`
 	FieldTypes []FieldTypeInfo `json:"-"`
 }
 
 type FieldTypeInfo struct {
-	Name   string
-	GoType string
+	Name    string
+	GoType  string
 	JSONTag string
 }
 
@@ -211,10 +211,10 @@ func inferGoType(fieldName string) string {
 
 	// Text/name fields are strings
 	if strings.HasSuffix(lower, "_name") || strings.HasSuffix(lower, "_text") ||
-	   strings.HasSuffix(lower, "_abbreviation") || strings.HasSuffix(lower, "_city") ||
-	   strings.HasSuffix(lower, "_tricode") || strings.Contains(lower, "nickname") ||
-	   strings.Contains(lower, "matchup") || strings.Contains(lower, "comment") ||
-	   strings.Contains(lower, "position") {
+		strings.HasSuffix(lower, "_abbreviation") || strings.HasSuffix(lower, "_city") ||
+		strings.HasSuffix(lower, "_tricode") || strings.Contains(lower, "nickname") ||
+		strings.Contains(lower, "matchup") || strings.Contains(lower, "comment") ||
+		strings.Contains(lower, "position") {
 		return "string"
 	}
 
@@ -272,7 +272,7 @@ func inferGoType(fieldName string) string {
 
 	// Sequence/period numbers are int
 	if strings.Contains(lower, "sequence") || strings.Contains(lower, "period") ||
-	   strings.Contains(lower, "range") {
+		strings.Contains(lower, "range") {
 		return "int"
 	}
 

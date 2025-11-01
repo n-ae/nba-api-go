@@ -12,14 +12,13 @@ import (
 
 // TeamGameLogsRequest contains parameters for the TeamGameLogs endpoint
 type TeamGameLogsRequest struct {
-	Season parameters.Season
+	Season     parameters.Season
 	SeasonType parameters.SeasonType
-	LeagueID *parameters.LeagueID
-	TeamID *string
-	DateFrom *string
-	DateTo *string
+	LeagueID   *parameters.LeagueID
+	TeamID     *string
+	DateFrom   *string
+	DateTo     *string
 }
-
 
 // TeamGameLogsTeamGameLogs represents the TeamGameLogs result set for TeamGameLogs
 type TeamGameLogsTeamGameLogs struct {
@@ -57,7 +56,6 @@ type TeamGameLogsTeamGameLogs struct {
 	DD2               int     `json:"DD2"`
 	TD3               int     `json:"TD3"`
 }
-
 
 // TeamGameLogsResponse contains the response data from the TeamGameLogs endpoint
 type TeamGameLogsResponse struct {

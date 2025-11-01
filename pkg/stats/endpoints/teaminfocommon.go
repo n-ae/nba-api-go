@@ -12,11 +12,10 @@ import (
 
 // TeamInfoCommonRequest contains parameters for the TeamInfoCommon endpoint
 type TeamInfoCommonRequest struct {
-	TeamID string
-	LeagueID *parameters.LeagueID
+	TeamID     string
+	LeagueID   *parameters.LeagueID
 	SeasonType *parameters.SeasonType
 }
-
 
 // TeamInfoCommonTeamInfoCommon represents the TeamInfoCommon result set for TeamInfoCommon
 type TeamInfoCommonTeamInfoCommon struct {
@@ -49,10 +48,9 @@ type TeamInfoCommonTeamSeasonRanks struct {
 	OPP_PTS_PG   float64 `json:"OPP_PTS_PG"`
 }
 
-
 // TeamInfoCommonResponse contains the response data from the TeamInfoCommon endpoint
 type TeamInfoCommonResponse struct {
-	TeamInfoCommon []TeamInfoCommonTeamInfoCommon
+	TeamInfoCommon  []TeamInfoCommonTeamInfoCommon
 	TeamSeasonRanks []TeamInfoCommonTeamSeasonRanks
 }
 

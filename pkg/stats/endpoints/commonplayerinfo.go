@@ -11,37 +11,37 @@ import (
 )
 
 type PlayerInfo struct {
-	PersonID               int    `json:"PERSON_ID"`
-	FirstName              string `json:"FIRST_NAME"`
-	LastName               string `json:"LAST_NAME"`
-	DisplayFirstLast       string `json:"DISPLAY_FIRST_LAST"`
-	DisplayLastCommaFirst  string `json:"DISPLAY_LAST_COMMA_FIRST"`
-	DisplayFILast          string `json:"DISPLAY_FI_LAST"`
-	PlayerSlug             string `json:"PLAYER_SLUG"`
-	Birthdate              string `json:"BIRTHDATE"`
-	School                 string `json:"SCHOOL"`
-	Country                string `json:"COUNTRY"`
-	LastAffiliation        string `json:"LAST_AFFILIATION"`
-	Height                 string `json:"HEIGHT"`
-	Weight                 string `json:"WEIGHT"`
-	SeasonExp              int    `json:"SEASON_EXP"`
-	Jersey                 string `json:"JERSEY"`
-	Position               string `json:"POSITION"`
-	RosterStatus           string `json:"ROSTERSTATUS"`
-	TeamID                 int    `json:"TEAM_ID"`
-	TeamName               string `json:"TEAM_NAME"`
-	TeamAbbreviation       string `json:"TEAM_ABBREVIATION"`
-	TeamCode               string `json:"TEAM_CODE"`
-	TeamCity               string `json:"TEAM_CITY"`
-	PlayerCode             string `json:"PLAYERCODE"`
-	FromYear               string `json:"FROM_YEAR"`
-	ToYear                 string `json:"TO_YEAR"`
-	DLeagueFlag            string `json:"DLEAGUE_FLAG"`
-	NBAFlag                string `json:"NBA_FLAG"`
-	GamesPlayedFlag        string `json:"GAMES_PLAYED_FLAG"`
-	DraftYear              string `json:"DRAFT_YEAR"`
-	DraftRound             string `json:"DRAFT_ROUND"`
-	DraftNumber            string `json:"DRAFT_NUMBER"`
+	PersonID              int    `json:"PERSON_ID"`
+	FirstName             string `json:"FIRST_NAME"`
+	LastName              string `json:"LAST_NAME"`
+	DisplayFirstLast      string `json:"DISPLAY_FIRST_LAST"`
+	DisplayLastCommaFirst string `json:"DISPLAY_LAST_COMMA_FIRST"`
+	DisplayFILast         string `json:"DISPLAY_FI_LAST"`
+	PlayerSlug            string `json:"PLAYER_SLUG"`
+	Birthdate             string `json:"BIRTHDATE"`
+	School                string `json:"SCHOOL"`
+	Country               string `json:"COUNTRY"`
+	LastAffiliation       string `json:"LAST_AFFILIATION"`
+	Height                string `json:"HEIGHT"`
+	Weight                string `json:"WEIGHT"`
+	SeasonExp             int    `json:"SEASON_EXP"`
+	Jersey                string `json:"JERSEY"`
+	Position              string `json:"POSITION"`
+	RosterStatus          string `json:"ROSTERSTATUS"`
+	TeamID                int    `json:"TEAM_ID"`
+	TeamName              string `json:"TEAM_NAME"`
+	TeamAbbreviation      string `json:"TEAM_ABBREVIATION"`
+	TeamCode              string `json:"TEAM_CODE"`
+	TeamCity              string `json:"TEAM_CITY"`
+	PlayerCode            string `json:"PLAYERCODE"`
+	FromYear              string `json:"FROM_YEAR"`
+	ToYear                string `json:"TO_YEAR"`
+	DLeagueFlag           string `json:"DLEAGUE_FLAG"`
+	NBAFlag               string `json:"NBA_FLAG"`
+	GamesPlayedFlag       string `json:"GAMES_PLAYED_FLAG"`
+	DraftYear             string `json:"DRAFT_YEAR"`
+	DraftRound            string `json:"DRAFT_ROUND"`
+	DraftNumber           string `json:"DRAFT_NUMBER"`
 }
 
 type HeadlineStats struct {
@@ -59,9 +59,9 @@ type AvailableSeason struct {
 }
 
 type CommonPlayerInfoResponse struct {
-	CommonPlayerInfo   []PlayerInfo      `json:"CommonPlayerInfo"`
+	CommonPlayerInfo    []PlayerInfo      `json:"CommonPlayerInfo"`
 	PlayerHeadlineStats []HeadlineStats   `json:"PlayerHeadlineStats"`
-	AvailableSeasons   []AvailableSeason `json:"AvailableSeasons"`
+	AvailableSeasons    []AvailableSeason `json:"AvailableSeasons"`
 }
 
 type CommonPlayerInfoRequest struct {

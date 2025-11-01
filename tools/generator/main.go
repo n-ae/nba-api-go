@@ -9,10 +9,10 @@ import (
 
 func main() {
 	var (
-		endpoint   = flag.String("endpoint", "", "Endpoint name to generate (e.g., PlayerGameLog)")
+		endpoint     = flag.String("endpoint", "", "Endpoint name to generate (e.g., PlayerGameLog)")
 		metadataFile = flag.String("metadata", "", "Path to metadata JSON file")
-		outputDir  = flag.String("output", "pkg/stats/endpoints", "Output directory for generated files")
-		dryRun     = flag.Bool("dry-run", false, "Print generated code without writing files")
+		outputDir    = flag.String("output", "pkg/stats/endpoints", "Output directory for generated files")
+		dryRun       = flag.Bool("dry-run", false, "Print generated code without writing files")
 	)
 
 	flag.Parse()

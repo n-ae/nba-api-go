@@ -12,37 +12,36 @@ import (
 
 // ShotChartDetailRequest contains parameters for the ShotChartDetail endpoint
 type ShotChartDetailRequest struct {
-	PlayerID *string
-	TeamID *string
-	GameID *string
-	Season parameters.Season
-	SeasonType parameters.SeasonType
-	LeagueID *parameters.LeagueID
+	PlayerID       *string
+	TeamID         *string
+	GameID         *string
+	Season         parameters.Season
+	SeasonType     parameters.SeasonType
+	LeagueID       *parameters.LeagueID
 	ContextMeasure *string
-	DateFrom *string
-	DateTo *string
+	DateFrom       *string
+	DateTo         *string
 	OpponentTeamID *string
-	Period *string
-	RookieYear *string
-	VsConference *string
-	VsDivision *string
-	Position *string
-	GameSegment *string
-	LastNGames *string
-	Location *string
-	Month *string
-	Outcome *string
-	SeasonSegment *string
-	AheadBehind *string
-	ClutchTime *string
-	PointDiff *string
-	RangeType *string
-	StartPeriod *string
-	EndPeriod *string
-	StartRange *string
-	EndRange *string
+	Period         *string
+	RookieYear     *string
+	VsConference   *string
+	VsDivision     *string
+	Position       *string
+	GameSegment    *string
+	LastNGames     *string
+	Location       *string
+	Month          *string
+	Outcome        *string
+	SeasonSegment  *string
+	AheadBehind    *string
+	ClutchTime     *string
+	PointDiff      *string
+	RangeType      *string
+	StartPeriod    *string
+	EndPeriod      *string
+	StartRange     *string
+	EndRange       *string
 }
-
 
 // ShotChartDetailShot_Chart_Detail represents the Shot_Chart_Detail result set for ShotChartDetail
 type ShotChartDetailShot_Chart_Detail struct {
@@ -83,11 +82,10 @@ type ShotChartDetailLeagueAverages struct {
 	FG_PCT          float64 `json:"FG_PCT"`
 }
 
-
 // ShotChartDetailResponse contains the response data from the ShotChartDetail endpoint
 type ShotChartDetailResponse struct {
 	Shot_Chart_Detail []ShotChartDetailShot_Chart_Detail
-	LeagueAverages []ShotChartDetailLeagueAverages
+	LeagueAverages    []ShotChartDetailLeagueAverages
 }
 
 // GetShotChartDetail retrieves data from the shotchartdetail endpoint

@@ -11,25 +11,24 @@ import (
 
 // LeagueGameFinderRequest contains parameters for the LeagueGameFinder endpoint
 type LeagueGameFinderRequest struct {
-	LeagueID *parameters.LeagueID
-	Season *parameters.Season
-	SeasonType *parameters.SeasonType
+	LeagueID     *parameters.LeagueID
+	Season       *parameters.Season
+	SeasonType   *parameters.SeasonType
 	PlayerOrTeam *string
-	PlayerID *string
-	TeamID *string
-	VsTeamID *string
-	Outcome *string
-	Location *string
-	DateFrom *string
-	DateTo *string
+	PlayerID     *string
+	TeamID       *string
+	VsTeamID     *string
+	Outcome      *string
+	Location     *string
+	DateFrom     *string
+	DateTo       *string
 	VsConference *string
-	VsDivision *string
-	GameSegment *string
-	Period *string
-	LastNGames *string
-	PORound *string
+	VsDivision   *string
+	GameSegment  *string
+	Period       *string
+	LastNGames   *string
+	PORound      *string
 }
-
 
 // LeagueGameFinderLeagueGameFinderResults represents the LeagueGameFinderResults result set for LeagueGameFinder
 type LeagueGameFinderLeagueGameFinderResults struct {
@@ -48,21 +47,20 @@ type LeagueGameFinderLeagueGameFinderResults struct {
 	FG3M              int     `json:"FG3M"`
 	FG3A              int     `json:"FG3A"`
 	FG3_PCT           float64 `json:"FG3_PCT"`
-	FTM        int     `json:"FTM"`
-	FTA        int     `json:"FTA"`
-	FT_PCT     float64 `json:"FT_PCT"`
-	OREB       int     `json:"OREB"`
-	DREB       int     `json:"DREB"`
-	REB        int     `json:"REB"`
-	AST        int     `json:"AST"`
-	STL        int     `json:"STL"`
-	BLK        int     `json:"BLK"`
-	TOV        int     `json:"TOV"`
-	PF         int     `json:"PF"`
-	PTS        int     `json:"PTS"`
-	PLUS_MINUS float64 `json:"PLUS_MINUS"`
+	FTM               int     `json:"FTM"`
+	FTA               int     `json:"FTA"`
+	FT_PCT            float64 `json:"FT_PCT"`
+	OREB              int     `json:"OREB"`
+	DREB              int     `json:"DREB"`
+	REB               int     `json:"REB"`
+	AST               int     `json:"AST"`
+	STL               int     `json:"STL"`
+	BLK               int     `json:"BLK"`
+	TOV               int     `json:"TOV"`
+	PF                int     `json:"PF"`
+	PTS               int     `json:"PTS"`
+	PLUS_MINUS        float64 `json:"PLUS_MINUS"`
 }
-
 
 // LeagueGameFinderResponse contains the response data from the LeagueGameFinder endpoint
 type LeagueGameFinderResponse struct {

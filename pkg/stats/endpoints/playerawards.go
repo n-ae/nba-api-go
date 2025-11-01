@@ -14,25 +14,23 @@ type PlayerAwardsRequest struct {
 	PlayerID string
 }
 
-
 // PlayerAwardsPlayerAwards represents the PlayerAwards result set for PlayerAwards
 type PlayerAwardsPlayerAwards struct {
-	PERSON_ID string `json:"PERSON_ID"`
-	FIRST_NAME string `json:"FIRST_NAME"`
-	LAST_NAME string `json:"LAST_NAME"`
-	TEAM string `json:"TEAM"`
-	DESCRIPTION string `json:"DESCRIPTION"`
+	PERSON_ID           string `json:"PERSON_ID"`
+	FIRST_NAME          string `json:"FIRST_NAME"`
+	LAST_NAME           string `json:"LAST_NAME"`
+	TEAM                string `json:"TEAM"`
+	DESCRIPTION         string `json:"DESCRIPTION"`
 	ALL_NBA_TEAM_NUMBER string `json:"ALL_NBA_TEAM_NUMBER"`
-	SEASON string `json:"SEASON"`
-	MONTH string `json:"MONTH"`
-	WEEK string `json:"WEEK"`
-	CONFERENCE string `json:"CONFERENCE"`
-	TYPE string `json:"TYPE"`
-	SUBTYPE1 string `json:"SUBTYPE1"`
-	SUBTYPE2 string `json:"SUBTYPE2"`
-	SUBTYPE3 string `json:"SUBTYPE3"`
+	SEASON              string `json:"SEASON"`
+	MONTH               string `json:"MONTH"`
+	WEEK                string `json:"WEEK"`
+	CONFERENCE          string `json:"CONFERENCE"`
+	TYPE                string `json:"TYPE"`
+	SUBTYPE1            string `json:"SUBTYPE1"`
+	SUBTYPE2            string `json:"SUBTYPE2"`
+	SUBTYPE3            string `json:"SUBTYPE3"`
 }
-
 
 // PlayerAwardsResponse contains the response data from the PlayerAwards endpoint
 type PlayerAwardsResponse struct {
@@ -58,20 +56,20 @@ func GetPlayerAwards(ctx context.Context, client *stats.Client, req PlayerAwards
 		for _, row := range rawResp.ResultSets[0].RowSet {
 			if len(row) >= 14 {
 				item := PlayerAwardsPlayerAwards{
-					PERSON_ID: toString(row[0]),
-					FIRST_NAME: toString(row[1]),
-					LAST_NAME: toString(row[2]),
-					TEAM: toString(row[3]),
-					DESCRIPTION: toString(row[4]),
+					PERSON_ID:           toString(row[0]),
+					FIRST_NAME:          toString(row[1]),
+					LAST_NAME:           toString(row[2]),
+					TEAM:                toString(row[3]),
+					DESCRIPTION:         toString(row[4]),
 					ALL_NBA_TEAM_NUMBER: toString(row[5]),
-					SEASON: toString(row[6]),
-					MONTH: toString(row[7]),
-					WEEK: toString(row[8]),
-					CONFERENCE: toString(row[9]),
-					TYPE: toString(row[10]),
-					SUBTYPE1: toString(row[11]),
-					SUBTYPE2: toString(row[12]),
-					SUBTYPE3: toString(row[13]),
+					SEASON:              toString(row[6]),
+					MONTH:               toString(row[7]),
+					WEEK:                toString(row[8]),
+					CONFERENCE:          toString(row[9]),
+					TYPE:                toString(row[10]),
+					SUBTYPE1:            toString(row[11]),
+					SUBTYPE2:            toString(row[12]),
+					SUBTYPE3:            toString(row[13]),
 				}
 				response.PlayerAwards = append(response.PlayerAwards, item)
 			}

@@ -11,53 +11,51 @@ import (
 
 // AllTimeLeadersGridsRequest contains parameters for the AllTimeLeadersGrids endpoint
 type AllTimeLeadersGridsRequest struct {
-	LeagueID *parameters.LeagueID
-	PerMode *parameters.PerMode
+	LeagueID   *parameters.LeagueID
+	PerMode    *parameters.PerMode
 	SeasonType *parameters.SeasonType
-	TopX *string
+	TopX       *string
 }
-
 
 // AllTimeLeadersGridsAllTimeLeadersPTS represents the AllTimeLeadersPTS result set for AllTimeLeadersGrids
 type AllTimeLeadersGridsAllTimeLeadersPTS struct {
-	PLAYER_ID int `json:"PLAYER_ID"`
-	PLAYER_NAME string `json:"PLAYER_NAME"`
-	PTS float64 `json:"PTS"`
-	PTS_RANK float64 `json:"PTS_RANK"`
+	PLAYER_ID   int     `json:"PLAYER_ID"`
+	PLAYER_NAME string  `json:"PLAYER_NAME"`
+	PTS         float64 `json:"PTS"`
+	PTS_RANK    float64 `json:"PTS_RANK"`
 }
 
 // AllTimeLeadersGridsAllTimeLeadersAST represents the AllTimeLeadersAST result set for AllTimeLeadersGrids
 type AllTimeLeadersGridsAllTimeLeadersAST struct {
-	PLAYER_ID int `json:"PLAYER_ID"`
-	PLAYER_NAME string `json:"PLAYER_NAME"`
-	AST float64 `json:"AST"`
-	AST_RANK float64 `json:"AST_RANK"`
+	PLAYER_ID   int     `json:"PLAYER_ID"`
+	PLAYER_NAME string  `json:"PLAYER_NAME"`
+	AST         float64 `json:"AST"`
+	AST_RANK    float64 `json:"AST_RANK"`
 }
 
 // AllTimeLeadersGridsAllTimeLeadersREB represents the AllTimeLeadersREB result set for AllTimeLeadersGrids
 type AllTimeLeadersGridsAllTimeLeadersREB struct {
-	PLAYER_ID int `json:"PLAYER_ID"`
-	PLAYER_NAME string `json:"PLAYER_NAME"`
-	REB float64 `json:"REB"`
-	REB_RANK float64 `json:"REB_RANK"`
+	PLAYER_ID   int     `json:"PLAYER_ID"`
+	PLAYER_NAME string  `json:"PLAYER_NAME"`
+	REB         float64 `json:"REB"`
+	REB_RANK    float64 `json:"REB_RANK"`
 }
 
 // AllTimeLeadersGridsAllTimeLeadersBLK represents the AllTimeLeadersBLK result set for AllTimeLeadersGrids
 type AllTimeLeadersGridsAllTimeLeadersBLK struct {
-	PLAYER_ID int `json:"PLAYER_ID"`
-	PLAYER_NAME string `json:"PLAYER_NAME"`
-	BLK float64 `json:"BLK"`
-	BLK_RANK float64 `json:"BLK_RANK"`
+	PLAYER_ID   int     `json:"PLAYER_ID"`
+	PLAYER_NAME string  `json:"PLAYER_NAME"`
+	BLK         float64 `json:"BLK"`
+	BLK_RANK    float64 `json:"BLK_RANK"`
 }
 
 // AllTimeLeadersGridsAllTimeLeadersSTL represents the AllTimeLeadersSTL result set for AllTimeLeadersGrids
 type AllTimeLeadersGridsAllTimeLeadersSTL struct {
-	PLAYER_ID int `json:"PLAYER_ID"`
-	PLAYER_NAME string `json:"PLAYER_NAME"`
-	STL float64 `json:"STL"`
-	STL_RANK float64 `json:"STL_RANK"`
+	PLAYER_ID   int     `json:"PLAYER_ID"`
+	PLAYER_NAME string  `json:"PLAYER_NAME"`
+	STL         float64 `json:"STL"`
+	STL_RANK    float64 `json:"STL_RANK"`
 }
-
 
 // AllTimeLeadersGridsResponse contains the response data from the AllTimeLeadersGrids endpoint
 type AllTimeLeadersGridsResponse struct {
@@ -95,10 +93,10 @@ func GetAllTimeLeadersGrids(ctx context.Context, client *stats.Client, req AllTi
 		for _, row := range rawResp.ResultSets[0].RowSet {
 			if len(row) >= 4 {
 				item := AllTimeLeadersGridsAllTimeLeadersPTS{
-					PLAYER_ID: toInt(row[0]),
+					PLAYER_ID:   toInt(row[0]),
 					PLAYER_NAME: toString(row[1]),
-					PTS: toFloat(row[2]),
-					PTS_RANK: toFloat(row[3]),
+					PTS:         toFloat(row[2]),
+					PTS_RANK:    toFloat(row[3]),
 				}
 				response.AllTimeLeadersPTS = append(response.AllTimeLeadersPTS, item)
 			}
@@ -109,10 +107,10 @@ func GetAllTimeLeadersGrids(ctx context.Context, client *stats.Client, req AllTi
 		for _, row := range rawResp.ResultSets[1].RowSet {
 			if len(row) >= 4 {
 				item := AllTimeLeadersGridsAllTimeLeadersAST{
-					PLAYER_ID: toInt(row[0]),
+					PLAYER_ID:   toInt(row[0]),
 					PLAYER_NAME: toString(row[1]),
-					AST: toFloat(row[2]),
-					AST_RANK: toFloat(row[3]),
+					AST:         toFloat(row[2]),
+					AST_RANK:    toFloat(row[3]),
 				}
 				response.AllTimeLeadersAST = append(response.AllTimeLeadersAST, item)
 			}
@@ -123,10 +121,10 @@ func GetAllTimeLeadersGrids(ctx context.Context, client *stats.Client, req AllTi
 		for _, row := range rawResp.ResultSets[2].RowSet {
 			if len(row) >= 4 {
 				item := AllTimeLeadersGridsAllTimeLeadersREB{
-					PLAYER_ID: toInt(row[0]),
+					PLAYER_ID:   toInt(row[0]),
 					PLAYER_NAME: toString(row[1]),
-					REB: toFloat(row[2]),
-					REB_RANK: toFloat(row[3]),
+					REB:         toFloat(row[2]),
+					REB_RANK:    toFloat(row[3]),
 				}
 				response.AllTimeLeadersREB = append(response.AllTimeLeadersREB, item)
 			}
@@ -137,10 +135,10 @@ func GetAllTimeLeadersGrids(ctx context.Context, client *stats.Client, req AllTi
 		for _, row := range rawResp.ResultSets[3].RowSet {
 			if len(row) >= 4 {
 				item := AllTimeLeadersGridsAllTimeLeadersBLK{
-					PLAYER_ID: toInt(row[0]),
+					PLAYER_ID:   toInt(row[0]),
 					PLAYER_NAME: toString(row[1]),
-					BLK: toFloat(row[2]),
-					BLK_RANK: toFloat(row[3]),
+					BLK:         toFloat(row[2]),
+					BLK_RANK:    toFloat(row[3]),
 				}
 				response.AllTimeLeadersBLK = append(response.AllTimeLeadersBLK, item)
 			}
@@ -151,10 +149,10 @@ func GetAllTimeLeadersGrids(ctx context.Context, client *stats.Client, req AllTi
 		for _, row := range rawResp.ResultSets[4].RowSet {
 			if len(row) >= 4 {
 				item := AllTimeLeadersGridsAllTimeLeadersSTL{
-					PLAYER_ID: toInt(row[0]),
+					PLAYER_ID:   toInt(row[0]),
 					PLAYER_NAME: toString(row[1]),
-					STL: toFloat(row[2]),
-					STL_RANK: toFloat(row[3]),
+					STL:         toFloat(row[2]),
+					STL_RANK:    toFloat(row[3]),
 				}
 				response.AllTimeLeadersSTL = append(response.AllTimeLeadersSTL, item)
 			}

@@ -25,29 +25,29 @@ type TeamScore struct {
 }
 
 type GameLeader struct {
-	PersonID   int     `json:"personId"`
-	Name       string  `json:"name"`
-	JerseyNum  string  `json:"jerseyNum"`
-	Position   string  `json:"position"`
-	TeamTricode string `json:"teamTricode"`
-	PlayerSlug *string `json:"playerSlug"`
-	Points     int     `json:"points"`
-	Rebounds   int     `json:"rebounds"`
-	Assists    int     `json:"assists"`
+	PersonID    int     `json:"personId"`
+	Name        string  `json:"name"`
+	JerseyNum   string  `json:"jerseyNum"`
+	Position    string  `json:"position"`
+	TeamTricode string  `json:"teamTricode"`
+	PlayerSlug  *string `json:"playerSlug"`
+	Points      int     `json:"points"`
+	Rebounds    int     `json:"rebounds"`
+	Assists     int     `json:"assists"`
 }
 
 type Game struct {
-	GameID            string  `json:"gameId"`
-	GameCode          string  `json:"gameCode"`
-	GameStatus        int     `json:"gameStatus"`
-	GameStatusText    string  `json:"gameStatusText"`
-	Period            int     `json:"period"`
-	GameClock         string  `json:"gameClock"`
-	GameTimeUTC       string  `json:"gameTimeUTC"`
-	GameEt            string  `json:"gameEt"`
-	RegulationPeriods int     `json:"regulationPeriods"`
-	SeriesGameNumber  string  `json:"seriesGameNumber"`
-	SeriesText        string  `json:"seriesText"`
+	GameID            string    `json:"gameId"`
+	GameCode          string    `json:"gameCode"`
+	GameStatus        int       `json:"gameStatus"`
+	GameStatusText    string    `json:"gameStatusText"`
+	Period            int       `json:"period"`
+	GameClock         string    `json:"gameClock"`
+	GameTimeUTC       string    `json:"gameTimeUTC"`
+	GameEt            string    `json:"gameEt"`
+	RegulationPeriods int       `json:"regulationPeriods"`
+	SeriesGameNumber  string    `json:"seriesGameNumber"`
+	SeriesText        string    `json:"seriesText"`
 	HomeTeam          TeamScore `json:"homeTeam"`
 	AwayTeam          TeamScore `json:"awayTeam"`
 	GameLeaders       struct {

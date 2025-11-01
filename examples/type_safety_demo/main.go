@@ -67,10 +67,10 @@ func demoBoxScore(ctx context.Context, client *stats.Client) {
 		// player.FG_PCT is float64
 
 		fmt.Printf("%-20s | %2d pts | %.1f min | %.1f%% FG\n",
-			player.PLAYER_NAME,  // string - no assertion!
-			player.PTS,          // int - no assertion!
-			player.MIN,          // float64 - no assertion!
-			player.FG_PCT*100,   // float64 - math works directly!
+			player.PLAYER_NAME, // string - no assertion!
+			player.PTS,         // int - no assertion!
+			player.MIN,         // float64 - no assertion!
+			player.FG_PCT*100,  // float64 - math works directly!
 		)
 
 		count++
@@ -81,14 +81,14 @@ func demoBoxScore(ctx context.Context, client *stats.Client) {
 		fmt.Println("\n✅ Type-Safe Team Stats:")
 		for _, team := range resp.Data.TeamStats {
 			fmt.Printf("\n%s %s:\n",
-				team.TEAM_CITY,          // string
-				team.TEAM_NAME,          // string
+				team.TEAM_CITY, // string
+				team.TEAM_NAME, // string
 			)
-			fmt.Printf("  Points: %d\n", team.PTS)              // int
-			fmt.Printf("  FG%%: %.1f%%\n", team.FG_PCT*100)     // float64
-			fmt.Printf("  3P%%: %.1f%%\n", team.FG3_PCT*100)    // float64
-			fmt.Printf("  Rebounds: %d\n", team.REB)            // int
-			fmt.Printf("  Assists: %d\n", team.AST)             // int
+			fmt.Printf("  Points: %d\n", team.PTS)           // int
+			fmt.Printf("  FG%%: %.1f%%\n", team.FG_PCT*100)  // float64
+			fmt.Printf("  3P%%: %.1f%%\n", team.FG3_PCT*100) // float64
+			fmt.Printf("  Rebounds: %d\n", team.REB)         // int
+			fmt.Printf("  Assists: %d\n", team.AST)          // int
 		}
 	}
 
@@ -133,13 +133,13 @@ func demoGameFinder(ctx context.Context, client *stats.Client) {
 		}
 
 		fmt.Printf("%s | %s | %s (%s) - %d pts | %.1f%% FG | %+.0f\n",
-			game.GAME_DATE,          // string
-			outcome,                 // string (from WL)
-			game.MATCHUP,            // string
-			game.WL,                 // string
-			game.PTS,                // int
-			game.FG_PCT*100,         // float64
-			game.PLUS_MINUS,         // float64
+			game.GAME_DATE,  // string
+			outcome,         // string (from WL)
+			game.MATCHUP,    // string
+			game.WL,         // string
+			game.PTS,        // int
+			game.FG_PCT*100, // float64
+			game.PLUS_MINUS, // float64
 		)
 
 		count++
@@ -151,11 +151,11 @@ func demoGameFinder(ctx context.Context, client *stats.Client) {
 		var totalFGPct, totalPlusMinus float64
 
 		for _, game := range resp.Data.LeagueGameFinderResults {
-			totalPts += game.PTS           // int addition
-			totalFG += game.FGM            // int addition
-			totalReb += game.REB           // int addition
-			totalAst += game.AST           // int addition
-			totalFGPct += game.FG_PCT      // float64 addition
+			totalPts += game.PTS              // int addition
+			totalFG += game.FGM               // int addition
+			totalReb += game.REB              // int addition
+			totalAst += game.AST              // int addition
+			totalFGPct += game.FG_PCT         // float64 addition
 			totalPlusMinus += game.PLUS_MINUS // float64 addition
 		}
 
@@ -215,30 +215,30 @@ func demoTeamLogs(ctx context.Context, client *stats.Client) {
 
 		fmt.Printf("%d. %s %s\n",
 			count+1,
-			log.TEAM_ABBREVIATION,  // string
-			log.TEAM_NAME,          // string
+			log.TEAM_ABBREVIATION, // string
+			log.TEAM_NAME,         // string
 		)
 		fmt.Printf("   Latest: %s vs %s (%s)\n",
-			log.GAME_DATE,          // string
-			log.MATCHUP,            // string
-			log.WL,                 // string
+			log.GAME_DATE, // string
+			log.MATCHUP,   // string
+			log.WL,        // string
 		)
 		fmt.Printf("   Stats: %d pts, %d reb, %d ast (%.1f eff)\n",
-			log.PTS,               // int
-			log.REB,               // int
-			log.AST,               // int
-			efficiency,            // calculated from ints and floats
+			log.PTS,    // int
+			log.REB,    // int
+			log.AST,    // int
+			efficiency, // calculated from ints and floats
 		)
 		fmt.Printf("   Shooting: %.1f%% FG, %.1f%% 3P, %.1f%% FT\n",
-			log.FG_PCT*100,        // float64
-			log.FG3_PCT*100,       // float64
-			log.FT_PCT*100,        // float64
+			log.FG_PCT*100,  // float64
+			log.FG3_PCT*100, // float64
+			log.FT_PCT*100,  // float64
 		)
 		fmt.Printf("   Advanced: +%.1f, %.1f fantasy pts, %d DD2, %d TD3\n",
-			log.PLUS_MINUS,        // float64
-			log.NBA_FANTASY_PTS,   // float64
-			log.DD2,               // int
-			log.TD3,               // int
+			log.PLUS_MINUS,      // float64
+			log.NBA_FANTASY_PTS, // float64
+			log.DD2,             // int
+			log.TD3,             // int
 		)
 		fmt.Println()
 

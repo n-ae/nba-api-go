@@ -1,0 +1,595 @@
+[
+  {
+    "name": "CommonPlayoffSeries",
+    "endpoint": "commonplayoffseries",
+    "parameters": [
+      {
+        "name": "LeagueID",
+        "type": "LeagueID",
+        "required": false,
+        "default": "00"
+      },
+      {
+        "name": "Season",
+        "type": "Season",
+        "required": true,
+        "default": ""
+      },
+      {
+        "name": "SeriesID",
+        "type": "string",
+        "required": false,
+        "default": ""
+      }
+    ],
+    "result_sets": [
+      {
+        "name": "PlayoffSeries",
+        "fields": [
+          "GAME_ID",
+          "HOME_TEAM_ID",
+          "VISITOR_TEAM_ID",
+          "SERIES_ID",
+          "GAME_NUM"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "TeamDetails",
+    "endpoint": "teamdetails",
+    "parameters": [
+      {
+        "name": "TeamID",
+        "type": "int",
+        "required": true,
+        "default": ""
+      }
+    ],
+    "result_sets": [
+      {
+        "name": "TeamBackground",
+        "fields": [
+          "TEAM_ID",
+          "ABBREVIATION",
+          "NICKNAME",
+          "YEARFOUNDED",
+          "CITY",
+          "ARENA",
+          "ARENACAPACITY",
+          "OWNER",
+          "GENERALMANAGER",
+          "HEADCOACH",
+          "DLEAGUEAFFILIATION"
+        ]
+      },
+      {
+        "name": "TeamHistory",
+        "fields": [
+          "TEAM_ID",
+          "CITY",
+          "NICKNAME",
+          "YEARFOUNDED",
+          "YEARACTIVETILL"
+        ]
+      },
+      {
+        "name": "TeamSocialSites",
+        "fields": [
+          "ACCOUNTTYPE",
+          "WEBSITE_LINK"
+        ]
+      },
+      {
+        "name": "TeamAwardsChampionships",
+        "fields": [
+          "YEARAWARDED",
+          "OPPOSITETEAM"
+        ]
+      },
+      {
+        "name": "TeamAwardsConf",
+        "fields": [
+          "YEARAWARDED",
+          "OPPOSITETEAM"
+        ]
+      },
+      {
+        "name": "TeamAwardsDiv",
+        "fields": [
+          "YEARAWARDED",
+          "OPPOSITETEAM"
+        ]
+      },
+      {
+        "name": "TeamHof",
+        "fields": [
+          "PLAYERID",
+          "PLAYER",
+          "POSITION",
+          "JERSEY",
+          "SEASONSWITHTEAM",
+          "YEAR"
+        ]
+      },
+      {
+        "name": "TeamRetired",
+        "fields": [
+          "PLAYERID",
+          "PLAYER",
+          "POSITION",
+          "JERSEY",
+          "SEASONSWITHTEAM",
+          "YEAR"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "TeamInfoCommonV2",
+    "endpoint": "teaminfocommonv2",
+    "parameters": [
+      {
+        "name": "TeamID",
+        "type": "int",
+        "required": true,
+        "default": ""
+      },
+      {
+        "name": "LeagueID",
+        "type": "LeagueID",
+        "required": false,
+        "default": "00"
+      },
+      {
+        "name": "Season",
+        "type": "Season",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "SeasonType",
+        "type": "SeasonType",
+        "required": false,
+        "default": "Regular Season"
+      }
+    ],
+    "result_sets": [
+      {
+        "name": "TeamInfoCommon",
+        "fields": [
+          "TEAM_ID",
+          "SEASON_YEAR",
+          "TEAM_CITY",
+          "TEAM_NAME",
+          "TEAM_ABBREVIATION",
+          "TEAM_CONFERENCE",
+          "TEAM_DIVISION",
+          "TEAM_CODE",
+          "W",
+          "L",
+          "PCT",
+          "CONF_RANK",
+          "DIV_RANK",
+          "MIN_YEAR",
+          "MAX_YEAR"
+        ]
+      },
+      {
+        "name": "TeamSeasonRanks",
+        "fields": [
+          "LEAGUE_ID",
+          "SEASON_ID",
+          "TEAM_ID",
+          "PTS_RANK",
+          "PTS_PG",
+          "REB_RANK",
+          "REB_PG",
+          "AST_RANK",
+          "AST_PG",
+          "OPP_PTS_RANK",
+          "OPP_PTS_PG"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "PlayerIndex",
+    "endpoint": "playerindex",
+    "parameters": [
+      {
+        "name": "LeagueID",
+        "type": "LeagueID",
+        "required": false,
+        "default": "00"
+      },
+      {
+        "name": "Season",
+        "type": "Season",
+        "required": false,
+        "default": ""
+      },
+      {
+        "name": "TeamID",
+        "type": "int",
+        "required": false,
+        "default": "0"
+      },
+      {
+        "name": "Historical",
+        "type": "int",
+        "required": false,
+        "default": "0"
+      }
+    ],
+    "result_sets": [
+      {
+        "name": "PlayerIndex",
+        "fields": [
+          "PERSON_ID",
+          "PLAYER_LAST_NAME",
+          "PLAYER_FIRST_NAME",
+          "PLAYER_SLUG",
+          "TEAM_ID",
+          "TEAM_SLUG",
+          "IS_DEFUNCT",
+          "TEAM_CITY",
+          "TEAM_NAME",
+          "TEAM_ABBREVIATION",
+          "JERSEY_NUMBER",
+          "POSITION",
+          "HEIGHT",
+          "WEIGHT",
+          "COLLEGE",
+          "COUNTRY",
+          "DRAFT_YEAR",
+          "DRAFT_ROUND",
+          "DRAFT_NUMBER",
+          "ROSTER_STATUS",
+          "FROM_YEAR",
+          "TO_YEAR"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "BoxScorePlayerTrackV2",
+    "endpoint": "boxscoreplayertrackv2",
+    "parameters": [
+      {
+        "name": "GameID",
+        "type": "string",
+        "required": true,
+        "default": ""
+      }
+    ],
+    "result_sets": [
+      {
+        "name": "PlayerTrack",
+        "fields": [
+          "GAME_ID",
+          "TEAM_ID",
+          "TEAM_ABBREVIATION",
+          "TEAM_CITY",
+          "PLAYER_ID",
+          "PLAYER_NAME",
+          "START_POSITION",
+          "COMMENT",
+          "MIN",
+          "SPD",
+          "DIST",
+          "ORBC",
+          "DRBC",
+          "RBC",
+          "TCHS",
+          "SAST",
+          "FTAST",
+          "PASS",
+          "AST",
+          "CFGM",
+          "CFGA",
+          "CFG_PCT",
+          "UFGM",
+          "UFGA",
+          "UFG_PCT",
+          "FG_PCT",
+          "DFGM",
+          "DFGA",
+          "DFG_PCT"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "BoxScoreFourFactorsV2",
+    "endpoint": "boxscorefourfactorsv2",
+    "parameters": [
+      {
+        "name": "GameID",
+        "type": "string",
+        "required": true,
+        "default": ""
+      },
+      {
+        "name": "StartPeriod",
+        "type": "int",
+        "required": false,
+        "default": "0"
+      },
+      {
+        "name": "EndPeriod",
+        "type": "int",
+        "required": false,
+        "default": "10"
+      },
+      {
+        "name": "StartRange",
+        "type": "int",
+        "required": false,
+        "default": "0"
+      },
+      {
+        "name": "EndRange",
+        "type": "int",
+        "required": false,
+        "default": "28800"
+      },
+      {
+        "name": "RangeType",
+        "type": "int",
+        "required": false,
+        "default": "0"
+      }
+    ],
+    "result_sets": [
+      {
+        "name": "PlayerStats",
+        "fields": [
+          "GAME_ID",
+          "TEAM_ID",
+          "TEAM_ABBREVIATION",
+          "TEAM_CITY",
+          "PLAYER_ID",
+          "PLAYER_NAME",
+          "NICKNAME",
+          "START_POSITION",
+          "COMMENT",
+          "MIN",
+          "EFG_PCT",
+          "FTA_RATE",
+          "TM_TOV_PCT",
+          "OREB_PCT",
+          "OPP_EFG_PCT",
+          "OPP_FTA_RATE",
+          "OPP_TOV_PCT",
+          "OPP_OREB_PCT"
+        ]
+      },
+      {
+        "name": "TeamStats",
+        "fields": [
+          "GAME_ID",
+          "TEAM_ID",
+          "TEAM_NAME",
+          "TEAM_ABBREVIATION",
+          "TEAM_CITY",
+          "MIN",
+          "EFG_PCT",
+          "FTA_RATE",
+          "TM_TOV_PCT",
+          "OREB_PCT",
+          "OPP_EFG_PCT",
+          "OPP_FTA_RATE",
+          "OPP_TOV_PCT",
+          "OPP_OREB_PCT"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "BoxScoreScoringV2",
+    "endpoint": "boxscorescoringv2",
+    "parameters": [
+      {
+        "name": "GameID",
+        "type": "string",
+        "required": true,
+        "default": ""
+      },
+      {
+        "name": "StartPeriod",
+        "type": "int",
+        "required": false,
+        "default": "0"
+      },
+      {
+        "name": "EndPeriod",
+        "type": "int",
+        "required": false,
+        "default": "10"
+      },
+      {
+        "name": "StartRange",
+        "type": "int",
+        "required": false,
+        "default": "0"
+      },
+      {
+        "name": "EndRange",
+        "type": "int",
+        "required": false,
+        "default": "28800"
+      },
+      {
+        "name": "RangeType",
+        "type": "int",
+        "required": false,
+        "default": "0"
+      }
+    ],
+    "result_sets": [
+      {
+        "name": "PlayerStats",
+        "fields": [
+          "GAME_ID",
+          "TEAM_ID",
+          "TEAM_ABBREVIATION",
+          "TEAM_CITY",
+          "PLAYER_ID",
+          "PLAYER_NAME",
+          "NICKNAME",
+          "START_POSITION",
+          "COMMENT",
+          "MIN",
+          "PCT_FGA_2PT",
+          "PCT_FGA_3PT",
+          "PCT_PTS_2PT",
+          "PCT_PTS_2PT_MR",
+          "PCT_PTS_3PT",
+          "PCT_PTS_FB",
+          "PCT_PTS_FT",
+          "PCT_PTS_OFF_TOV",
+          "PCT_PTS_PAINT",
+          "PCT_AST_2PM",
+          "PCT_UAST_2PM",
+          "PCT_AST_3PM",
+          "PCT_UAST_3PM",
+          "PCT_AST_FGM",
+          "PCT_UAST_FGM"
+        ]
+      },
+      {
+        "name": "TeamStats",
+        "fields": [
+          "GAME_ID",
+          "TEAM_ID",
+          "TEAM_NAME",
+          "TEAM_ABBREVIATION",
+          "TEAM_CITY",
+          "MIN",
+          "PCT_FGA_2PT",
+          "PCT_FGA_3PT",
+          "PCT_PTS_2PT",
+          "PCT_PTS_2PT_MR",
+          "PCT_PTS_3PT",
+          "PCT_PTS_FB",
+          "PCT_PTS_FT",
+          "PCT_PTS_OFF_TOV",
+          "PCT_PTS_PAINT",
+          "PCT_AST_2PM",
+          "PCT_UAST_2PM",
+          "PCT_AST_3PM",
+          "PCT_UAST_3PM",
+          "PCT_AST_FGM",
+          "PCT_UAST_FGM"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "BoxScoreUsageV2",
+    "endpoint": "boxscoreusagev2",
+    "parameters": [
+      {
+        "name": "GameID",
+        "type": "string",
+        "required": true,
+        "default": ""
+      },
+      {
+        "name": "StartPeriod",
+        "type": "int",
+        "required": false,
+        "default": "0"
+      },
+      {
+        "name": "EndPeriod",
+        "type": "int",
+        "required": false,
+        "default": "10"
+      },
+      {
+        "name": "StartRange",
+        "type": "int",
+        "required": false,
+        "default": "0"
+      },
+      {
+        "name": "EndRange",
+        "type": "int",
+        "required": false,
+        "default": "28800"
+      },
+      {
+        "name": "RangeType",
+        "type": "int",
+        "required": false,
+        "default": "0"
+      }
+    ],
+    "result_sets": [
+      {
+        "name": "PlayerStats",
+        "fields": [
+          "GAME_ID",
+          "TEAM_ID",
+          "TEAM_ABBREVIATION",
+          "TEAM_CITY",
+          "PLAYER_ID",
+          "PLAYER_NAME",
+          "NICKNAME",
+          "START_POSITION",
+          "COMMENT",
+          "MIN",
+          "USG_PCT",
+          "PCT_FGM",
+          "PCT_FGA",
+          "PCT_FG3M",
+          "PCT_FG3A",
+          "PCT_FTM",
+          "PCT_FTA",
+          "PCT_OREB",
+          "PCT_DREB",
+          "PCT_REB",
+          "PCT_AST",
+          "PCT_TOV",
+          "PCT_STL",
+          "PCT_BLK",
+          "PCT_BLKA",
+          "PCT_PF",
+          "PCT_PFD",
+          "PCT_PTS"
+        ]
+      },
+      {
+        "name": "TeamStats",
+        "fields": [
+          "GAME_ID",
+          "TEAM_ID",
+          "TEAM_NAME",
+          "TEAM_ABBREVIATION",
+          "TEAM_CITY",
+          "MIN",
+          "USG_PCT",
+          "PCT_FGM",
+          "PCT_FGA",
+          "PCT_FG3M",
+          "PCT_FG3A",
+          "PCT_FTM",
+          "PCT_FTA",
+          "PCT_OREB",
+          "PCT_DREB",
+          "PCT_REB",
+          "PCT_AST",
+          "PCT_TOV",
+          "PCT_STL",
+          "PCT_BLK",
+          "PCT_BLKA",
+          "PCT_PF",
+          "PCT_PFD",
+          "PCT_PTS"
+        ]
+      }
+    ]
+  }
+]

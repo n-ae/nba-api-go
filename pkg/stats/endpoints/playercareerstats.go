@@ -68,14 +68,14 @@ type CareerTotalStat struct {
 }
 
 type PlayerCareerStatsResponse struct {
-	SeasonTotalsRegularSeason   []SeasonStat    `json:"SeasonTotalsRegularSeason"`
-	CareerTotalsRegularSeason   []CareerTotalStat `json:"CareerTotalsRegularSeason"`
-	SeasonTotalsPostSeason      []SeasonStat    `json:"SeasonTotalsPostSeason"`
-	CareerTotalsPostSeason      []CareerTotalStat `json:"CareerTotalsPostSeason"`
-	SeasonTotalsAllStarSeason   []SeasonStat    `json:"SeasonTotalsAllStarSeason"`
-	CareerTotalsAllStarSeason   []CareerTotalStat `json:"CareerTotalsAllStarSeason"`
-	SeasonTotalsCollegeSeason   []SeasonStat    `json:"SeasonTotalsCollegeSeason"`
-	CareerTotalsCollegeSeason   []CareerTotalStat `json:"CareerTotalsCollegeSeason"`
+	SeasonTotalsRegularSeason []SeasonStat      `json:"SeasonTotalsRegularSeason"`
+	CareerTotalsRegularSeason []CareerTotalStat `json:"CareerTotalsRegularSeason"`
+	SeasonTotalsPostSeason    []SeasonStat      `json:"SeasonTotalsPostSeason"`
+	CareerTotalsPostSeason    []CareerTotalStat `json:"CareerTotalsPostSeason"`
+	SeasonTotalsAllStarSeason []SeasonStat      `json:"SeasonTotalsAllStarSeason"`
+	CareerTotalsAllStarSeason []CareerTotalStat `json:"CareerTotalsAllStarSeason"`
+	SeasonTotalsCollegeSeason []SeasonStat      `json:"SeasonTotalsCollegeSeason"`
+	CareerTotalsCollegeSeason []CareerTotalStat `json:"CareerTotalsCollegeSeason"`
 }
 
 type PlayerCareerStatsRequest struct {
