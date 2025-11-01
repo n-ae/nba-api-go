@@ -9,18 +9,16 @@ import (
 	"github.com/username/nba-api-go/pkg/stats/parameters"
 )
 
-// LeagueDashPtStatsRequest contains parameters for the LeagueDashPtStats endpoint
-type LeagueDashPtStatsRequest struct {
-	Season        *parameters.Season
-	SeasonType    *parameters.SeasonType
-	PerMode       *parameters.PerMode
-	LeagueID      *parameters.LeagueID
-	PlayerOrTeam  *string
-	PtMeasureType *string
+// PlayerTrackingSpeedDistanceRequest contains parameters for the PlayerTrackingSpeedDistance endpoint
+type PlayerTrackingSpeedDistanceRequest struct {
+	Season     *parameters.Season
+	SeasonType *parameters.SeasonType
+	PerMode    *parameters.PerMode
+	LeagueID   *parameters.LeagueID
 }
 
-// LeagueDashPtStatsLeagueDashPTStats represents the LeagueDashPTStats result set for LeagueDashPtStats
-type LeagueDashPtStatsLeagueDashPTStats struct {
+// PlayerTrackingSpeedDistancePlayerTrackingSpeedDistance represents the PlayerTrackingSpeedDistance result set for PlayerTrackingSpeedDistance
+type PlayerTrackingSpeedDistancePlayerTrackingSpeedDistance struct {
 	PLAYER_ID         int     `json:"PLAYER_ID"`
 	PLAYER_NAME       string  `json:"PLAYER_NAME"`
 	TEAM_ID           int     `json:"TEAM_ID"`
@@ -36,13 +34,13 @@ type LeagueDashPtStatsLeagueDashPTStats struct {
 	AVG_SPEED_DEF     string  `json:"AVG_SPEED_DEF"`
 }
 
-// LeagueDashPtStatsResponse contains the response data from the LeagueDashPtStats endpoint
-type LeagueDashPtStatsResponse struct {
-	LeagueDashPTStats []LeagueDashPtStatsLeagueDashPTStats
+// PlayerTrackingSpeedDistanceResponse contains the response data from the PlayerTrackingSpeedDistance endpoint
+type PlayerTrackingSpeedDistanceResponse struct {
+	PlayerTrackingSpeedDistance []PlayerTrackingSpeedDistancePlayerTrackingSpeedDistance
 }
 
-// GetLeagueDashPtStats retrieves data from the leaguedashptstats endpoint
-func GetLeagueDashPtStats(ctx context.Context, client *stats.Client, req LeagueDashPtStatsRequest) (*models.Response[*LeagueDashPtStatsResponse], error) {
+// GetPlayerTrackingSpeedDistance retrieves data from the playertrackingspeeddistance endpoint
+func GetPlayerTrackingSpeedDistance(ctx context.Context, client *stats.Client, req PlayerTrackingSpeedDistanceRequest) (*models.Response[*PlayerTrackingSpeedDistanceResponse], error) {
 	params := url.Values{}
 	if req.Season != nil {
 		params.Set("Season", string(*req.Season))
@@ -56,24 +54,18 @@ func GetLeagueDashPtStats(ctx context.Context, client *stats.Client, req LeagueD
 	if req.LeagueID != nil {
 		params.Set("LeagueID", string(*req.LeagueID))
 	}
-	if req.PlayerOrTeam != nil {
-		params.Set("PlayerOrTeam", string(*req.PlayerOrTeam))
-	}
-	if req.PtMeasureType != nil {
-		params.Set("PtMeasureType", string(*req.PtMeasureType))
-	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/leaguedashptstats", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "/playertrackingspeeddistance", params, &rawResp); err != nil {
 		return nil, err
 	}
 
-	response := &LeagueDashPtStatsResponse{}
+	response := &PlayerTrackingSpeedDistanceResponse{}
 	if len(rawResp.ResultSets) > 0 {
-		response.LeagueDashPTStats = make([]LeagueDashPtStatsLeagueDashPTStats, 0, len(rawResp.ResultSets[0].RowSet))
+		response.PlayerTrackingSpeedDistance = make([]PlayerTrackingSpeedDistancePlayerTrackingSpeedDistance, 0, len(rawResp.ResultSets[0].RowSet))
 		for _, row := range rawResp.ResultSets[0].RowSet {
 			if len(row) >= 13 {
-				item := LeagueDashPtStatsLeagueDashPTStats{
+				item := PlayerTrackingSpeedDistancePlayerTrackingSpeedDistance{
 					PLAYER_ID:         toInt(row[0]),
 					PLAYER_NAME:       toString(row[1]),
 					TEAM_ID:           toInt(row[2]),
@@ -88,7 +80,7 @@ func GetLeagueDashPtStats(ctx context.Context, client *stats.Client, req LeagueD
 					AVG_SPEED_OFF:     toString(row[11]),
 					AVG_SPEED_DEF:     toString(row[12]),
 				}
-				response.LeagueDashPTStats = append(response.LeagueDashPTStats, item)
+				response.PlayerTrackingSpeedDistance = append(response.PlayerTrackingSpeedDistance, item)
 			}
 		}
 	}
