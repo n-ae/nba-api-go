@@ -73,12 +73,19 @@ func getEnv(key, defaultValue string) string {
 type Server struct {
 	logger       *log.Logger
 	statsHandler *StatsHandler
+	metrics      *Metrics
+	rateLimiter  *RateLimiter
 }
 
 func NewServer(logger *log.Logger) *Server {
+	rateLimiter := NewRateLimiter(100, 200)
+	rateLimiter.CleanupOldLimiters(5 * time.Minute)
+
 	return &Server{
 		logger:       logger,
 		statsHandler: NewStatsHandler(),
+		metrics:      NewMetrics(),
+		rateLimiter:  rateLimiter,
 	}
 }
 
@@ -86,9 +93,32 @@ func (s *Server) Routes() http.Handler {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/health", s.handleHealth())
+	mux.HandleFunc("/metrics", s.handleMetrics())
 	mux.Handle("/api/v1/stats/", s.statsHandler)
 
-	return s.loggingMiddleware(s.corsMiddleware(mux))
+	return s.metricsMiddleware(s.loggingMiddleware(s.rateLimiter.Middleware(s.corsMiddleware(mux))))
+}
+
+func (s *Server) metricsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+
+		rec := &responseRecorder{ResponseWriter: w, statusCode: http.StatusOK}
+		next.ServeHTTP(rec, r)
+
+		duration := time.Since(start)
+		s.metrics.RecordRequest(r.URL.Path, rec.statusCode, duration)
+	})
+}
+
+type responseRecorder struct {
+	http.ResponseWriter
+	statusCode int
+}
+
+func (rec *responseRecorder) WriteHeader(code int) {
+	rec.statusCode = code
+	rec.ResponseWriter.WriteHeader(code)
 }
 
 func (s *Server) loggingMiddleware(next http.Handler) http.Handler {
@@ -150,6 +180,16 @@ func (s *Server) handleHealth() http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(resp)
+	}
+}
+
+func (s *Server) handleMetrics() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		snapshot := s.metrics.GetSnapshot()
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(snapshot)
 	}
 }
 

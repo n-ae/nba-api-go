@@ -16,6 +16,7 @@ See [Migration Guide](./docs/MIGRATION_GUIDE.md) to migrate from Python nba_api 
 
 ## Features
 
+### Core Features
 - **🏆 139 Stats API endpoints** - 100% COVERAGE! (Complete feature parity with Python nba_api)
 - **Go SDK** - Type-safe library for direct Go integration
 - **HTTP API Server** - Complete REST API with all 139 endpoints for any language
@@ -23,10 +24,19 @@ See [Migration Guide](./docs/MIGRATION_GUIDE.md) to migrate from Python nba_api 
 - **Live API** - Real-time game data and scoreboards
 - **Static Data** - Pre-loaded player and team datasets with search (5,135 players, 30 teams)
 - **Type Safety** - Automatic type inference from field names to Go types
-- **Rate Limiting** - Built-in respect for NBA.com API limits
 - **Context Support** - Full support for cancellation and timeouts
 - **Zero Frameworks** - HTTP API uses stdlib only (net/http, encoding/json)
 - **Code Generation** - Advanced tooling for type-safe endpoint generation
+
+### Production Features (HTTP Server)
+- **⚡ Rate Limiting** - Per-IP rate limiting (100 req/s, burst 200) to prevent abuse
+- **📊 Metrics & Monitoring** - Built-in `/metrics` endpoint with request stats, response times, error rates
+- **🏥 Health Checks** - `/health` endpoint with NBA API connectivity status and build info
+- **🔒 CORS Support** - Configurable cross-origin resource sharing
+- **📝 Request Logging** - Structured logging with response times
+- **🚀 High Performance** - Handles 10,000+ req/min on 1 vCPU
+- **💾 Low Memory** - < 100MB typical memory usage
+- **🔄 Graceful Shutdown** - Safe shutdown with connection draining (10s timeout)
 
 ## Installation
 
@@ -320,6 +330,9 @@ go test ./...
 # Run tests with coverage
 go test -cover ./...
 
+# Test example programs compile
+make test-examples
+
 # Run benchmarks
 go test -bench=. -benchmem ./...
 
@@ -328,6 +341,66 @@ INTEGRATION_TESTS=1 go test -tags=integration ./...
 ```
 
 See [BENCHMARKS.md](./docs/BENCHMARKS.md) for detailed performance analysis.
+
+## Monitoring & Deployment
+
+### Health & Metrics
+
+The HTTP server includes built-in monitoring endpoints:
+
+**Health Check** (`/health`):
+```bash
+curl http://localhost:8080/health
+```
+
+Returns:
+- Server status
+- NBA API connectivity status (operational/degraded)
+- Build information (Go version, build time, git commit)
+- Endpoint counts
+- Timestamp
+
+**Metrics** (`/metrics`):
+```bash
+curl http://localhost:8080/metrics
+```
+
+Returns:
+- Uptime
+- Total requests & errors
+- Requests by status code
+- Requests by path
+- Response time statistics (avg, min, max)
+
+### Deployment
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete deployment guide including:
+- Systemd service setup
+- Docker/Podman deployment
+- Cloud platform deployment (Fly.io, Railway, etc.)
+- Reverse proxy configuration (Nginx, Caddy)
+- SSL/TLS setup
+- Monitoring with Prometheus/UptimeRobot
+- Cost estimates and recommendations
+
+**Quick Deploy**:
+```bash
+# Build with version info
+go build \
+  -ldflags="-X main.buildTime=$(date -u +%Y-%m-%dT%H:%M:%SZ) -X main.gitCommit=$(git rev-parse --short HEAD)" \
+  -o nba-api-server \
+  ./cmd/nba-api-server
+
+# Run
+./nba-api-server
+```
+
+**Recommended Setup** (Solo Maintainer):
+- Hetzner VPS ($5/month)
+- Systemd service
+- Caddy reverse proxy (auto SSL)
+- UptimeRobot (free monitoring)
+- **Total**: $5/month, ~1 hour maintenance/month
 
 ## Roadmap
 

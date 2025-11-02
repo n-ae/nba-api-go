@@ -228,3 +228,82 @@ func TestStatsHandlerInvalidEndpoint(t *testing.T) {
 		t.Error("expected success=false for invalid endpoint")
 	}
 }
+
+func TestMetricsEndpoint(t *testing.T) {
+	logger := log.New(os.Stdout, "[test] ", log.LstdFlags)
+	server := NewServer(logger)
+
+	req := httptest.NewRequest(http.MethodGet, "/metrics", nil)
+	w := httptest.NewRecorder()
+
+	server.handleMetrics()(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("expected status 200, got %d", w.Code)
+	}
+
+	var response map[string]interface{}
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		t.Fatalf("failed to decode metrics response: %v", err)
+	}
+
+	if _, ok := response["uptime_seconds"]; !ok {
+		t.Error("expected uptime_seconds in metrics")
+	}
+
+	if _, ok := response["total_requests"]; !ok {
+		t.Error("expected total_requests in metrics")
+	}
+}
+
+func TestRateLimiting(t *testing.T) {
+	rl := NewRateLimiter(2, 2)
+
+	handler := rl.Middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+
+	for i := 0; i < 3; i++ {
+		req := httptest.NewRequest(http.MethodGet, "/test", nil)
+		req.RemoteAddr = "127.0.0.1:1234"
+		w := httptest.NewRecorder()
+
+		handler.ServeHTTP(w, req)
+
+		if i < 2 {
+			if w.Code != http.StatusOK {
+				t.Errorf("request %d: expected status 200, got %d", i, w.Code)
+			}
+		} else {
+			if w.Code != http.StatusTooManyRequests {
+				t.Errorf("request %d: expected status 429, got %d", i, w.Code)
+			}
+		}
+	}
+}
+
+func TestMetricsTracking(t *testing.T) {
+	metrics := NewMetrics()
+
+	metrics.RecordRequest("/api/test", 200, 10000000)
+	metrics.RecordRequest("/api/test", 404, 5000000)
+	metrics.RecordRequest("/health", 200, 1000000)
+
+	snapshot := metrics.GetSnapshot()
+
+	if snapshot.TotalRequests != 3 {
+		t.Errorf("expected 3 total requests, got %d", snapshot.TotalRequests)
+	}
+
+	if snapshot.TotalErrors != 1 {
+		t.Errorf("expected 1 error, got %d", snapshot.TotalErrors)
+	}
+
+	if snapshot.RequestsByStatus[200] != 2 {
+		t.Errorf("expected 2 requests with status 200, got %d", snapshot.RequestsByStatus[200])
+	}
+
+	if snapshot.RequestsByPath["/api/test"] != 2 {
+		t.Errorf("expected 2 requests to /api/test, got %d", snapshot.RequestsByPath["/api/test"])
+	}
+}
