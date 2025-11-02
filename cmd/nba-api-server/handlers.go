@@ -320,6 +320,28 @@ func (h *StatsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.handleShotChartLineupDetail(w, r)
 	case "playercareerbycollegerollup":
 		h.handlePlayerCareerByCollegeRollup(w, r)
+	
+	// Iteration 10 endpoints - Final SDK endpoints (beyond 100%)
+	case "commonplayoffseriesv2":
+		h.handleCommonPlayoffSeriesV2(w, r)
+	case "leaguedashplayerclutchv2":
+		h.handleLeagueDashPlayerClutchV2(w, r)
+	case "leaguedashplayershotlocationv2":
+		h.handleLeagueDashPlayerShotLocationV2(w, r)
+	case "leaguedashteamclutchv2":
+		h.handleLeagueDashTeamClutchV2(w, r)
+	case "playernextngames":
+		h.handlePlayerNextNGames(w, r)
+	case "playertrackingshootingefficiency":
+		h.handlePlayerTrackingShootingEfficiency(w, r)
+	case "teamandplayersvsplayers":
+		h.handleTeamAndPlayersVsPlayers(w, r)
+	case "teaminfocommonv2":
+		h.handleTeamInfoCommonV2(w, r)
+	case "teamnextngames":
+		h.handleTeamNextNGames(w, r)
+	case "teamyearoveryearsplits":
+		h.handleTeamYearOverYearSplits(w, r)
 
 	default:
 		writeError(w, http.StatusNotFound, "endpoint_not_found", "Endpoint not supported: "+endpoint)
@@ -3281,6 +3303,255 @@ func (h *StatsHandler) handlePlayerCareerByCollegeRollup(w http.ResponseWriter, 
 	}
 
 	resp, err := endpoints.GetPlayerCareerByCollegeRollup(r.Context(), h.client, req)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		return
+	}
+
+	writeSuccess(w, resp)
+}
+
+// Iteration 10 endpoints - Final SDK endpoints
+
+func (h *StatsHandler) handleCommonPlayoffSeriesV2(w http.ResponseWriter, r *http.Request) {
+	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	leagueID := parameters.LeagueIDNBA
+
+	req := endpoints.CommonPlayoffSeriesV2Request{
+		Season:   &season,
+		LeagueID: &leagueID,
+	}
+
+	resp, err := endpoints.GetCommonPlayoffSeriesV2(r.Context(), h.client, req)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		return
+	}
+
+	writeSuccess(w, resp)
+}
+
+func (h *StatsHandler) handleLeagueDashPlayerClutchV2(w http.ResponseWriter, r *http.Request) {
+	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
+	perMode := parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))
+	leagueID := parameters.LeagueIDNBA
+
+	req := endpoints.LeagueDashPlayerClutchV2Request{
+		Season:     &season,
+		SeasonType: &seasonType,
+		PerMode:    &perMode,
+		LeagueID:   &leagueID,
+	}
+
+	resp, err := endpoints.GetLeagueDashPlayerClutchV2(r.Context(), h.client, req)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		return
+	}
+
+	writeSuccess(w, resp)
+}
+
+func (h *StatsHandler) handleLeagueDashPlayerShotLocationV2(w http.ResponseWriter, r *http.Request) {
+	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
+	perMode := parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))
+	leagueID := parameters.LeagueIDNBA
+
+	req := endpoints.LeagueDashPlayerShotLocationV2Request{
+		Season:     &season,
+		SeasonType: &seasonType,
+		PerMode:    &perMode,
+		LeagueID:   &leagueID,
+	}
+
+	resp, err := endpoints.GetLeagueDashPlayerShotLocationV2(r.Context(), h.client, req)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		return
+	}
+
+	writeSuccess(w, resp)
+}
+
+func (h *StatsHandler) handleLeagueDashTeamClutchV2(w http.ResponseWriter, r *http.Request) {
+	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
+	perMode := parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))
+	leagueID := parameters.LeagueIDNBA
+
+	req := endpoints.LeagueDashTeamClutchV2Request{
+		Season:     &season,
+		SeasonType: &seasonType,
+		PerMode:    &perMode,
+		LeagueID:   &leagueID,
+	}
+
+	resp, err := endpoints.GetLeagueDashTeamClutchV2(r.Context(), h.client, req)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		return
+	}
+
+	writeSuccess(w, resp)
+}
+
+func (h *StatsHandler) handlePlayerNextNGames(w http.ResponseWriter, r *http.Request) {
+	playerID := r.URL.Query().Get("PlayerID")
+	if playerID == "" {
+		writeError(w, http.StatusBadRequest, "missing_parameter", "PlayerID is required")
+		return
+	}
+
+	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
+	leagueID := parameters.LeagueIDNBA
+
+	req := endpoints.PlayerNextNGamesRequest{
+		PlayerID:   playerID,
+		Season:     &season,
+		SeasonType: &seasonType,
+		LeagueID:   &leagueID,
+	}
+
+	resp, err := endpoints.GetPlayerNextNGames(r.Context(), h.client, req)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		return
+	}
+
+	writeSuccess(w, resp)
+}
+
+func (h *StatsHandler) handlePlayerTrackingShootingEfficiency(w http.ResponseWriter, r *http.Request) {
+	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
+	perMode := parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))
+	leagueID := parameters.LeagueIDNBA
+
+	req := endpoints.PlayerTrackingShootingEfficiencyRequest{
+		Season:     &season,
+		SeasonType: &seasonType,
+		PerMode:    &perMode,
+		LeagueID:   &leagueID,
+	}
+
+	resp, err := endpoints.GetPlayerTrackingShootingEfficiency(r.Context(), h.client, req)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		return
+	}
+
+	writeSuccess(w, resp)
+}
+
+func (h *StatsHandler) handleTeamAndPlayersVsPlayers(w http.ResponseWriter, r *http.Request) {
+	teamID := r.URL.Query().Get("TeamID")
+	vsPlayerID := r.URL.Query().Get("VsPlayerID")
+	if teamID == "" || vsPlayerID == "" {
+		writeError(w, http.StatusBadRequest, "missing_parameter", "TeamID and VsPlayerID are required")
+		return
+	}
+
+	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
+	perMode := parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))
+	leagueID := parameters.LeagueIDNBA
+
+	req := endpoints.TeamAndPlayersVsPlayersRequest{
+		TeamID:     teamID,
+		VsPlayerID: vsPlayerID,
+		Season:     &season,
+		SeasonType: &seasonType,
+		PerMode:    &perMode,
+		LeagueID:   &leagueID,
+	}
+
+	resp, err := endpoints.GetTeamAndPlayersVsPlayers(r.Context(), h.client, req)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		return
+	}
+
+	writeSuccess(w, resp)
+}
+
+func (h *StatsHandler) handleTeamInfoCommonV2(w http.ResponseWriter, r *http.Request) {
+	teamID := r.URL.Query().Get("TeamID")
+	if teamID == "" {
+		writeError(w, http.StatusBadRequest, "missing_parameter", "TeamID is required")
+		return
+	}
+
+	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
+	leagueID := parameters.LeagueIDNBA
+
+	req := endpoints.TeamInfoCommonV2Request{
+		TeamID:     teamID,
+		Season:     &season,
+		SeasonType: &seasonType,
+		LeagueID:   &leagueID,
+	}
+
+	resp, err := endpoints.GetTeamInfoCommonV2(r.Context(), h.client, req)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		return
+	}
+
+	writeSuccess(w, resp)
+}
+
+func (h *StatsHandler) handleTeamNextNGames(w http.ResponseWriter, r *http.Request) {
+	teamID := r.URL.Query().Get("TeamID")
+	if teamID == "" {
+		writeError(w, http.StatusBadRequest, "missing_parameter", "TeamID is required")
+		return
+	}
+
+	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
+	leagueID := parameters.LeagueIDNBA
+
+	req := endpoints.TeamNextNGamesRequest{
+		TeamID:     teamID,
+		Season:     &season,
+		SeasonType: &seasonType,
+		LeagueID:   &leagueID,
+	}
+
+	resp, err := endpoints.GetTeamNextNGames(r.Context(), h.client, req)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		return
+	}
+
+	writeSuccess(w, resp)
+}
+
+func (h *StatsHandler) handleTeamYearOverYearSplits(w http.ResponseWriter, r *http.Request) {
+	teamID := r.URL.Query().Get("TeamID")
+	if teamID == "" {
+		writeError(w, http.StatusBadRequest, "missing_parameter", "TeamID is required")
+		return
+	}
+
+	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
+	perMode := parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))
+	leagueID := parameters.LeagueIDNBA
+
+	req := endpoints.TeamYearOverYearSplitsRequest{
+		TeamID:     teamID,
+		Season:     &season,
+		SeasonType: &seasonType,
+		PerMode:    &perMode,
+		LeagueID:   &leagueID,
+	}
+
+	resp, err := endpoints.GetTeamYearOverYearSplits(r.Context(), h.client, req)
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
 		return

@@ -118,8 +118,8 @@ func (s *Server) handleHealth() http.HandlerFunc {
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"status":                 "healthy",
 			"version":                version,
-			"sdk_endpoints_total":    139,
-			"http_endpoints_exposed": 139,
+			"sdk_endpoints_total":    140,
+			"http_endpoints_exposed": 149,
 			"timestamp":              time.Now().Unix(),
 		})
 	}
