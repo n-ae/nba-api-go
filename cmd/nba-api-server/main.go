@@ -7,11 +7,20 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 	"time"
+
+	"github.com/n-ae/nba-api-go/pkg/stats"
+	"github.com/n-ae/nba-api-go/pkg/stats/endpoints"
 )
 
 const version = "0.1.0"
+
+var (
+	buildTime = "unknown"
+	gitCommit = "unknown"
+)
 
 func main() {
 	port := getEnv("PORT", "8080")
@@ -107,22 +116,59 @@ func (s *Server) corsMiddleware(next http.Handler) http.Handler {
 
 func (s *Server) handleHealth() http.HandlerFunc {
 	type healthResponse struct {
-		Status         string `json:"status"`
-		Version        string `json:"version"`
-		EndpointsCount int    `json:"endpoints_count"`
+		Status         string                 `json:"status"`
+		Version        string                 `json:"version"`
+		BuildInfo      map[string]string      `json:"build_info"`
+		EndpointsCount map[string]int         `json:"endpoints_count"`
+		Dependencies   map[string]string      `json:"dependencies"`
+		NBAAPIStatus   string                 `json:"nba_api_status"`
+		Timestamp      int64                  `json:"timestamp"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		nbaAPIStatus := s.checkNBAAPI()
+
+		resp := healthResponse{
+			Status:  "healthy",
+			Version: version,
+			BuildInfo: map[string]string{
+				"go_version": runtime.Version(),
+				"build_time": buildTime,
+				"git_commit": gitCommit,
+			},
+			EndpointsCount: map[string]int{
+				"sdk_total":      140,
+				"http_exposed":   149,
+			},
+			Dependencies: map[string]string{
+				"nba_api": "stats.nba.com",
+			},
+			NBAAPIStatus: nbaAPIStatus,
+			Timestamp:    time.Now().Unix(),
+		}
+
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"status":                 "healthy",
-			"version":                version,
-			"sdk_endpoints_total":    140,
-			"http_endpoints_exposed": 149,
-			"timestamp":              time.Now().Unix(),
-		})
+		json.NewEncoder(w).Encode(resp)
 	}
+}
+
+func (s *Server) checkNBAAPI() string {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	client := stats.NewDefaultClient()
+
+	req := endpoints.CommonAllPlayersRequest{
+		Season: "2023-24",
+	}
+
+	_, err := endpoints.GetCommonAllPlayers(ctx, client, req)
+	if err != nil {
+		return "degraded"
+	}
+
+	return "operational"
 }
 
 func writeError(w http.ResponseWriter, status int, code, message string) {

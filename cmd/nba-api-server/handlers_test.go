@@ -34,6 +34,24 @@ func TestHealthEndpoint(t *testing.T) {
 	if version, ok := response["version"].(string); !ok || version == "" {
 		t.Errorf("expected version to be set, got %v", response["version"])
 	}
+
+	if buildInfo, ok := response["build_info"].(map[string]interface{}); !ok {
+		t.Error("expected build_info to be present")
+	} else {
+		if goVersion, ok := buildInfo["go_version"].(string); !ok || goVersion == "" {
+			t.Error("expected go_version in build_info")
+		}
+	}
+
+	if nbaAPIStatus, ok := response["nba_api_status"].(string); !ok {
+		t.Error("expected nba_api_status to be present")
+	} else if nbaAPIStatus != "operational" && nbaAPIStatus != "degraded" {
+		t.Errorf("expected nba_api_status to be 'operational' or 'degraded', got %s", nbaAPIStatus)
+	}
+
+	if timestamp, ok := response["timestamp"].(float64); !ok || timestamp == 0 {
+		t.Error("expected timestamp to be set")
+	}
 }
 
 func TestCORSMiddleware(t *testing.T) {
@@ -140,5 +158,73 @@ func TestWriteError(t *testing.T) {
 
 	if code := errorObj["code"].(string); code != "invalid_param" {
 		t.Errorf("expected error code 'invalid_param', got %s", code)
+	}
+}
+
+func TestLoggingMiddleware(t *testing.T) {
+	logger := log.New(os.Stdout, "[test] ", log.LstdFlags)
+	server := NewServer(logger)
+
+	handlerCalled := false
+	handler := server.loggingMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		handlerCalled = true
+		w.WriteHeader(http.StatusOK)
+	}))
+
+	req := httptest.NewRequest(http.MethodGet, "/test", nil)
+	w := httptest.NewRecorder()
+
+	handler.ServeHTTP(w, req)
+
+	if !handlerCalled {
+		t.Error("expected handler to be called")
+	}
+
+	if w.Code != http.StatusOK {
+		t.Errorf("expected status 200, got %d", w.Code)
+	}
+}
+
+func TestStatsHandlerMethodNotAllowed(t *testing.T) {
+	handler := NewStatsHandler()
+
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/stats/playergamelog", nil)
+	w := httptest.NewRecorder()
+
+	handler.ServeHTTP(w, req)
+
+	if w.Code != http.StatusMethodNotAllowed {
+		t.Errorf("expected status 405, got %d", w.Code)
+	}
+
+	var response map[string]interface{}
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
+	}
+
+	if success, ok := response["success"].(bool); !ok || success {
+		t.Error("expected success=false for method not allowed")
+	}
+}
+
+func TestStatsHandlerInvalidEndpoint(t *testing.T) {
+	handler := NewStatsHandler()
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/stats/nonexistent", nil)
+	w := httptest.NewRecorder()
+
+	handler.ServeHTTP(w, req)
+
+	if w.Code != http.StatusNotFound {
+		t.Errorf("expected status 404, got %d", w.Code)
+	}
+
+	var response map[string]interface{}
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
+	}
+
+	if success, ok := response["success"].(bool); !ok || success {
+		t.Error("expected success=false for invalid endpoint")
 	}
 }
