@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yourusername/nba-api-go/pkg/client"
-	"github.com/yourusername/nba-api-go/pkg/stats/parameters"
+	"github.com/yourn-ae/nba-api-go/pkg/client"
+	"github.com/yourn-ae/nba-api-go/pkg/stats/parameters"
 )
 
 // EndpointTester provides a framework for testing NBA API endpoints

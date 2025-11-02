@@ -3,8 +3,8 @@ package integration
 import (
 	"testing"
 
-	"github.com/yourusername/nba-api-go/pkg/stats/endpoints"
-	"github.com/yourusername/nba-api-go/pkg/stats/parameters"
+	"github.com/yourn-ae/nba-api-go/pkg/stats/endpoints"
+	"github.com/yourn-ae/nba-api-go/pkg/stats/parameters"
 )
 
 // TestPlayerEndpoints runs all player-related endpoint tests

@@ -36,7 +36,7 @@ linters-settings:
     simplify: true
 
   goimports:
-    local-prefixes: github.com/username/nba-api-go
+    local-prefixes: github.com/n-ae/nba-api-go
 
   misspell:
     locale: US

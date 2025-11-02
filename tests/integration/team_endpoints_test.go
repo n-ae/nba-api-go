@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/yourusername/nba-api-go/pkg/stats/endpoints"
-	"github.com/yourusername/nba-api-go/pkg/stats/parameters"
+	"github.com/yourn-ae/nba-api-go/pkg/stats/endpoints"
+	"github.com/yourn-ae/nba-api-go/pkg/stats/parameters"
 )
 
 // TestTeamEndpoints runs all team-related endpoint tests

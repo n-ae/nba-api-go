@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	main "github.com/username/nba-api-go/cmd/nba-api-server"
+	main "github.com/n-ae/nba-api-go/cmd/nba-api-server"
 )
 
 // TestHealthEndpoint tests the health check endpoint

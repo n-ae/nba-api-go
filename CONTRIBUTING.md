@@ -21,7 +21,7 @@ Be respectful, collaborative, and constructive in all interactions.
 
 1. Fork the repository
 2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/nba-api-go.git`
-3. Add upstream remote: `git remote add upstream https://github.com/username/nba-api-go.git`
+3. Add upstream remote: `git remote add upstream https://github.com/n-ae/nba-api-go.git`
 4. Create a feature branch: `git checkout -b feature/your-feature-name`
 
 ## Development Setup
@@ -110,8 +110,8 @@ import (
     "context"
     "net/url"
 
-    "github.com/username/nba-api-go/pkg/models"
-    "github.com/username/nba-api-go/pkg/stats"
+    "github.com/n-ae/nba-api-go/pkg/models"
+    "github.com/n-ae/nba-api-go/pkg/stats"
 )
 
 type YourEndpointRequest struct {
@@ -262,8 +262,8 @@ import (
 
     "golang.org/x/text/transform"
 
-    "github.com/username/nba-api-go/pkg/models"
-    "github.com/username/nba-api-go/pkg/stats"
+    "github.com/n-ae/nba-api-go/pkg/models"
+    "github.com/n-ae/nba-api-go/pkg/stats"
 )
 ```
 

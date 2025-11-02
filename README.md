@@ -32,7 +32,7 @@ See [Migration Guide](./docs/MIGRATION_GUIDE.md) to migrate from Python nba_api 
 
 ### Go SDK
 ```bash
-go get github.com/username/nba-api-go
+go get github.com/n-ae/nba-api-go
 ```
 
 ### HTTP API Server
@@ -53,7 +53,7 @@ This project provides **two ways** to access NBA data:
 Best for: Type-safety, performance, direct Go integration
 
 ```go
-import "github.com/username/nba-api-go/pkg/stats"
+import "github.com/n-ae/nba-api-go/pkg/stats"
 ```
 
 ### Pattern 2: HTTP API (For Any Language)
@@ -84,9 +84,9 @@ import (
     "fmt"
     "log"
 
-    "github.com/username/nba-api-go/pkg/stats"
-    "github.com/username/nba-api-go/pkg/stats/endpoints"
-    "github.com/username/nba-api-go/pkg/stats/parameters"
+    "github.com/n-ae/nba-api-go/pkg/stats"
+    "github.com/n-ae/nba-api-go/pkg/stats/endpoints"
+    "github.com/n-ae/nba-api-go/pkg/stats/parameters"
 )
 
 func main() {
@@ -161,8 +161,8 @@ import (
     "fmt"
     "log"
 
-    "github.com/username/nba-api-go/pkg/live"
-    "github.com/username/nba-api-go/pkg/live/endpoints"
+    "github.com/n-ae/nba-api-go/pkg/live"
+    "github.com/n-ae/nba-api-go/pkg/live/endpoints"
 )
 
 func main() {
@@ -191,7 +191,7 @@ import (
     "fmt"
     "log"
 
-    "github.com/username/nba-api-go/pkg/stats/static"
+    "github.com/n-ae/nba-api-go/pkg/stats/static"
 )
 
 func main() {
@@ -239,8 +239,8 @@ The client supports composable middleware for cross-cutting concerns:
 
 ```go
 import (
-    "github.com/username/nba-api-go/internal/middleware"
-    "github.com/username/nba-api-go/pkg/client"
+    "github.com/n-ae/nba-api-go/internal/middleware"
+    "github.com/n-ae/nba-api-go/pkg/client"
 )
 
 config := client.Config{
@@ -271,7 +271,7 @@ The library includes embedded static data for all NBA players and teams:
 All NBA API parameters are strongly typed with validation:
 
 ```go
-import "github.com/username/nba-api-go/pkg/stats/parameters"
+import "github.com/n-ae/nba-api-go/pkg/stats/parameters"
 
 // Season types
 parameters.SeasonTypeRegular

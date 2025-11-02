@@ -4,9 +4,9 @@ import (
 	"context"
 	"net/url"
 
-	"github.com/username/nba-api-go/pkg/models"
-	"github.com/username/nba-api-go/pkg/stats"
-	"github.com/username/nba-api-go/pkg/stats/parameters"
+	"github.com/n-ae/nba-api-go/pkg/models"
+	"github.com/n-ae/nba-api-go/pkg/stats"
+	"github.com/n-ae/nba-api-go/pkg/stats/parameters"
 )
 
 // LeagueDashTeamClutchV2Request contains parameters for the LeagueDashTeamClutchV2 endpoint

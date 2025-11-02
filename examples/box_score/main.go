@@ -6,8 +6,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/username/nba-api-go/pkg/stats"
-	"github.com/username/nba-api-go/pkg/stats/endpoints"
+	"github.com/n-ae/nba-api-go/pkg/stats"
+	"github.com/n-ae/nba-api-go/pkg/stats/endpoints"
 )
 
 func main() {

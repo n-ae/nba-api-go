@@ -38,7 +38,7 @@ Keep your Python/JavaScript code, just change the data source to the HTTP API.
 ### Installation
 
 ```bash
-go get github.com/username/nba-api-go
+go get github.com/n-ae/nba-api-go
 ```
 
 ### Basic Patterns
@@ -52,8 +52,8 @@ from nba_api.stats.static import players
 #### Go: Import
 ```go
 import (
-    "github.com/username/nba-api-go/pkg/stats/endpoints"
-    "github.com/username/nba-api-go/pkg/stats/static"
+    "github.com/n-ae/nba-api-go/pkg/stats/endpoints"
+    "github.com/n-ae/nba-api-go/pkg/stats/static"
 )
 ```
 
@@ -80,8 +80,8 @@ import (
     "fmt"
     "log"
 
-    "github.com/username/nba-api-go/pkg/stats"
-    "github.com/username/nba-api-go/pkg/stats/endpoints"
+    "github.com/n-ae/nba-api-go/pkg/stats"
+    "github.com/n-ae/nba-api-go/pkg/stats/endpoints"
 )
 
 func main() {
@@ -129,9 +129,9 @@ import (
     "fmt"
     "log"
 
-    "github.com/username/nba-api-go/pkg/stats"
-    "github.com/username/nba-api-go/pkg/stats/endpoints"
-    "github.com/username/nba-api-go/pkg/stats/parameters"
+    "github.com/n-ae/nba-api-go/pkg/stats"
+    "github.com/n-ae/nba-api-go/pkg/stats/endpoints"
+    "github.com/n-ae/nba-api-go/pkg/stats/parameters"
 )
 
 func main() {
@@ -185,9 +185,9 @@ import (
     "fmt"
     "log"
 
-    "github.com/username/nba-api-go/pkg/stats"
-    "github.com/username/nba-api-go/pkg/stats/endpoints"
-    "github.com/username/nba-api-go/pkg/stats/parameters"
+    "github.com/n-ae/nba-api-go/pkg/stats"
+    "github.com/n-ae/nba-api-go/pkg/stats/endpoints"
+    "github.com/n-ae/nba-api-go/pkg/stats/parameters"
 )
 
 func main() {
@@ -238,7 +238,7 @@ import (
     "fmt"
     "log"
 
-    "github.com/username/nba-api-go/pkg/stats/static"
+    "github.com/n-ae/nba-api-go/pkg/stats/static"
 )
 
 func main() {
@@ -281,8 +281,8 @@ import (
     "fmt"
     "log"
 
-    "github.com/username/nba-api-go/pkg/stats"
-    "github.com/username/nba-api-go/pkg/stats/endpoints"
+    "github.com/n-ae/nba-api-go/pkg/stats"
+    "github.com/n-ae/nba-api-go/pkg/stats/endpoints"
 )
 
 func main() {
@@ -633,7 +633,7 @@ active = players.get_active_players()
 
 **Go:**
 ```go
-import "github.com/username/nba-api-go/pkg/stats/static"
+import "github.com/n-ae/nba-api-go/pkg/stats/static"
 active := static.GetActivePlayers()
 ```
 
@@ -647,7 +647,7 @@ team = teams.find_team_by_abbreviation('LAL')
 
 **Go:**
 ```go
-import "github.com/username/nba-api-go/pkg/stats/static"
+import "github.com/n-ae/nba-api-go/pkg/stats/static"
 team, err := static.FindTeamByAbbreviation("LAL")
 ```
 
@@ -662,8 +662,8 @@ games = scoreboard.ScoreBoard().get_dict()
 **Go:**
 ```go
 import (
-    "github.com/username/nba-api-go/pkg/live"
-    "github.com/username/nba-api-go/pkg/live/endpoints"
+    "github.com/n-ae/nba-api-go/pkg/live"
+    "github.com/n-ae/nba-api-go/pkg/live/endpoints"
 )
 
 client := live.NewDefaultClient()
@@ -745,7 +745,7 @@ fmt.Printf("Took %v\n", time.Since(start))
 
 **Solution:**
 ```bash
-go get github.com/username/nba-api-go
+go get github.com/n-ae/nba-api-go
 go mod tidy
 ```
 
@@ -858,8 +858,8 @@ func fetchMultiplePlayers(playerIDs []string) []Result {
 
 ## Support
 
-- **GitHub Issues**: [Report bugs or request features](https://github.com/username/nba-api-go/issues)
-- **Documentation**: [Full documentation](https://github.com/username/nba-api-go)
+- **GitHub Issues**: [Report bugs or request features](https://github.com/n-ae/nba-api-go/issues)
+- **Documentation**: [Full documentation](https://github.com/n-ae/nba-api-go)
 - **Examples**: [Working examples](../examples/)
 
 ---

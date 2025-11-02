@@ -3,8 +3,8 @@ package endpoints
 import (
 	"context"
 
-	"github.com/username/nba-api-go/pkg/live"
-	"github.com/username/nba-api-go/pkg/models"
+	"github.com/n-ae/nba-api-go/pkg/live"
+	"github.com/n-ae/nba-api-go/pkg/models"
 )
 
 type TeamScore struct {

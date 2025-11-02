@@ -9,7 +9,7 @@ The NBA API Server provides HTTP/REST access to NBA statistics data. It's design
 ### Pattern 1: Go SDK (Recommended for Go apps)
 
 ```go
-import "github.com/username/nba-api-go/pkg/stats"
+import "github.com/n-ae/nba-api-go/pkg/stats"
 
 client := stats.NewDefaultClient()
 resp, err := endpoints.PlayerGameLog(ctx, client, req)
@@ -573,5 +573,5 @@ podman logs <container-id>
 
 ## Support
 
-- GitHub Issues: https://github.com/username/nba-api-go/issues
+- GitHub Issues: https://github.com/n-ae/nba-api-go/issues
 - Based on Python nba_api: https://github.com/swar/nba_api

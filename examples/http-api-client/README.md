@@ -253,6 +253,6 @@ To add more examples:
 
 ## Support
 
-- GitHub Issues: [Report bugs](https://github.com/username/nba-api-go/issues)
-- Documentation: [Full docs](https://github.com/username/nba-api-go)
+- GitHub Issues: [Report bugs](https://github.com/n-ae/nba-api-go/issues)
+- Documentation: [Full docs](https://github.com/n-ae/nba-api-go)
 - Migration Guide: [Python to Go](../../docs/MIGRATION_GUIDE.md)

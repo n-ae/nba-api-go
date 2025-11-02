@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/url"
 
-	"github.com/username/nba-api-go/pkg/models"
+	"github.com/n-ae/nba-api-go/pkg/models"
 )
 
 func (c *Client) GetJSON(ctx context.Context, endpoint string, params url.Values, v interface{}) error {

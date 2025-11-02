@@ -71,7 +71,7 @@ tools/
 ### 1. Minimal, Stable Dependencies
 
 ```go
-module github.com/username/nba-api-go
+module github.com/n-ae/nba-api-go
 go 1.25.3
 
 require (
@@ -243,11 +243,11 @@ This is like leaving 36 Slack conversation exports in your production repo. Dele
 ### CONCERN: Example Code Has Build Failures
 
 ```bash
-FAIL	github.com/username/nba-api-go/examples/team_history [build failed]
-FAIL	github.com/username/nba-api-go/examples/tier1_endpoints_demo [build failed]
-FAIL	github.com/username/nba-api-go/examples/tier2_endpoints_demo [build failed]
-FAIL	github.com/username/nba-api-go/examples/tier3_endpoints_demo [build failed]
-FAIL	github.com/username/nba-api-go/examples/type_safety_demo [build failed]
+FAIL	github.com/n-ae/nba-api-go/examples/team_history [build failed]
+FAIL	github.com/n-ae/nba-api-go/examples/tier1_endpoints_demo [build failed]
+FAIL	github.com/n-ae/nba-api-go/examples/tier2_endpoints_demo [build failed]
+FAIL	github.com/n-ae/nba-api-go/examples/tier3_endpoints_demo [build failed]
+FAIL	github.com/n-ae/nba-api-go/examples/type_safety_demo [build failed]
 ```
 
 **What This Means:**

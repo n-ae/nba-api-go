@@ -1,8 +1,8 @@
 package live
 
 import (
-	"github.com/username/nba-api-go/internal/middleware"
-	"github.com/username/nba-api-go/pkg/client"
+	"github.com/n-ae/nba-api-go/internal/middleware"
+	"github.com/n-ae/nba-api-go/pkg/client"
 )
 
 const (

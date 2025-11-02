@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	main "github.com/username/nba-api-go/cmd/nba-api-server"
+	main "github.com/n-ae/nba-api-go/cmd/nba-api-server"
 )
 
 // EndpointTest represents a test case for an endpoint

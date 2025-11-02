@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/username/nba-api-go/pkg/stats"
-	"github.com/username/nba-api-go/pkg/stats/endpoints"
-	"github.com/username/nba-api-go/pkg/stats/parameters"
+	"github.com/n-ae/nba-api-go/pkg/stats"
+	"github.com/n-ae/nba-api-go/pkg/stats/endpoints"
+	"github.com/n-ae/nba-api-go/pkg/stats/parameters"
 )
 
 func main() {

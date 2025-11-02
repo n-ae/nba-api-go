@@ -10,8 +10,8 @@ import (
 	"sort"
 	"time"
 
-	"github.com/username/nba-api-go/internal/middleware"
-	"github.com/username/nba-api-go/pkg/models"
+	"github.com/n-ae/nba-api-go/internal/middleware"
+	"github.com/n-ae/nba-api-go/pkg/models"
 )
 
 const (

@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/username/nba-api-go/pkg/models"
-	"github.com/username/nba-api-go/pkg/stats"
-	"github.com/username/nba-api-go/pkg/stats/parameters"
+	"github.com/n-ae/nba-api-go/pkg/models"
+	"github.com/n-ae/nba-api-go/pkg/stats"
+	"github.com/n-ae/nba-api-go/pkg/stats/parameters"
 )
 
 // TeamDashboardByGameSplitsRequest contains parameters for the TeamDashboardByGameSplits endpoint

@@ -285,6 +285,6 @@ To add more integration tests:
 
 ## Support
 
-- Report issues: [GitHub Issues](https://github.com/username/nba-api-go/issues)
+- Report issues: [GitHub Issues](https://github.com/n-ae/nba-api-go/issues)
 - See examples: [HTTP API Client Examples](../../examples/http-api-client/)
 - Full documentation: [Project README](../../README.md)
