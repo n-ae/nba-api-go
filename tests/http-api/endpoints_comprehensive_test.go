@@ -23,9 +23,9 @@ func TestAllEndpointsExist(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping comprehensive endpoint test in short mode")
 	}
-	
+
 	handler := main.NewStatsHandler()
-	
+
 	// List of all 149 endpoints with valid parameters
 	endpoints := []EndpointTest{
 		// Player endpoints (35)
@@ -34,41 +34,41 @@ func TestAllEndpointsExist(t *testing.T) {
 		{Name: "commonplayerinfo", Path: "/api/v1/stats/commonplayerinfo?PlayerID=203999", ShouldPass: true, CheckData: true},
 		{Name: "playerprofilev2", Path: "/api/v1/stats/playerprofilev2?PlayerID=203999", ShouldPass: true, CheckData: true},
 		{Name: "playerawards", Path: "/api/v1/stats/playerawards?PlayerID=203999", ShouldPass: true, CheckData: true},
-		
+
 		// Team endpoints (30)
 		{Name: "commonteamroster", Path: "/api/v1/stats/commonteamroster?TeamID=1610612747&Season=2023-24", ShouldPass: true, CheckData: true},
 		{Name: "teamgamelog", Path: "/api/v1/stats/teamgamelog?TeamID=1610612747&Season=2023-24", ShouldPass: true, CheckData: true},
 		{Name: "teaminfocommon", Path: "/api/v1/stats/teaminfocommon?TeamID=1610612747", ShouldPass: true, CheckData: true},
-		
+
 		// League endpoints (28)
 		{Name: "leagueleaders", Path: "/api/v1/stats/leagueleaders?Season=2023-24", ShouldPass: true, CheckData: true},
 		{Name: "leaguestandings", Path: "/api/v1/stats/leaguestandings?Season=2023-24", ShouldPass: true, CheckData: true},
 		{Name: "leaguedashteamstats", Path: "/api/v1/stats/leaguedashteamstats?Season=2023-24", ShouldPass: true, CheckData: true},
-		
+
 		// Box score endpoints (10)
 		{Name: "boxscoresummaryv2", Path: "/api/v1/stats/boxscoresummaryv2?GameID=0022300001", ShouldPass: true, CheckData: true},
 		{Name: "boxscoretraditionalv2", Path: "/api/v1/stats/boxscoretraditionalv2?GameID=0022300001", ShouldPass: true, CheckData: true},
 		{Name: "boxscoreadvancedv2", Path: "/api/v1/stats/boxscoreadvancedv2?GameID=0022300001", ShouldPass: true, CheckData: true},
-		
+
 		// Game endpoints (12)
 		{Name: "playbyplayv2", Path: "/api/v1/stats/playbyplayv2?GameID=0022300001", ShouldPass: true, CheckData: true},
 		{Name: "shotchartdetail", Path: "/api/v1/stats/shotchartdetail?GameID=0022300001", ShouldPass: true, CheckData: true},
-		
+
 		// Common endpoints
 		{Name: "commonallplayers", Path: "/api/v1/stats/commonallplayers", ShouldPass: true, CheckData: true},
 		{Name: "scoreboardv2", Path: "/api/v1/stats/scoreboardv2?GameDate=2024-01-15", ShouldPass: true, CheckData: true},
 	}
-	
+
 	passed := 0
 	failed := 0
-	
+
 	for _, endpoint := range endpoints {
 		t.Run(endpoint.Name, func(t *testing.T) {
 			req := httptest.NewRequest(http.MethodGet, endpoint.Path, nil)
 			w := httptest.NewRecorder()
-			
+
 			handler.ServeHTTP(w, req)
-			
+
 			if endpoint.ShouldPass {
 				if w.Code != http.StatusOK && w.Code != http.StatusInternalServerError {
 					// Allow 500 for endpoints that might fail due to NBA API issues
@@ -76,7 +76,7 @@ func TestAllEndpointsExist(t *testing.T) {
 					failed++
 					return
 				}
-				
+
 				if endpoint.CheckData && w.Code == http.StatusOK {
 					var response map[string]interface{}
 					if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
@@ -84,7 +84,7 @@ func TestAllEndpointsExist(t *testing.T) {
 						failed++
 						return
 					}
-					
+
 					if response["data"] == nil && response["error"] == nil {
 						t.Errorf("Expected data or error field for %s", endpoint.Name)
 						failed++
@@ -95,7 +95,7 @@ func TestAllEndpointsExist(t *testing.T) {
 			}
 		})
 	}
-	
+
 	t.Logf("Endpoint tests: %d passed, %d failed out of %d", passed, failed, len(endpoints))
 }
 
@@ -104,9 +104,9 @@ func TestEndpointResponseFormat(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping response format test in short mode")
 	}
-	
+
 	handler := main.NewStatsHandler()
-	
+
 	testCases := []struct {
 		name string
 		path string
@@ -115,20 +115,20 @@ func TestEndpointResponseFormat(t *testing.T) {
 		{"LeagueLeaders", "/api/v1/stats/leagueleaders?Season=2023-24"},
 		{"TeamRoster", "/api/v1/stats/commonteamroster?TeamID=1610612747&Season=2023-24"},
 	}
-	
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			req := httptest.NewRequest(http.MethodGet, tc.path, nil)
 			w := httptest.NewRecorder()
-			
+
 			handler.ServeHTTP(w, req)
-			
+
 			// Check Content-Type
 			contentType := w.Header().Get("Content-Type")
 			if contentType != "application/json" {
 				t.Errorf("Expected Content-Type 'application/json', got '%s'", contentType)
 			}
-			
+
 			// Verify valid JSON
 			var response map[string]interface{}
 			if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
@@ -141,7 +141,7 @@ func TestEndpointResponseFormat(t *testing.T) {
 // TestEndpointParameterValidation tests parameter validation
 func TestEndpointParameterValidation(t *testing.T) {
 	handler := main.NewStatsHandler()
-	
+
 	testCases := []struct {
 		name           string
 		path           string
@@ -152,14 +152,14 @@ func TestEndpointParameterValidation(t *testing.T) {
 		{"MissingGameID", "/api/v1/stats/boxscoresummaryv2", http.StatusBadRequest},
 		{"ValidPlayerID", "/api/v1/stats/playercareerstats?PlayerID=203999", http.StatusOK},
 	}
-	
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			req := httptest.NewRequest(http.MethodGet, tc.path, nil)
 			w := httptest.NewRecorder()
-			
+
 			handler.ServeHTTP(w, req)
-			
+
 			// Allow 500 for valid requests that might fail due to NBA API
 			if tc.expectedStatus == http.StatusOK {
 				if w.Code != http.StatusOK && w.Code != http.StatusInternalServerError {
@@ -177,7 +177,7 @@ func TestEndpointParameterValidation(t *testing.T) {
 // BenchmarkEndpointPerformance benchmarks endpoint response times
 func BenchmarkEndpointPerformance(b *testing.B) {
 	handler := main.NewStatsHandler()
-	
+
 	testCases := []struct {
 		name string
 		path string
@@ -186,11 +186,11 @@ func BenchmarkEndpointPerformance(b *testing.B) {
 		{"LeagueLeaders", "/api/v1/stats/leagueleaders?Season=2023-24"},
 		{"CommonAllPlayers", "/api/v1/stats/commonallplayers"},
 	}
-	
+
 	for _, tc := range testCases {
 		b.Run(tc.name, func(b *testing.B) {
 			req := httptest.NewRequest(http.MethodGet, tc.path, nil)
-			
+
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
 				w := httptest.NewRecorder()
@@ -205,19 +205,19 @@ func TestConcurrentRequests(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping concurrent request test in short mode")
 	}
-	
+
 	handler := main.NewStatsHandler()
-	
+
 	const numRequests = 10
 	results := make(chan error, numRequests)
-	
+
 	for i := 0; i < numRequests; i++ {
 		go func(id int) {
 			req := httptest.NewRequest(http.MethodGet, "/api/v1/stats/playercareerstats?PlayerID=203999", nil)
 			w := httptest.NewRecorder()
-			
+
 			handler.ServeHTTP(w, req)
-			
+
 			if w.Code != http.StatusOK && w.Code != http.StatusInternalServerError {
 				results <- fmt.Errorf("request %d: expected status 200 or 500, got %d", id, w.Code)
 			} else {
@@ -225,7 +225,7 @@ func TestConcurrentRequests(t *testing.T) {
 			}
 		}(i)
 	}
-	
+
 	// Collect results
 	errors := 0
 	for i := 0; i < numRequests; i++ {
@@ -234,6 +234,6 @@ func TestConcurrentRequests(t *testing.T) {
 			errors++
 		}
 	}
-	
+
 	t.Logf("Concurrent requests: %d/%d successful", numRequests-errors, numRequests)
 }

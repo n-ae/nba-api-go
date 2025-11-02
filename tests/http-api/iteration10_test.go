@@ -224,18 +224,18 @@ func TestIteration10ResponseStructure(t *testing.T) {
 		expectedFields []string
 	}{
 		{
-			name: "CommonPlayoffSeriesV2_Structure",
-			path: "/api/v1/stats/commonplayoffseriesv2?Season=2023-24",
+			name:           "CommonPlayoffSeriesV2_Structure",
+			path:           "/api/v1/stats/commonplayoffseriesv2?Season=2023-24",
 			expectedFields: []string{"success", "data"},
 		},
 		{
-			name: "LeagueDashPlayerClutchV2_Structure",
-			path: "/api/v1/stats/leaguedashplayerclutchv2?Season=2023-24",
+			name:           "LeagueDashPlayerClutchV2_Structure",
+			path:           "/api/v1/stats/leaguedashplayerclutchv2?Season=2023-24",
 			expectedFields: []string{"success", "data"},
 		},
 		{
-			name: "PlayerTrackingShootingEfficiency_Structure",
-			path: "/api/v1/stats/playertrackingshootingefficiency?Season=2023-24",
+			name:           "PlayerTrackingShootingEfficiency_Structure",
+			path:           "/api/v1/stats/playertrackingshootingefficiency?Season=2023-24",
 			expectedFields: []string{"success", "data"},
 		},
 	}

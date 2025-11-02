@@ -320,7 +320,7 @@ func (h *StatsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.handleShotChartLineupDetail(w, r)
 	case "playercareerbycollegerollup":
 		h.handlePlayerCareerByCollegeRollup(w, r)
-	
+
 	// Iteration 10 endpoints - Final SDK endpoints (beyond 100%)
 	case "commonplayoffseriesv2":
 		h.handleCommonPlayoffSeriesV2(w, r)
