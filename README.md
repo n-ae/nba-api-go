@@ -1,26 +1,66 @@
 # nba-api-go
 
-A Go client library for accessing NBA.com APIs. This is a Go implementation inspired by the Python [nba_api](https://github.com/swar/nba_api) library.
+A type-safe Go library and HTTP API server for accessing NBA statistics from stats.nba.com. Inspired by the Python [nba_api](https://github.com/swar/nba_api) library.
 
 ## Features
 
-- **Stats API** - Access to NBA official stats (stats.nba.com) with 15/139 endpoints implemented (10.8%)
+- **79 Stats API endpoints** implemented (56.8% coverage of Python nba_api)
+- **Go SDK** - Type-safe library for direct Go integration
+- **HTTP API Server** - RESTful API for language-agnostic access (Python, JavaScript, etc.)
+- **Docker/Podman Ready** - Multi-stage containerization (< 20MB images)
 - **Live API** - Real-time game data and scoreboards
-- **Static Data** - Pre-loaded player and team datasets with search functionality (5,135 players, 30 teams)
-- **Type Safety** - Strongly typed requests and responses with automatic type inference
-- **Automatic Type Inference** - Generator infers proper Go types (int, float64, string) from field names
-- **Middleware Support** - Rate limiting, retry logic, logging, and custom headers
+- **Static Data** - Pre-loaded player and team datasets with search (5,135 players, 30 teams)
+- **Type Safety** - Automatic type inference from field names to Go types
+- **Rate Limiting** - Built-in respect for NBA.com API limits
 - **Context Support** - Full support for cancellation and timeouts
-- **No External Dependencies** - Uses only Go standard library and golang.org/x packages
-- **Code Generation** - Advanced tooling to generate type-safe endpoint code from metadata
+- **Zero Frameworks** - HTTP API uses stdlib only (net/http, encoding/json)
+- **Code Generation** - Advanced tooling for type-safe endpoint generation
 
 ## Installation
 
+### Go SDK
 ```bash
 go get github.com/username/nba-api-go
 ```
 
-## Quick Start
+### HTTP API Server
+```bash
+# Docker/Podman
+podman pull nba-api-go:latest  # or build locally
+
+# From source
+go build -o nba-api-server ./cmd/nba-api-server
+```
+
+## Usage Patterns
+
+This project provides **two ways** to access NBA data:
+
+### Pattern 1: Go SDK (For Go Applications)
+
+Best for: Type-safety, performance, direct Go integration
+
+```go
+import "github.com/username/nba-api-go/pkg/stats"
+```
+
+### Pattern 2: HTTP API (For Any Language)
+
+Best for: Python, JavaScript, Ruby, or any language that can make HTTP requests
+
+```bash
+# Start server
+docker run -p 8080:8080 nba-api-go
+
+# Use from any language
+curl "http://localhost:8080/api/v1/stats/playergamelog?PlayerID=2544&Season=2023-24"
+```
+
+See [API Usage Documentation](./docs/API_USAGE.md) for complete HTTP API guide with Python/JavaScript examples.
+
+---
+
+## Quick Start - Go SDK
 
 ### Get Player Career Statistics
 
