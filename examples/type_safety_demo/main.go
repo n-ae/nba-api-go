@@ -99,9 +99,11 @@ func demoGameFinder(ctx context.Context, client *stats.Client) {
 	fmt.Println("\n🔍 Example 2: Game Finder with Type Safety")
 	fmt.Println("-------------------------------------------")
 
+	season := parameters.NewSeason(2023)
+	seasonType := parameters.SeasonTypeRegular
 	req := endpoints.LeagueGameFinderRequest{
-		Season:     stringPtr(string(parameters.NewSeason(2023))),
-		SeasonType: stringPtr(string(parameters.SeasonTypeRegular)),
+		Season:     &season,
+		SeasonType: &seasonType,
 		TeamID:     stringPtr("1610612747"), // Lakers team ID
 	}
 
@@ -203,7 +205,7 @@ func demoTeamLogs(ctx context.Context, client *stats.Client) {
 
 	// Display first 5 teams
 	count := 0
-	for teamID, log := range teamLatest {
+	for _, log := range teamLatest {
 		if count >= 5 {
 			break
 		}

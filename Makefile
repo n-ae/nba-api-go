@@ -1,9 +1,10 @@
-.PHONY: help test test-coverage build clean lint fmt vet examples
+.PHONY: help test test-coverage test-examples build clean lint fmt vet examples
 
 help:
 	@echo "Available targets:"
 	@echo "  test          - Run all tests"
 	@echo "  test-coverage - Run tests with coverage report"
+	@echo "  test-examples - Build all example programs to verify they compile"
 	@echo "  build         - Build all examples"
 	@echo "  clean         - Remove build artifacts"
 	@echo "  lint          - Run golangci-lint"
@@ -18,6 +19,28 @@ test-coverage:
 	go test -v -coverprofile=coverage.out ./...
 	go tool cover -html=coverage.out -o coverage.html
 	@echo "Coverage report generated: coverage.html"
+
+test-examples:
+	@echo "Building all example programs..."
+	@failed=0; \
+	for dir in examples/*/; do \
+		if [ -f "$$dir/main.go" ]; then \
+			example=$$(basename "$$dir"); \
+			printf "  %-30s" "$$example"; \
+			if go build -o /dev/null "./$$dir" 2>/dev/null; then \
+				echo "✓ PASS"; \
+			else \
+				echo "✗ FAIL"; \
+				failed=$$((failed + 1)); \
+			fi; \
+		fi; \
+	done; \
+	if [ $$failed -eq 0 ]; then \
+		echo "\n✓ All examples compiled successfully!"; \
+	else \
+		echo "\n✗ $$failed example(s) failed to compile"; \
+		exit 1; \
+	fi
 
 build:
 	@echo "Building examples..."
