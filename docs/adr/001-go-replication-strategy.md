@@ -259,7 +259,7 @@ func (p PerMode) Validate() error {
   - Automatically infers Go types (int, float64, string) from field names
   - Generates proper JSON tags for all fields
   - Eliminates interface{} in generated code
-  - See [Type Inference Documentation](../TYPE_INFERENCE_IMPROVEMENT.md)
+  - See [Type Inference Documentation](../archive/TYPE_INFERENCE_IMPROVEMENT.md)
 - [x] **139 Stats endpoints implemented (100% complete - HISTORIC ACHIEVEMENT!)** 🎊🎊🎊
   - [x] PlayerCareerStats
   - [x] PlayerGameLog
