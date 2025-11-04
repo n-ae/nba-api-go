@@ -39,3 +39,14 @@ func WithReferer(referer string) Middleware {
 		})
 	}
 }
+
+func WithAccept(accept string) Middleware {
+	return func(next RoundTripper) RoundTripper {
+		return RoundTripperFunc(func(ctx context.Context, req *http.Request) (*http.Response, error) {
+			if req.Header.Get("Accept") == "" {
+				req.Header.Set("Accept", accept)
+			}
+			return next.RoundTrip(ctx, req)
+		})
+	}
+}

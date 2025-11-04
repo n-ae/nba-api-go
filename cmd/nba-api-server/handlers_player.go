@@ -33,7 +33,6 @@ func (h *StatsHandler) handlePlayerGameLog(w http.ResponseWriter, r *http.Reques
 	writeSuccess(w, resp.Data)
 }
 
-
 func (h *StatsHandler) handlePlayerCareerStats(w http.ResponseWriter, r *http.Request) {
 	playerID := r.URL.Query().Get("PlayerID")
 	if playerID == "" {
@@ -58,7 +57,6 @@ func (h *StatsHandler) handlePlayerCareerStats(w http.ResponseWriter, r *http.Re
 	writeSuccess(w, resp.Data)
 }
 
-
 func (h *StatsHandler) handlePlayerProfileV2(w http.ResponseWriter, r *http.Request) {
 	playerID := r.URL.Query().Get("PlayerID")
 	if playerID == "" {
@@ -80,7 +78,6 @@ func (h *StatsHandler) handlePlayerProfileV2(w http.ResponseWriter, r *http.Requ
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handlePlayerAwards(w http.ResponseWriter, r *http.Request) {
 	playerID := r.URL.Query().Get("PlayerID")
 	if playerID == "" {
@@ -100,7 +97,6 @@ func (h *StatsHandler) handlePlayerAwards(w http.ResponseWriter, r *http.Request
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handlePlayerDashboardByGeneralSplits(w http.ResponseWriter, r *http.Request) {
 	playerID := r.URL.Query().Get("PlayerID")
@@ -131,7 +127,6 @@ func (h *StatsHandler) handlePlayerDashboardByGeneralSplits(w http.ResponseWrite
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handlePlayerDashboardByShootingSplits(w http.ResponseWriter, r *http.Request) {
 	playerID := r.URL.Query().Get("PlayerID")
 	if playerID == "" {
@@ -160,7 +155,6 @@ func (h *StatsHandler) handlePlayerDashboardByShootingSplits(w http.ResponseWrit
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handlePlayerDashboardByOpponent(w http.ResponseWriter, r *http.Request) {
 	playerID := r.URL.Query().Get("PlayerID")
@@ -191,7 +185,6 @@ func (h *StatsHandler) handlePlayerDashboardByOpponent(w http.ResponseWriter, r 
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handlePlayerDashboardByClutch(w http.ResponseWriter, r *http.Request) {
 	playerID := r.URL.Query().Get("PlayerID")
 	if playerID == "" {
@@ -221,7 +214,6 @@ func (h *StatsHandler) handlePlayerDashboardByClutch(w http.ResponseWriter, r *h
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handlePlayerGameLogs(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -240,7 +232,6 @@ func (h *StatsHandler) handlePlayerGameLogs(w http.ResponseWriter, r *http.Reque
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handlePlayerVsPlayer(w http.ResponseWriter, r *http.Request) {
 	playerID := r.URL.Query().Get("PlayerID")
@@ -278,7 +269,6 @@ func (h *StatsHandler) handlePlayerVsPlayer(w http.ResponseWriter, r *http.Reque
 
 // Team endpoint handlers (expanded)
 
-
 func (h *StatsHandler) handlePlayerTrackingShotDashboard(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -299,7 +289,6 @@ func (h *StatsHandler) handlePlayerTrackingShotDashboard(w http.ResponseWriter, 
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handlePlayerTrackingPasses(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
@@ -322,7 +311,6 @@ func (h *StatsHandler) handlePlayerTrackingPasses(w http.ResponseWriter, r *http
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handlePlayerTrackingDefense(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -343,7 +331,6 @@ func (h *StatsHandler) handlePlayerTrackingDefense(w http.ResponseWriter, r *htt
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handlePlayerTrackingRebounding(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
@@ -366,7 +353,6 @@ func (h *StatsHandler) handlePlayerTrackingRebounding(w http.ResponseWriter, r *
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handlePlayerTrackingSpeedDistance(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -387,7 +373,6 @@ func (h *StatsHandler) handlePlayerTrackingSpeedDistance(w http.ResponseWriter, 
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handlePlayerTrackingCatchShoot(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
@@ -410,7 +395,6 @@ func (h *StatsHandler) handlePlayerTrackingCatchShoot(w http.ResponseWriter, r *
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handlePlayerTrackingDrives(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -432,7 +416,6 @@ func (h *StatsHandler) handlePlayerTrackingDrives(w http.ResponseWriter, r *http
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handlePlayerEstimatedMetrics(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -451,7 +434,6 @@ func (h *StatsHandler) handlePlayerEstimatedMetrics(w http.ResponseWriter, r *ht
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handlePlayerFantasyProfile(w http.ResponseWriter, r *http.Request) {
 	playerID := r.URL.Query().Get("PlayerID")
@@ -472,7 +454,6 @@ func (h *StatsHandler) handlePlayerFantasyProfile(w http.ResponseWriter, r *http
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handlePlayerDashPtShots(w http.ResponseWriter, r *http.Request) {
 	playerID := r.URL.Query().Get("PlayerID")
@@ -499,7 +480,6 @@ func (h *StatsHandler) handlePlayerDashPtShots(w http.ResponseWriter, r *http.Re
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handlePlayerDashboardByLastNGames(w http.ResponseWriter, r *http.Request) {
 	playerID := r.URL.Query().Get("PlayerID")
@@ -530,7 +510,6 @@ func (h *StatsHandler) handlePlayerDashboardByLastNGames(w http.ResponseWriter, 
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handlePlayerDashboardByTeamPerformance(w http.ResponseWriter, r *http.Request) {
 	playerID := r.URL.Query().Get("PlayerID")
 	if playerID == "" {
@@ -559,7 +538,6 @@ func (h *StatsHandler) handlePlayerDashboardByTeamPerformance(w http.ResponseWri
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handlePlayerDashboardByGameSplits(w http.ResponseWriter, r *http.Request) {
 	playerID := r.URL.Query().Get("PlayerID")
@@ -592,7 +570,6 @@ func (h *StatsHandler) handlePlayerDashboardByGameSplits(w http.ResponseWriter, 
 
 // Team endpoints (iteration 4)
 
-
 func (h *StatsHandler) handlePlayerDashboardByYearOverYear(w http.ResponseWriter, r *http.Request) {
 	playerID := r.URL.Query().Get("PlayerID")
 	if playerID == "" {
@@ -621,7 +598,6 @@ func (h *StatsHandler) handlePlayerDashboardByYearOverYear(w http.ResponseWriter
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handlePlayerCompare(w http.ResponseWriter, r *http.Request) {
 	playerIDList := r.URL.Query().Get("PlayerIDList")
 	if playerIDList == "" {
@@ -648,7 +624,6 @@ func (h *StatsHandler) handlePlayerCompare(w http.ResponseWriter, r *http.Reques
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handlePlayerYearByYearStats(w http.ResponseWriter, r *http.Request) {
 	playerID := r.URL.Query().Get("PlayerID")
 	if playerID == "" {
@@ -672,7 +647,6 @@ func (h *StatsHandler) handlePlayerYearByYearStats(w http.ResponseWriter, r *htt
 
 // Common endpoints (iteration 4)
 
-
 func (h *StatsHandler) handlePlayerTrackingPostTouch(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -693,7 +667,6 @@ func (h *StatsHandler) handlePlayerTrackingPostTouch(w http.ResponseWriter, r *h
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handlePlayerTrackingPaintTouch(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
@@ -716,7 +689,6 @@ func (h *StatsHandler) handlePlayerTrackingPaintTouch(w http.ResponseWriter, r *
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handlePlayerTrackingElbowTouch(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -737,7 +709,6 @@ func (h *StatsHandler) handlePlayerTrackingElbowTouch(w http.ResponseWriter, r *
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handlePlayerTrackingPullUpShot(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
@@ -762,7 +733,6 @@ func (h *StatsHandler) handlePlayerTrackingPullUpShot(w http.ResponseWriter, r *
 
 // Team endpoints (iteration 6)
 
-
 func (h *StatsHandler) handlePlayerIndex(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 
@@ -779,7 +749,6 @@ func (h *StatsHandler) handlePlayerIndex(w http.ResponseWriter, r *http.Request)
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handlePlayerCareerByCollege(w http.ResponseWriter, r *http.Request) {
 	college := r.URL.Query().Get("College")
@@ -800,7 +769,6 @@ func (h *StatsHandler) handlePlayerCareerByCollege(w http.ResponseWriter, r *htt
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handlePlayerGameStreakFinder(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -819,7 +787,6 @@ func (h *StatsHandler) handlePlayerGameStreakFinder(w http.ResponseWriter, r *ht
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handlePlayerEstimatedAdvancedStats(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
@@ -840,7 +807,6 @@ func (h *StatsHandler) handlePlayerEstimatedAdvancedStats(w http.ResponseWriter,
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handlePlayerCareerByCollegeRollup(w http.ResponseWriter, r *http.Request) {
 	perMode := parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))
 
@@ -859,7 +825,6 @@ func (h *StatsHandler) handlePlayerCareerByCollegeRollup(w http.ResponseWriter, 
 }
 
 // Iteration 10 endpoints - Final SDK endpoints
-
 
 func (h *StatsHandler) handlePlayerNextNGames(w http.ResponseWriter, r *http.Request) {
 	playerID := r.URL.Query().Get("PlayerID")
@@ -888,7 +853,6 @@ func (h *StatsHandler) handlePlayerNextNGames(w http.ResponseWriter, r *http.Req
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handlePlayerTrackingShootingEfficiency(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -910,6 +874,3 @@ func (h *StatsHandler) handlePlayerTrackingShootingEfficiency(w http.ResponseWri
 
 	writeSuccess(w, resp)
 }
-
-
-

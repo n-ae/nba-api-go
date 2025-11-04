@@ -27,7 +27,6 @@ func (h *StatsHandler) handleCommonAllPlayers(w http.ResponseWriter, r *http.Req
 	writeSuccess(w, resp.Data)
 }
 
-
 func (h *StatsHandler) handleScoreboardV2(w http.ResponseWriter, r *http.Request) {
 	gameDate := r.URL.Query().Get("GameDate")
 	if gameDate == "" {
@@ -49,7 +48,6 @@ func (h *StatsHandler) handleScoreboardV2(w http.ResponseWriter, r *http.Request
 
 	writeSuccess(w, resp.Data)
 }
-
 
 func (h *StatsHandler) handleCommonTeamRoster(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("TeamID")
@@ -76,7 +74,6 @@ func (h *StatsHandler) handleCommonTeamRoster(w http.ResponseWriter, r *http.Req
 	writeSuccess(w, resp.Data)
 }
 
-
 func (h *StatsHandler) handleCommonPlayerInfo(w http.ResponseWriter, r *http.Request) {
 	playerID := r.URL.Query().Get("PlayerID")
 	if playerID == "" {
@@ -98,7 +95,6 @@ func (h *StatsHandler) handleCommonPlayerInfo(w http.ResponseWriter, r *http.Req
 	writeSuccess(w, resp.Data)
 }
 
-
 func (h *StatsHandler) handlePlayoffPicture(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 
@@ -115,7 +111,6 @@ func (h *StatsHandler) handlePlayoffPicture(w http.ResponseWriter, r *http.Reque
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleCommonPlayerInfoV2(w http.ResponseWriter, r *http.Request) {
 	playerID := r.URL.Query().Get("PlayerID")
@@ -138,7 +133,6 @@ func (h *StatsHandler) handleCommonPlayerInfoV2(w http.ResponseWriter, r *http.R
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleCommonAllPlayersV2(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 
@@ -155,7 +149,6 @@ func (h *StatsHandler) handleCommonAllPlayersV2(w http.ResponseWriter, r *http.R
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleCommonTeamRosterV2(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("TeamID")
@@ -181,7 +174,6 @@ func (h *StatsHandler) handleCommonTeamRosterV2(w http.ResponseWriter, r *http.R
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleCommonPlayoffSeries(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 
@@ -199,7 +191,6 @@ func (h *StatsHandler) handleCommonPlayoffSeries(w http.ResponseWriter, r *http.
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleCommonTeamYears(w http.ResponseWriter, r *http.Request) {
 	req := endpoints.CommonTeamYearsRequest{
 		LeagueID: leagueIDPtr(parameters.LeagueIDNBA),
@@ -216,7 +207,6 @@ func (h *StatsHandler) handleCommonTeamYears(w http.ResponseWriter, r *http.Requ
 
 // Draft & Historical endpoints (iteration 4)
 
-
 func (h *StatsHandler) handleDraftHistory(w http.ResponseWriter, r *http.Request) {
 	req := endpoints.DraftHistoryRequest{
 		LeagueID: leagueIDPtr(parameters.LeagueIDNBA),
@@ -230,7 +220,6 @@ func (h *StatsHandler) handleDraftHistory(w http.ResponseWriter, r *http.Request
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleDraftBoard(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
@@ -249,7 +238,6 @@ func (h *StatsHandler) handleDraftBoard(w http.ResponseWriter, r *http.Request) 
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleDraftCombineStats(w http.ResponseWriter, r *http.Request) {
 	seasonYear := getQueryOrDefault(r, "SeasonYear", "2023-24")
 
@@ -267,7 +255,6 @@ func (h *StatsHandler) handleDraftCombineStats(w http.ResponseWriter, r *http.Re
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleFranchiseHistory(w http.ResponseWriter, r *http.Request) {
 	req := endpoints.FranchiseHistoryRequest{
 		LeagueID: leagueIDPtr(parameters.LeagueIDNBA),
@@ -281,7 +268,6 @@ func (h *StatsHandler) handleFranchiseHistory(w http.ResponseWriter, r *http.Req
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleFranchiseLeaders(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("TeamID")
@@ -306,7 +292,6 @@ func (h *StatsHandler) handleFranchiseLeaders(w http.ResponseWriter, r *http.Req
 
 // League endpoints (iteration 5)
 
-
 func (h *StatsHandler) handleInfographicFanDuelPlayer(w http.ResponseWriter, r *http.Request) {
 	playerID := r.URL.Query().Get("PlayerID")
 	if playerID == "" {
@@ -327,7 +312,6 @@ func (h *StatsHandler) handleInfographicFanDuelPlayer(w http.ResponseWriter, r *
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleHomepageV2(w http.ResponseWriter, r *http.Request) {
 	req := endpoints.HomepageV2Request{
 		LeagueID: leagueIDPtr(parameters.LeagueIDNBA),
@@ -341,7 +325,6 @@ func (h *StatsHandler) handleHomepageV2(w http.ResponseWriter, r *http.Request) 
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleHomepageLeaders(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
@@ -364,7 +347,6 @@ func (h *StatsHandler) handleHomepageLeaders(w http.ResponseWriter, r *http.Requ
 
 // Player Tracking endpoints (iteration 6)
 
-
 func (h *StatsHandler) handleScoreboardV3(w http.ResponseWriter, r *http.Request) {
 	gameDate := getQueryOrDefault(r, "GameDate", "")
 
@@ -381,7 +363,6 @@ func (h *StatsHandler) handleScoreboardV3(w http.ResponseWriter, r *http.Request
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleAllTimeLeadersGrids(w http.ResponseWriter, r *http.Request) {
 	perMode := parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))
@@ -401,7 +382,6 @@ func (h *StatsHandler) handleAllTimeLeadersGrids(w http.ResponseWriter, r *http.
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleDefenseHub(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
@@ -424,7 +404,6 @@ func (h *StatsHandler) handleDefenseHub(w http.ResponseWriter, r *http.Request) 
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleAssistTracker(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -446,7 +425,6 @@ func (h *StatsHandler) handleAssistTracker(w http.ResponseWriter, r *http.Reques
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleSynergyPlayTypes(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -467,7 +445,6 @@ func (h *StatsHandler) handleSynergyPlayTypes(w http.ResponseWriter, r *http.Req
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleCumeStatsPlayer(w http.ResponseWriter, r *http.Request) {
 	playerID := r.URL.Query().Get("PlayerID")
@@ -495,7 +472,6 @@ func (h *StatsHandler) handleCumeStatsPlayer(w http.ResponseWriter, r *http.Requ
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleCumeStatsTeam(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("TeamID")
 	if teamID == "" {
@@ -522,7 +498,6 @@ func (h *StatsHandler) handleCumeStatsTeam(w http.ResponseWriter, r *http.Reques
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleOpponentShooting(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -543,7 +518,6 @@ func (h *StatsHandler) handleOpponentShooting(w http.ResponseWriter, r *http.Req
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleShootingEfficiency(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
@@ -566,7 +540,6 @@ func (h *StatsHandler) handleShootingEfficiency(w http.ResponseWriter, r *http.R
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleMatchupRollup(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -587,7 +560,6 @@ func (h *StatsHandler) handleMatchupRollup(w http.ResponseWriter, r *http.Reques
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleAssistLeaders(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
@@ -610,7 +582,6 @@ func (h *StatsHandler) handleAssistLeaders(w http.ResponseWriter, r *http.Reques
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleCommonPlayoffSeriesV2(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	leagueID := parameters.LeagueIDNBA
@@ -628,6 +599,3 @@ func (h *StatsHandler) handleCommonPlayoffSeriesV2(w http.ResponseWriter, r *htt
 
 	writeSuccess(w, resp)
 }
-
-
-

@@ -32,7 +32,6 @@ func (h *StatsHandler) handleTeamGameLog(w http.ResponseWriter, r *http.Request)
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleTeamInfoCommon(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("TeamID")
 	if teamID == "" {
@@ -56,7 +55,6 @@ func (h *StatsHandler) handleTeamInfoCommon(w http.ResponseWriter, r *http.Reque
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleTeamDashboardByGeneralSplits(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("TeamID")
@@ -86,7 +84,6 @@ func (h *StatsHandler) handleTeamDashboardByGeneralSplits(w http.ResponseWriter,
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleTeamDashboardByShootingSplits(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("TeamID")
 	if teamID == "" {
@@ -114,7 +111,6 @@ func (h *StatsHandler) handleTeamDashboardByShootingSplits(w http.ResponseWriter
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleTeamDashboardByOpponent(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("TeamID")
@@ -144,7 +140,6 @@ func (h *StatsHandler) handleTeamDashboardByOpponent(w http.ResponseWriter, r *h
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleTeamDetails(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("TeamID")
 	if teamID == "" {
@@ -164,7 +159,6 @@ func (h *StatsHandler) handleTeamDetails(w http.ResponseWriter, r *http.Request)
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleTeamPlayerDashboard(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("TeamID")
@@ -193,7 +187,6 @@ func (h *StatsHandler) handleTeamPlayerDashboard(w http.ResponseWriter, r *http.
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleTeamLineups(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("TeamID")
@@ -226,7 +219,6 @@ func (h *StatsHandler) handleTeamLineups(w http.ResponseWriter, r *http.Request)
 
 // Box Score endpoint handlers
 
-
 func (h *StatsHandler) handleTeamGameLogs(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -249,7 +241,6 @@ func (h *StatsHandler) handleTeamGameLogs(w http.ResponseWriter, r *http.Request
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleTeamYearByYearStats(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("TeamID")
@@ -276,7 +267,6 @@ func (h *StatsHandler) handleTeamYearByYearStats(w http.ResponseWriter, r *http.
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleTeamVsTeam(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("TeamID")
@@ -306,7 +296,6 @@ func (h *StatsHandler) handleTeamVsTeam(w http.ResponseWriter, r *http.Request) 
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleTeamHistoricalLeaders(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("TeamID")
 	if teamID == "" {
@@ -328,7 +317,6 @@ func (h *StatsHandler) handleTeamHistoricalLeaders(w http.ResponseWriter, r *htt
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleTeamEstimatedMetrics(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -347,7 +335,6 @@ func (h *StatsHandler) handleTeamEstimatedMetrics(w http.ResponseWriter, r *http
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleTeamDashPtShots(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("TeamID")
@@ -377,7 +364,6 @@ func (h *StatsHandler) handleTeamDashPtShots(w http.ResponseWriter, r *http.Requ
 
 // Player endpoints (iteration 4)
 
-
 func (h *StatsHandler) handleTeamDashboardByClutch(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("TeamID")
 	if teamID == "" {
@@ -405,7 +391,6 @@ func (h *StatsHandler) handleTeamDashboardByClutch(w http.ResponseWriter, r *htt
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleTeamDashboardByLastNGames(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("TeamID")
@@ -435,7 +420,6 @@ func (h *StatsHandler) handleTeamDashboardByLastNGames(w http.ResponseWriter, r 
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleTeamDashboardByYearOverYear(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("TeamID")
 	if teamID == "" {
@@ -463,7 +447,6 @@ func (h *StatsHandler) handleTeamDashboardByYearOverYear(w http.ResponseWriter, 
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleTeamVsPlayer(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("TeamID")
@@ -495,7 +478,6 @@ func (h *StatsHandler) handleTeamVsPlayer(w http.ResponseWriter, r *http.Request
 
 // Additional endpoints (iteration 5)
 
-
 func (h *StatsHandler) handleTeamDashboardByGameSplits(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("TeamID")
 	if teamID == "" {
@@ -524,7 +506,6 @@ func (h *StatsHandler) handleTeamDashboardByGameSplits(w http.ResponseWriter, r 
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleTeamDashboardByTeamPerformance(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("TeamID")
 	if teamID == "" {
@@ -552,7 +533,6 @@ func (h *StatsHandler) handleTeamDashboardByTeamPerformance(w http.ResponseWrite
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleTeamPlayerOnOffSummary(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("TeamID")
@@ -584,7 +564,6 @@ func (h *StatsHandler) handleTeamPlayerOnOffSummary(w http.ResponseWriter, r *ht
 
 // League endpoints (iteration 6)
 
-
 func (h *StatsHandler) handleTeamGameStreakFinder(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -603,7 +582,6 @@ func (h *StatsHandler) handleTeamGameStreakFinder(w http.ResponseWriter, r *http
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleTeamPlayerOnOffDetails(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("TeamID")
@@ -627,7 +605,6 @@ func (h *StatsHandler) handleTeamPlayerOnOffDetails(w http.ResponseWriter, r *ht
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleTeamAndPlayersVsPlayers(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("TeamID")
@@ -660,7 +637,6 @@ func (h *StatsHandler) handleTeamAndPlayersVsPlayers(w http.ResponseWriter, r *h
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleTeamInfoCommonV2(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("TeamID")
 	if teamID == "" {
@@ -688,7 +664,6 @@ func (h *StatsHandler) handleTeamInfoCommonV2(w http.ResponseWriter, r *http.Req
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleTeamNextNGames(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("TeamID")
 	if teamID == "" {
@@ -715,7 +690,6 @@ func (h *StatsHandler) handleTeamNextNGames(w http.ResponseWriter, r *http.Reque
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleTeamYearOverYearSplits(w http.ResponseWriter, r *http.Request) {
 	teamID := r.URL.Query().Get("TeamID")
@@ -745,6 +719,3 @@ func (h *StatsHandler) handleTeamYearOverYearSplits(w http.ResponseWriter, r *ht
 
 	writeSuccess(w, resp)
 }
-
-
-

@@ -7,14 +7,14 @@ import (
 )
 
 type Metrics struct {
-	mu                sync.RWMutex
-	startTime         time.Time
-	totalRequests     atomic.Int64
-	totalErrors       atomic.Int64
-	requestsByStatus  map[int]*atomic.Int64
-	requestsByPath    map[string]*atomic.Int64
-	responseTimes     []time.Duration
-	maxResponseTimes  int
+	mu               sync.RWMutex
+	startTime        time.Time
+	totalRequests    atomic.Int64
+	totalErrors      atomic.Int64
+	requestsByStatus map[int]*atomic.Int64
+	requestsByPath   map[string]*atomic.Int64
+	responseTimes    []time.Duration
+	maxResponseTimes int
 }
 
 func NewMetrics() *Metrics {
@@ -97,12 +97,12 @@ func (m *Metrics) GetSnapshot() MetricsSnapshot {
 }
 
 type MetricsSnapshot struct {
-	Uptime           float64           `json:"uptime_seconds"`
-	TotalRequests    int64             `json:"total_requests"`
-	TotalErrors      int64             `json:"total_errors"`
-	RequestsByStatus map[int]int64     `json:"requests_by_status"`
-	RequestsByPath   map[string]int64  `json:"requests_by_path"`
-	AvgResponseTime  time.Duration     `json:"avg_response_time_ns"`
-	MinResponseTime  time.Duration     `json:"min_response_time_ns"`
-	MaxResponseTime  time.Duration     `json:"max_response_time_ns"`
+	Uptime           float64          `json:"uptime_seconds"`
+	TotalRequests    int64            `json:"total_requests"`
+	TotalErrors      int64            `json:"total_errors"`
+	RequestsByStatus map[int]int64    `json:"requests_by_status"`
+	RequestsByPath   map[string]int64 `json:"requests_by_path"`
+	AvgResponseTime  time.Duration    `json:"avg_response_time_ns"`
+	MinResponseTime  time.Duration    `json:"min_response_time_ns"`
+	MaxResponseTime  time.Duration    `json:"max_response_time_ns"`
 }

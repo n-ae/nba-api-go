@@ -30,6 +30,7 @@ func NewClient(config Config) *Client {
 		clientConfig.Middlewares = []middleware.Middleware{
 			middleware.WithUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"),
 			middleware.WithReferer("https://www.nba.com/"),
+			middleware.WithAccept("application/json"),
 			middleware.WithPerHostRateLimit(3, 5),
 		}
 	}

@@ -16,7 +16,7 @@ import (
 
 const (
 	DefaultUserAgent = "nba-api-go/1.0"
-	DefaultTimeout   = 30 * time.Second
+	DefaultTimeout   = 2 * time.Minute
 )
 
 type HTTPClient interface {
@@ -40,14 +40,23 @@ type Config struct {
 }
 
 func NewClient(config Config) *Client {
-	if config.HTTPClient == nil {
-		config.HTTPClient = &http.Client{
-			Timeout: config.Timeout,
-		}
-	}
-
 	if config.Timeout == 0 {
 		config.Timeout = DefaultTimeout
+	}
+
+	if config.HTTPClient == nil {
+		transport := &http.Transport{
+			DisableKeepAlives:     true,
+			MaxIdleConns:          1,
+			IdleConnTimeout:       30 * time.Second,
+			TLSHandshakeTimeout:   30 * time.Second,
+			ResponseHeaderTimeout: 60 * time.Second,
+		}
+
+		config.HTTPClient = &http.Client{
+			Timeout:   config.Timeout,
+			Transport: transport,
+		}
 	}
 
 	if config.Headers == nil {

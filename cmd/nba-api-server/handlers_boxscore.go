@@ -26,7 +26,6 @@ func (h *StatsHandler) handleBoxScoreSummaryV2(w http.ResponseWriter, r *http.Re
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleBoxScoreTraditionalV2(w http.ResponseWriter, r *http.Request) {
 	gameID := r.URL.Query().Get("GameID")
 	if gameID == "" {
@@ -48,7 +47,6 @@ func (h *StatsHandler) handleBoxScoreTraditionalV2(w http.ResponseWriter, r *htt
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleBoxScoreAdvancedV2(w http.ResponseWriter, r *http.Request) {
 	gameID := r.URL.Query().Get("GameID")
@@ -72,7 +70,6 @@ func (h *StatsHandler) handleBoxScoreAdvancedV2(w http.ResponseWriter, r *http.R
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleBoxScoreScoringV2(w http.ResponseWriter, r *http.Request) {
 	gameID := r.URL.Query().Get("GameID")
 	if gameID == "" {
@@ -94,7 +91,6 @@ func (h *StatsHandler) handleBoxScoreScoringV2(w http.ResponseWriter, r *http.Re
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleBoxScoreMiscV2(w http.ResponseWriter, r *http.Request) {
 	gameID := r.URL.Query().Get("GameID")
@@ -118,7 +114,6 @@ func (h *StatsHandler) handleBoxScoreMiscV2(w http.ResponseWriter, r *http.Reque
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleBoxScoreUsageV2(w http.ResponseWriter, r *http.Request) {
 	gameID := r.URL.Query().Get("GameID")
 	if gameID == "" {
@@ -140,7 +135,6 @@ func (h *StatsHandler) handleBoxScoreUsageV2(w http.ResponseWriter, r *http.Requ
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleBoxScoreFourFactorsV2(w http.ResponseWriter, r *http.Request) {
 	gameID := r.URL.Query().Get("GameID")
@@ -164,7 +158,6 @@ func (h *StatsHandler) handleBoxScoreFourFactorsV2(w http.ResponseWriter, r *htt
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleBoxScorePlayerTrackV2(w http.ResponseWriter, r *http.Request) {
 	gameID := r.URL.Query().Get("GameID")
 	if gameID == "" {
@@ -186,7 +179,6 @@ func (h *StatsHandler) handleBoxScorePlayerTrackV2(w http.ResponseWriter, r *htt
 }
 
 // Player Tracking endpoint handlers
-
 
 func (h *StatsHandler) handleBoxScoreDefensiveV2(w http.ResponseWriter, r *http.Request) {
 	gameID := r.URL.Query().Get("GameID")
@@ -210,7 +202,6 @@ func (h *StatsHandler) handleBoxScoreDefensiveV2(w http.ResponseWriter, r *http.
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleBoxScoreHustleV2(w http.ResponseWriter, r *http.Request) {
 	gameID := r.URL.Query().Get("GameID")
 	if gameID == "" {
@@ -232,7 +223,6 @@ func (h *StatsHandler) handleBoxScoreHustleV2(w http.ResponseWriter, r *http.Req
 }
 
 // Game endpoint handlers
-
 
 func (h *StatsHandler) handleBoxScoreMatchupsV3(w http.ResponseWriter, r *http.Request) {
 	gameID := r.URL.Query().Get("GameID")
@@ -263,6 +253,3 @@ func (h *StatsHandler) handleBoxScoreMatchupsV3(w http.ResponseWriter, r *http.R
 
 	writeSuccess(w, resp)
 }
-
-
-

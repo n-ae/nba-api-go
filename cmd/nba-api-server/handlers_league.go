@@ -27,7 +27,6 @@ func (h *StatsHandler) handleLeagueStandings(w http.ResponseWriter, r *http.Requ
 	writeSuccess(w, resp.Data)
 }
 
-
 func (h *StatsHandler) handleLeagueLeaders(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -48,7 +47,6 @@ func (h *StatsHandler) handleLeagueLeaders(w http.ResponseWriter, r *http.Reques
 
 	writeSuccess(w, resp.Data)
 }
-
 
 func (h *StatsHandler) handleLeagueDashTeamStats(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
@@ -71,7 +69,6 @@ func (h *StatsHandler) handleLeagueDashTeamStats(w http.ResponseWriter, r *http.
 
 	writeSuccess(w, resp.Data)
 }
-
 
 func (h *StatsHandler) handleLeagueDashPlayerStats(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
@@ -97,7 +94,6 @@ func (h *StatsHandler) handleLeagueDashPlayerStats(w http.ResponseWriter, r *htt
 
 // Player endpoint handlers (expanded)
 
-
 func (h *StatsHandler) handleLeagueGameLog(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -117,7 +113,6 @@ func (h *StatsHandler) handleLeagueGameLog(w http.ResponseWriter, r *http.Reques
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleLeagueDashLineups(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
@@ -144,7 +139,6 @@ func (h *StatsHandler) handleLeagueDashLineups(w http.ResponseWriter, r *http.Re
 
 // Additional League endpoint handlers
 
-
 func (h *StatsHandler) handleLeagueDashPlayerClutch(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -165,7 +159,6 @@ func (h *StatsHandler) handleLeagueDashPlayerClutch(w http.ResponseWriter, r *ht
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleLeagueDashTeamClutch(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
@@ -188,7 +181,6 @@ func (h *StatsHandler) handleLeagueDashTeamClutch(w http.ResponseWriter, r *http
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleLeagueDashPlayerBioStats(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -208,7 +200,6 @@ func (h *StatsHandler) handleLeagueDashPlayerBioStats(w http.ResponseWriter, r *
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleLeagueDashTeamBioStats(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -227,7 +218,6 @@ func (h *StatsHandler) handleLeagueDashTeamBioStats(w http.ResponseWriter, r *ht
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleLeagueDashPtStats(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
@@ -250,7 +240,6 @@ func (h *StatsHandler) handleLeagueDashPtStats(w http.ResponseWriter, r *http.Re
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleLeagueHustleStatsPlayer(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -271,7 +260,6 @@ func (h *StatsHandler) handleLeagueHustleStatsPlayer(w http.ResponseWriter, r *h
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleLeagueHustleStatsTeam(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
@@ -294,7 +282,6 @@ func (h *StatsHandler) handleLeagueHustleStatsTeam(w http.ResponseWriter, r *htt
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleLeagueDashPtDefend(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -316,7 +303,6 @@ func (h *StatsHandler) handleLeagueDashPtDefend(w http.ResponseWriter, r *http.R
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleLeagueGameFinder(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -336,7 +322,6 @@ func (h *StatsHandler) handleLeagueGameFinder(w http.ResponseWriter, r *http.Req
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleLeagueStandingsV3(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 
@@ -355,7 +340,6 @@ func (h *StatsHandler) handleLeagueStandingsV3(w http.ResponseWriter, r *http.Re
 }
 
 // Additional Player endpoint handlers
-
 
 func (h *StatsHandler) handleLeagueDashPlayerShotLocations(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
@@ -378,7 +362,6 @@ func (h *StatsHandler) handleLeagueDashPlayerShotLocations(w http.ResponseWriter
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleLeagueDashTeamShotLocations(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -400,7 +383,6 @@ func (h *StatsHandler) handleLeagueDashTeamShotLocations(w http.ResponseWriter, 
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleLeagueSeasonMatchups(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -419,7 +401,6 @@ func (h *StatsHandler) handleLeagueSeasonMatchups(w http.ResponseWriter, r *http
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleLeagueDashPtTeamDefend(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
@@ -444,7 +425,6 @@ func (h *StatsHandler) handleLeagueDashPtTeamDefend(w http.ResponseWriter, r *ht
 
 // Team endpoints (iteration 5)
 
-
 func (h *StatsHandler) handleLeagueDashPlayerPtShot(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -465,7 +445,6 @@ func (h *StatsHandler) handleLeagueDashPlayerPtShot(w http.ResponseWriter, r *ht
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleLeagueDashTeamPtShot(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
@@ -490,7 +469,6 @@ func (h *StatsHandler) handleLeagueDashTeamPtShot(w http.ResponseWriter, r *http
 
 // Advanced analytics endpoints (iteration 7)
 
-
 func (h *StatsHandler) handleLeagueDashOppPtShot(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -514,7 +492,6 @@ func (h *StatsHandler) handleLeagueDashOppPtShot(w http.ResponseWriter, r *http.
 
 // Final endpoints (iteration 8)
 
-
 func (h *StatsHandler) handleLeagueLeadersV2(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -536,7 +513,6 @@ func (h *StatsHandler) handleLeagueLeadersV2(w http.ResponseWriter, r *http.Requ
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleLeaguePlayerOnDetails(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -557,7 +533,6 @@ func (h *StatsHandler) handleLeaguePlayerOnDetails(w http.ResponseWriter, r *htt
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleLeagueHustleStatsTeamLeaders(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
@@ -582,7 +557,6 @@ func (h *StatsHandler) handleLeagueHustleStatsTeamLeaders(w http.ResponseWriter,
 
 // Iteration 9 endpoints
 
-
 func (h *StatsHandler) handleLeagueDashPlayerClutchV2(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -604,7 +578,6 @@ func (h *StatsHandler) handleLeagueDashPlayerClutchV2(w http.ResponseWriter, r *
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleLeagueDashPlayerShotLocationV2(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
@@ -628,7 +601,6 @@ func (h *StatsHandler) handleLeagueDashPlayerShotLocationV2(w http.ResponseWrite
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleLeagueDashTeamClutchV2(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -650,6 +622,3 @@ func (h *StatsHandler) handleLeagueDashTeamClutchV2(w http.ResponseWriter, r *ht
 
 	writeSuccess(w, resp)
 }
-
-
-

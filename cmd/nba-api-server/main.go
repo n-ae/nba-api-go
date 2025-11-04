@@ -146,13 +146,13 @@ func (s *Server) corsMiddleware(next http.Handler) http.Handler {
 
 func (s *Server) handleHealth() http.HandlerFunc {
 	type healthResponse struct {
-		Status         string                 `json:"status"`
-		Version        string                 `json:"version"`
-		BuildInfo      map[string]string      `json:"build_info"`
-		EndpointsCount map[string]int         `json:"endpoints_count"`
-		Dependencies   map[string]string      `json:"dependencies"`
-		NBAAPIStatus   string                 `json:"nba_api_status"`
-		Timestamp      int64                  `json:"timestamp"`
+		Status         string            `json:"status"`
+		Version        string            `json:"version"`
+		BuildInfo      map[string]string `json:"build_info"`
+		EndpointsCount map[string]int    `json:"endpoints_count"`
+		Dependencies   map[string]string `json:"dependencies"`
+		NBAAPIStatus   string            `json:"nba_api_status"`
+		Timestamp      int64             `json:"timestamp"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -167,8 +167,8 @@ func (s *Server) handleHealth() http.HandlerFunc {
 				"git_commit": gitCommit,
 			},
 			EndpointsCount: map[string]int{
-				"sdk_total":      140,
-				"http_exposed":   149,
+				"sdk_total":    140,
+				"http_exposed": 149,
 			},
 			Dependencies: map[string]string{
 				"nba_api": "stats.nba.com",

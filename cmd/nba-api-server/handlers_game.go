@@ -29,7 +29,6 @@ func (h *StatsHandler) handlePlayByPlayV2(w http.ResponseWriter, r *http.Request
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleShotChartDetail(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
@@ -54,7 +53,6 @@ func (h *StatsHandler) handleShotChartDetail(w http.ResponseWriter, r *http.Requ
 	writeSuccess(w, resp)
 }
 
-
 func (h *StatsHandler) handleGameRotation(w http.ResponseWriter, r *http.Request) {
 	gameID := r.URL.Query().Get("GameID")
 	if gameID == "" {
@@ -78,7 +76,6 @@ func (h *StatsHandler) handleGameRotation(w http.ResponseWriter, r *http.Request
 
 // League endpoint handlers
 
-
 func (h *StatsHandler) handleWinProbabilityPBP(w http.ResponseWriter, r *http.Request) {
 	gameID := r.URL.Query().Get("GameID")
 	if gameID == "" {
@@ -98,7 +95,6 @@ func (h *StatsHandler) handleWinProbabilityPBP(w http.ResponseWriter, r *http.Re
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleVideoEvents(w http.ResponseWriter, r *http.Request) {
 	gameID := r.URL.Query().Get("GameID")
@@ -121,7 +117,6 @@ func (h *StatsHandler) handleVideoEvents(w http.ResponseWriter, r *http.Request)
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handlePlayByPlayV3(w http.ResponseWriter, r *http.Request) {
 	gameID := r.URL.Query().Get("GameID")
@@ -152,7 +147,6 @@ func (h *StatsHandler) handlePlayByPlayV3(w http.ResponseWriter, r *http.Request
 
 	writeSuccess(w, resp)
 }
-
 
 func (h *StatsHandler) handleShotChartLineupDetail(w http.ResponseWriter, r *http.Request) {
 	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
@@ -186,6 +180,3 @@ func (h *StatsHandler) handleShotChartLineupDetail(w http.ResponseWriter, r *htt
 
 	writeSuccess(w, resp)
 }
-
-
-

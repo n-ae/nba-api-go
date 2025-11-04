@@ -95,6 +95,29 @@ type LeagueDashPlayerStatsResponse struct {
 // GetLeagueDashPlayerStats retrieves data from the leaguedashplayerstats endpoint
 func GetLeagueDashPlayerStats(ctx context.Context, client *stats.Client, req LeagueDashPlayerStatsRequest) (*models.Response[*LeagueDashPlayerStatsResponse], error) {
 	params := url.Values{}
+
+	emptyParams := []string{
+		"College", "Conference", "Country", "DateFrom", "DateTo", "Division",
+		"DraftPick", "DraftYear", "GameScope", "GameSegment", "Height", "ISTRound",
+		"Location", "Outcome", "PlayerExperience", "PlayerPosition",
+		"SeasonSegment", "ShotClockRange", "StarterBench",
+		"VsConference", "VsDivision", "Weight",
+	}
+	for _, p := range emptyParams {
+		params.Set(p, "")
+	}
+
+	params.Set("LastNGames", "0")
+	params.Set("MeasureType", "Base")
+	params.Set("Month", "0")
+	params.Set("OpponentTeamID", "0")
+	params.Set("PORound", "0")
+	params.Set("PaceAdjust", "N")
+	params.Set("Period", "0")
+	params.Set("PlusMinus", "N")
+	params.Set("Rank", "N")
+	params.Set("TeamID", "0")
+
 	if req.Season != nil {
 		params.Set("Season", string(*req.Season))
 	}
