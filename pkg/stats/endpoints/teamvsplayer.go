@@ -120,7 +120,7 @@ func GetTeamVsPlayer(ctx context.Context, client *stats.Client, req TeamVsPlayer
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/teamvsplayer", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "teamvsplayer", params, &rawResp); err != nil {
 		return nil, err
 	}
 

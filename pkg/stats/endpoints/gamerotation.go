@@ -64,7 +64,7 @@ func GetGameRotation(ctx context.Context, client *stats.Client, req GameRotation
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/gamerotation", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "gamerotation", params, &rawResp); err != nil {
 		return nil, err
 	}
 

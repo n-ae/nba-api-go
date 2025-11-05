@@ -69,7 +69,7 @@ func GetTeamEstimatedMetrics(ctx context.Context, client *stats.Client, req Team
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/teamestimatedmetrics", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "teamestimatedmetrics", params, &rawResp); err != nil {
 		return nil, err
 	}
 

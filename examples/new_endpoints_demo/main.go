@@ -15,7 +15,7 @@ func main() {
 	ctx := context.Background()
 	statsClient := stats.NewDefaultClient()
 
-	fmt.Println("=== Testing Newly Generated Endpoints ===\n")
+	fmt.Println("=== Testing Newly Generated Endpoints ===")
 
 	fmt.Println("1. CommonAllPlayers - Get all players from 2023-24 season")
 	season := parameters.Season("2023-24")
@@ -33,7 +33,7 @@ func main() {
 		fmt.Printf("   ✓ Found %d players\n", len(allPlayersResp.Data.CommonAllPlayers))
 		if len(allPlayersResp.Data.CommonAllPlayers) > 0 {
 			player := allPlayersResp.Data.CommonAllPlayers[0]
-			fmt.Printf("   Example: %s (ID: %s)\n", player.DISPLAY_FIRST_LAST, player.PERSON_ID)
+			fmt.Printf("   Example: %v (ID: %v)\n", player.DISPLAY_FIRST_LAST, player.PERSON_ID)
 		}
 	}
 	fmt.Println()

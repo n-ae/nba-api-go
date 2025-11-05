@@ -99,7 +99,7 @@ func GetBoxScoreMatchupsV3(ctx context.Context, client *stats.Client, req BoxSco
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/boxscorematchupsv3", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "boxscorematchupsv3", params, &rawResp); err != nil {
 		return nil, err
 	}
 

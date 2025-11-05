@@ -19,8 +19,8 @@ func main() {
 	ctx := context.Background()
 	statsClient := stats.NewDefaultClient()
 
-	fmt.Println("=== NBA API Go - Tier 1 Endpoints Demo ===\n")
-	fmt.Println("Demonstrating 10 newly generated high-value endpoints\n")
+	fmt.Println("=== NBA API Go - Tier 1 Endpoints Demo ===")
+	fmt.Println("Demonstrating 10 newly generated high-value endpoints")
 
 	// 1. League Game Log
 	fmt.Println("1. LeagueGameLog - All games in a date range")

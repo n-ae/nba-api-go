@@ -87,7 +87,7 @@ func GetShotChartLineupDetail(ctx context.Context, client *stats.Client, req Sho
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/shotchartlineupdetail", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "shotchartlineupdetail", params, &rawResp); err != nil {
 		return nil, err
 	}
 

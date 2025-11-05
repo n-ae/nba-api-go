@@ -58,7 +58,7 @@ func main() {
 		winPct := fmt.Sprintf("%.3f", season.WIN_PCT)
 		playoffs := fmt.Sprintf("%v-%v", season.PO_WINS, season.PO_LOSSES)
 
-		fmt.Printf("%-10v %4v %6s %7s %5.1f %5.1f %5.1f %5v %5s\n",
+		fmt.Printf("%-10v %4v %6s %7s %5v %5v %5v %5v %5s\n",
 			season.YEAR,
 			season.GP,
 			record,

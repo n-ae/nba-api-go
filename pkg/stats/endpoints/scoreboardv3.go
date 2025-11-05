@@ -58,7 +58,7 @@ func GetScoreboardV3(ctx context.Context, client *stats.Client, req ScoreboardV3
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/scoreboardv3", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "scoreboardv3", params, &rawResp); err != nil {
 		return nil, err
 	}
 

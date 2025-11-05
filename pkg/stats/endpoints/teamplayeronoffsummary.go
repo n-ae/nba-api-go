@@ -65,7 +65,7 @@ func GetTeamPlayerOnOffSummary(ctx context.Context, client *stats.Client, req Te
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/teamplayeronoffsummary", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "teamplayeronoffsummary", params, &rawResp); err != nil {
 		return nil, err
 	}
 

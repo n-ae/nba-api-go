@@ -69,7 +69,7 @@ func GetTeamInfoCommon(ctx context.Context, client *stats.Client, req TeamInfoCo
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/teaminfocommon", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "teaminfocommon", params, &rawResp); err != nil {
 		return nil, err
 	}
 

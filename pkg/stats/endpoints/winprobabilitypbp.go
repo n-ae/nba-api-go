@@ -61,7 +61,7 @@ func GetWinProbabilityPBP(ctx context.Context, client *stats.Client, req WinProb
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/winprobabilitypbp", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "winprobabilitypbp", params, &rawResp); err != nil {
 		return nil, err
 	}
 

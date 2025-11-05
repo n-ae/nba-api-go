@@ -80,7 +80,7 @@ func LeagueLeaders(ctx context.Context, client *stats.Client, req LeagueLeadersR
 	params.Set("Scope", "S")
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/leagueleaders", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "leagueleaders", params, &rawResp); err != nil {
 		return nil, err
 	}
 

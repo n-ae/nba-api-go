@@ -58,7 +58,7 @@ func GetPlayerTrackingPasses(ctx context.Context, client *stats.Client, req Play
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/playertrackingpasses", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "playertrackingpasses", params, &rawResp); err != nil {
 		return nil, err
 	}
 

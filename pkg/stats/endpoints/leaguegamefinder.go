@@ -123,7 +123,7 @@ func GetLeagueGameFinder(ctx context.Context, client *stats.Client, req LeagueGa
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/leaguegamefinder", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "leaguegamefinder", params, &rawResp); err != nil {
 		return nil, err
 	}
 

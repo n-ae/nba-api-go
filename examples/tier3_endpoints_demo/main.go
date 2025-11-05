@@ -19,8 +19,8 @@ func main() {
 	ctx := context.Background()
 	statsClient := stats.NewDefaultClient()
 
-	fmt.Println("=== NBA API Go - Tier 3 Endpoints Demo ===\n")
-	fmt.Println("9 new synergy, historical, and comparison endpoints\n")
+	fmt.Println("=== NBA API Go - Tier 3 Endpoints Demo ===")
+	fmt.Println("9 new synergy, historical, and comparison endpoints")
 
 	// 1. Synergy Play Types
 	fmt.Println("1. SynergyPlayTypes - Play type breakdown (Isolation, Post-up, etc.)")

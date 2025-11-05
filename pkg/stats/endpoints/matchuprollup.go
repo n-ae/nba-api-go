@@ -66,7 +66,7 @@ func GetMatchupRollup(ctx context.Context, client *stats.Client, req MatchupRoll
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/matchuprollup", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "matchuprollup", params, &rawResp); err != nil {
 		return nil, err
 	}
 

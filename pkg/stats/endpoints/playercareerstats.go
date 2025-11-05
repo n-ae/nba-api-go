@@ -109,7 +109,7 @@ func PlayerCareerStats(ctx context.Context, client *stats.Client, req PlayerCare
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/playercareerstats", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "playercareerstats", params, &rawResp); err != nil {
 		return nil, err
 	}
 

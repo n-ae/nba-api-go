@@ -58,7 +58,7 @@ func GetOpponentShooting(ctx context.Context, client *stats.Client, req Opponent
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/opponentshooting", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "opponentshooting", params, &rawResp); err != nil {
 		return nil, err
 	}
 

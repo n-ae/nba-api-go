@@ -53,7 +53,7 @@ func GetPlayerTrackingDefense(ctx context.Context, client *stats.Client, req Pla
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/playertrackingdefense", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "playertrackingdefense", params, &rawResp); err != nil {
 		return nil, err
 	}
 

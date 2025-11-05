@@ -83,7 +83,7 @@ func GetLeagueDashTeamClutch(ctx context.Context, client *stats.Client, req Leag
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/leaguedashteamclutch", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "leaguedashteamclutch", params, &rawResp); err != nil {
 		return nil, err
 	}
 

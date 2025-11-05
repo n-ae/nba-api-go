@@ -103,7 +103,7 @@ func GetBoxScoreScoringV2(ctx context.Context, client *stats.Client, req BoxScor
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/boxscorescoringv2", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "boxscorescoringv2", params, &rawResp); err != nil {
 		return nil, err
 	}
 

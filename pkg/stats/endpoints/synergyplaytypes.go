@@ -74,7 +74,7 @@ func GetSynergyPlayTypes(ctx context.Context, client *stats.Client, req SynergyP
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/synergyplaytypes", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "synergyplaytypes", params, &rawResp); err != nil {
 		return nil, err
 	}
 

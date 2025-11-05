@@ -56,7 +56,7 @@ func GetPlayerTrackingSpeedDistance(ctx context.Context, client *stats.Client, r
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/playertrackingspeeddistance", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "playertrackingspeeddistance", params, &rawResp); err != nil {
 		return nil, err
 	}
 

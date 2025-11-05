@@ -1,0 +1,13 @@
+# Contract test fixtures
+# Commit a few key fixtures, but ignore large/generated ones
+
+# Keep these essential fixtures (add them with git add -f)
+# !fixtures/playercareerstats_203999.json
+# !fixtures/playergamelog_203999_2023-24.json
+# !fixtures/leagueleaders_2023-24_points.json
+
+# Ignore all other fixtures by default
+fixtures/*.json
+
+# Except the README
+!fixtures/README.md

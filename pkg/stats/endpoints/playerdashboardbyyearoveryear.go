@@ -127,7 +127,7 @@ func GetPlayerDashboardByYearOverYear(ctx context.Context, client *stats.Client,
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/playerdashboardbyyearoveryear", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "playerdashboardbyyearoveryear", params, &rawResp); err != nil {
 		return nil, err
 	}
 

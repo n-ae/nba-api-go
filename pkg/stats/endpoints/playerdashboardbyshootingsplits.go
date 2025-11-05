@@ -229,7 +229,7 @@ func GetPlayerDashboardByShootingSplits(ctx context.Context, client *stats.Clien
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/playerdashboardbyshootingsplits", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "playerdashboardbyshootingsplits", params, &rawResp); err != nil {
 		return nil, err
 	}
 

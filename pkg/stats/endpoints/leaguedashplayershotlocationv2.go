@@ -67,7 +67,7 @@ func GetLeagueDashPlayerShotLocationV2(ctx context.Context, client *stats.Client
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/leaguedashplayershotlocationv2", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "leaguedashplayershotlocationv2", params, &rawResp); err != nil {
 		return nil, err
 	}
 

@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"path"
 	"sort"
 	"time"
 
@@ -16,7 +17,7 @@ import (
 
 const (
 	DefaultUserAgent = "nba-api-go/1.0"
-	DefaultTimeout   = 2 * time.Minute
+	DefaultTimeout   = 30 * time.Second
 )
 
 type HTTPClient interface {
@@ -149,19 +150,14 @@ func (c *Client) buildURL(endpoint string, params url.Values) (string, error) {
 		return "", fmt.Errorf("invalid base URL: %w", err)
 	}
 
-	endpointURL, err := url.Parse(endpoint)
-	if err != nil {
-		return "", fmt.Errorf("invalid endpoint: %w", err)
-	}
-
-	finalURL := baseURL.ResolveReference(endpointURL)
+	baseURL.Path = path.Join(baseURL.Path, endpoint)
 
 	if params != nil {
 		sortedParams := c.sortParams(params)
-		finalURL.RawQuery = sortedParams.Encode()
+		baseURL.RawQuery = sortedParams.Encode()
 	}
 
-	return finalURL.String(), nil
+	return baseURL.String(), nil
 }
 
 func (c *Client) sortParams(params url.Values) url.Values {

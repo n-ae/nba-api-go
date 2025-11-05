@@ -53,7 +53,7 @@ func GetPlayerFantasyProfile(ctx context.Context, client *stats.Client, req Play
 	params.Set("PlayerID", string(req.PlayerID))
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/playerfantasyprofile", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "playerfantasyprofile", params, &rawResp); err != nil {
 		return nil, err
 	}
 

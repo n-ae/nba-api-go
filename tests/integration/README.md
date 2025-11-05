@@ -1,86 +1,64 @@
-# Integration Tests for NBA API Go
+# Integration Tests
 
-This directory contains integration tests for all 139 NBA.com API endpoints.
+This directory contains integration tests that verify the NBA API Go SDK works correctly with the live NBA.com API.
 
-## Overview
-
-Integration tests validate that:
-1. Each endpoint can successfully call the real NBA API
-2. Response parsing works correctly
-3. Type safety is maintained throughout
-4. Error handling works as expected
-
-## Running Tests
+## Running Integration Tests
 
 ```bash
-# Run all integration tests
-go test ./tests/integration/...
+# Run all integration tests (requires network access)
+INTEGRATION_TESTS=1 go test ./tests/integration/... -v
 
-# Run specific test suite
-go test ./tests/integration/ -run TestPlayerEndpoints
+# Run specific test
+INTEGRATION_TESTS=1 go test ./tests/integration/... -v -run TestPlayerEndpoints
 
-# Skip integration tests (use unit tests only)
-go test -short ./...
-
-# Run with verbose output
-go test -v ./tests/integration/...
+# Run with timeout
+INTEGRATION_TESTS=1 go test ./tests/integration/... -v -timeout 5m
 ```
 
-## Test Organization
+## Test Categories
 
-Tests are organized by endpoint category:
+1. **Player Endpoints** (`player_test.go`)
+   - PlayerCareerStats
+   - PlayerGameLog
+   - CommonPlayerInfo
+   - PlayerProfileV2
 
-- `player_endpoints_test.go` - All player-related endpoints (35+ endpoints)
-- `team_endpoints_test.go` - All team-related endpoints (32+ endpoints)
-- `league_endpoints_test.go` - League-wide data endpoints (28+ endpoints)
-- `game_endpoints_test.go` - Game-level endpoints (12+ endpoints)
-- `boxscore_endpoints_test.go` - All box score variants (10 endpoints)
-- `tracking_endpoints_test.go` - Player tracking endpoints (10+ endpoints)
-- `advanced_endpoints_test.go` - Advanced analytics endpoints (20+ endpoints)
+2. **Team Endpoints** (`team_test.go`)
+   - TeamGameLog
+   - TeamInfoCommon
+   - CommonTeamRoster
 
-## Framework
+3. **League Endpoints** (`league_test.go`)
+   - LeagueLeaders
+   - LeagueStandings
+   - LeagueDashPlayerStats
 
-The `endpoint_test_framework.go` provides:
-- Consistent test setup
-- Common validations
-- Timeout handling
-- Test parameters
+4. **Live Endpoints** (`live_test.go`)
+   - Scoreboard
 
-## Coverage
+## Test Philosophy
 
-Current integration test coverage:
-- Player endpoints: 8/35 (23%)
-- Team endpoints: 0/32 (0%)
-- League endpoints: 0/28 (0%)
-- Game endpoints: 0/12 (0%)
-- Box score endpoints: 0/10 (0%)
-- Tracking endpoints: 0/10 (0%)
-- Advanced endpoints: 0/20 (0%)
+- **Smoke tests**: Verify endpoints respond without errors
+- **Schema validation**: Ensure response structure matches expectations
+- **Data sanity**: Basic checks that returned data is reasonable
+- **No brittle assertions**: Don't assert specific values (NBA data changes)
 
-**Total: 8/139 (5.8%)**
+## Adding New Tests
 
-## Contributing
+1. Create test function in appropriate file
+2. Use `skipIfNotIntegration(t)` helper
+3. Use reasonable timeouts (30s default)
+4. Test with known good IDs (LeBron James: 2544, Nikola Jokic: 203999)
+5. Handle rate limiting gracefully
 
-To add tests for new endpoints:
+## Known Test IDs
 
-1. Identify the appropriate test file
-2. Add a TestEndpoint struct
-3. Implement the test function
-4. Add to the test suite
-5. Run and validate
-
-Example:
 ```go
-{
-    Name:        "NewEndpoint",
-    Description: "Test NewEndpoint endpoint",
-    TestFunc:    testNewEndpoint,
-},
+const (
+    LeBronJamesID   = "2544"
+    NikolaJokicID   = "203999"
+    LakersTeamID    = 1610612747
+    NuggetsTeamID   = 1610612743
+    Season2023      = "2023-24"
+)
 ```
-
-## Notes
-
-- Tests use real NBA API (require internet)
-- Rate limiting applies
-- Some endpoints may be seasonal
-- Use `testing.Short()` to skip in CI

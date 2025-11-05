@@ -53,7 +53,7 @@ func GetCommonAllPlayersV2(ctx context.Context, client *stats.Client, req Common
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/commonallplayersv2", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "commonallplayersv2", params, &rawResp); err != nil {
 		return nil, err
 	}
 

@@ -59,7 +59,7 @@ func GetDraftCombineStats(ctx context.Context, client *stats.Client, req DraftCo
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/draftcombinestats", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "draftcombinestats", params, &rawResp); err != nil {
 		return nil, err
 	}
 

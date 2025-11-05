@@ -125,7 +125,7 @@ func GetLeagueStandings(ctx context.Context, client *stats.Client, req LeagueSta
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/leaguestandings", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "leaguestandings", params, &rawResp); err != nil {
 		return nil, err
 	}
 

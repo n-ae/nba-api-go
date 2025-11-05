@@ -55,7 +55,7 @@ func GetPlayerTrackingShootingEfficiency(ctx context.Context, client *stats.Clie
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/playertrackingshootingefficiency", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "playertrackingshootingefficiency", params, &rawResp); err != nil {
 		return nil, err
 	}
 

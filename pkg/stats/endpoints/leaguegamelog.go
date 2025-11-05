@@ -94,7 +94,7 @@ func GetLeagueGameLog(ctx context.Context, client *stats.Client, req LeagueGameL
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/leaguegamelog", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "leaguegamelog", params, &rawResp); err != nil {
 		return nil, err
 	}
 

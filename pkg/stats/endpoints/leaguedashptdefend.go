@@ -61,7 +61,7 @@ func GetLeagueDashPtDefend(ctx context.Context, client *stats.Client, req League
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/leaguedashptdefend", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "leaguedashptdefend", params, &rawResp); err != nil {
 		return nil, err
 	}
 

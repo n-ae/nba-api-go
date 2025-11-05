@@ -70,7 +70,7 @@ func GetPlayoffPicture(ctx context.Context, client *stats.Client, req PlayoffPic
 	params.Set("SeasonID", string(req.SeasonID))
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/playoffpicture", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "playoffpicture", params, &rawResp); err != nil {
 		return nil, err
 	}
 

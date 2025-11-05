@@ -68,7 +68,7 @@ func GetPlayerYearByYearStats(ctx context.Context, client *stats.Client, req Pla
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/playeryearbyyearstats", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "playeryearbyyearstats", params, &rawResp); err != nil {
 		return nil, err
 	}
 

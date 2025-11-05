@@ -73,7 +73,7 @@ func GetPlayByPlayV3(ctx context.Context, client *stats.Client, req PlayByPlayV3
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/playbyplayv3", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "playbyplayv3", params, &rawResp); err != nil {
 		return nil, err
 	}
 

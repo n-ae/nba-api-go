@@ -85,7 +85,7 @@ func CommonPlayerInfo(ctx context.Context, client *stats.Client, req CommonPlaye
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/commonplayerinfo", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "commonplayerinfo", params, &rawResp); err != nil {
 		return nil, err
 	}
 

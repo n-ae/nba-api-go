@@ -97,7 +97,7 @@ func GetPlayerProfileV2(ctx context.Context, client *stats.Client, req PlayerPro
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/playerprofilev2", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "playerprofilev2", params, &rawResp); err != nil {
 		return nil, err
 	}
 

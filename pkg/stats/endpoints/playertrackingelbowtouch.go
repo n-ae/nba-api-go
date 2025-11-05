@@ -60,7 +60,7 @@ func GetPlayerTrackingElbowTouch(ctx context.Context, client *stats.Client, req 
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/playertrackingelbowtouch", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "playertrackingelbowtouch", params, &rawResp); err != nil {
 		return nil, err
 	}
 

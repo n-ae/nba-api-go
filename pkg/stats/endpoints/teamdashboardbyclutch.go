@@ -127,7 +127,7 @@ func GetTeamDashboardByClutch(ctx context.Context, client *stats.Client, req Tea
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/teamdashboardbyclutch", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "teamdashboardbyclutch", params, &rawResp); err != nil {
 		return nil, err
 	}
 

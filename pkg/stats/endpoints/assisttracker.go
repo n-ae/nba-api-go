@@ -58,7 +58,7 @@ func GetAssistTracker(ctx context.Context, client *stats.Client, req AssistTrack
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/assisttracker", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "assisttracker", params, &rawResp); err != nil {
 		return nil, err
 	}
 

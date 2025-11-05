@@ -71,7 +71,7 @@ func GetPlayerEstimatedMetrics(ctx context.Context, client *stats.Client, req Pl
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/playerestimatedmetrics", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "playerestimatedmetrics", params, &rawResp); err != nil {
 		return nil, err
 	}
 

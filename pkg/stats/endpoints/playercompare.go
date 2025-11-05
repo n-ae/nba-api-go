@@ -77,7 +77,7 @@ func GetPlayerCompare(ctx context.Context, client *stats.Client, req PlayerCompa
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/playercompare", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "playercompare", params, &rawResp); err != nil {
 		return nil, err
 	}
 

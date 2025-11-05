@@ -53,7 +53,7 @@ func GetFranchiseLeaders(ctx context.Context, client *stats.Client, req Franchis
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/franchiseleaders", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "franchiseleaders", params, &rawResp); err != nil {
 		return nil, err
 	}
 

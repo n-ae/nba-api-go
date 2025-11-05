@@ -165,7 +165,7 @@ func GetBoxScoreSummaryV2(ctx context.Context, client *stats.Client, req BoxScor
 	params.Set("GameID", string(req.GameID))
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/boxscoresummaryv2", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "boxscoresummaryv2", params, &rawResp); err != nil {
 		return nil, err
 	}
 

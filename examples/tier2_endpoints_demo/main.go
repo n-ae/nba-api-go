@@ -19,8 +19,8 @@ func main() {
 	ctx := context.Background()
 	statsClient := stats.NewDefaultClient()
 
-	fmt.Println("=== NBA API Go - Tier 2 Endpoints Demo ===\n")
-	fmt.Println("11 new shooting, defensive, and advanced analytics endpoints\n")
+	fmt.Println("=== NBA API Go - Tier 2 Endpoints Demo ===")
+	fmt.Println("11 new shooting, defensive, and advanced analytics endpoints")
 
 	// 1. Player Shot Tracking
 	fmt.Println("1. PlayerDashPtShots")

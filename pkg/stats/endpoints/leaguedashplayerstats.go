@@ -132,7 +132,7 @@ func GetLeagueDashPlayerStats(ctx context.Context, client *stats.Client, req Lea
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/leaguedashplayerstats", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "leaguedashplayerstats", params, &rawResp); err != nil {
 		return nil, err
 	}
 
