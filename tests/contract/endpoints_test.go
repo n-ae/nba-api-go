@@ -588,6 +588,48 @@ func TestShotChartDetail_Contract(t *testing.T) {
 	t.Log("✓ ShotChartDetail validated")
 }
 
+func TestInternationalBroadcasterSchedule_Contract(t *testing.T) {
+	fixtureName := "internationalbroadcasterschedule_2025.json"
+
+	if shouldUpdateFixtures() {
+		skipIfNotIntegration(t)
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+
+		client := stats.NewDefaultClient()
+		req := endpoints.InternationalBroadcasterScheduleRequest{
+			LeagueID: parameters.LeagueIDNBA,
+			Season:   "2025",
+		}
+
+		resp, err := endpoints.GetInternationalBroadcasterSchedule(ctx, client, req)
+		assertNoError(t, err, "Failed to fetch InternationalBroadcasterSchedule")
+
+		data, err := json.MarshalIndent(resp, "", "  ")
+		assertNoError(t, err, "Failed to marshal response")
+
+		saveFixture(t, fixtureName, data)
+	}
+
+	fixture := loadFixture(t, fixtureName)
+
+	var resp endpoints.InternationalBroadcasterScheduleResponse
+	err := json.Unmarshal(fixture, &resp)
+	assertNoError(t, err, "Failed to unmarshal fixture")
+
+	assert(t, len(resp.Games) >= 0, "Expected Games array to be present")
+
+	if len(resp.Games) > 0 {
+		game := resp.Games[0]
+		assert(t, game.GameID != "", "Expected GameID to be non-empty")
+		assert(t, game.Date != "", "Expected Date to be non-empty")
+		assert(t, game.HomeAbbr != "", "Expected HomeAbbr to be non-empty")
+		assert(t, game.VisitorAbbr != "", "Expected VisitorAbbr to be non-empty")
+	}
+
+	t.Log("✓ InternationalBroadcasterSchedule validated")
+}
+
 // =============================================================================
 // HELPER FUNCTIONS
 // =============================================================================

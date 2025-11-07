@@ -107,4 +107,44 @@ func TestSimpleSmokeTests(t *testing.T) {
 		gameCount := len(resp.Data.Scoreboard.Games)
 		t.Logf("✓ Scoreboard OK: %d games today", gameCount)
 	})
+
+	t.Run("InternationalBroadcasterSchedule_CurrentSeason", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(context.Background(), DefaultTimeout)
+		defer cancel()
+
+		client := stats.NewDefaultClient()
+		req := statsep.InternationalBroadcasterScheduleRequest{
+			LeagueID: parameters.LeagueIDNBA,
+			Season:   "2025",
+		}
+
+		resp, err := statsep.GetInternationalBroadcasterSchedule(ctx, client, req)
+		assertNoError(t, err, "InternationalBroadcasterSchedule failed")
+
+		if resp == nil {
+			t.Fatal("Expected response, got nil")
+		}
+
+		t.Logf("✓ InternationalBroadcasterSchedule OK: %d games", len(resp.Games))
+	})
+
+	t.Run("InternationalBroadcasterSchedule_PreviousSeason", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(context.Background(), DefaultTimeout)
+		defer cancel()
+
+		client := stats.NewDefaultClient()
+		req := statsep.InternationalBroadcasterScheduleRequest{
+			LeagueID: parameters.LeagueIDNBA,
+			Season:   "2024",
+		}
+
+		resp, err := statsep.GetInternationalBroadcasterSchedule(ctx, client, req)
+		assertNoError(t, err, "InternationalBroadcasterSchedule failed for 2024 season")
+
+		if resp == nil {
+			t.Fatal("Expected response, got nil")
+		}
+
+		t.Logf("✓ InternationalBroadcasterSchedule 2024 OK: %d games", len(resp.Games))
+	})
 }

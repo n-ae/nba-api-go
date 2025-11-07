@@ -307,3 +307,80 @@ func TestMetricsTracking(t *testing.T) {
 		t.Errorf("expected 2 requests to /api/test, got %d", snapshot.RequestsByPath["/api/test"])
 	}
 }
+
+func TestInternationalBroadcasterScheduleEndpoint_MissingSeason(t *testing.T) {
+	handler := NewStatsHandler()
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/stats/internationalbroadcasterschedule", nil)
+	w := httptest.NewRecorder()
+
+	handler.ServeHTTP(w, req)
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("expected status 400, got %d", w.Code)
+	}
+
+	var response struct {
+		Success bool `json:"success"`
+		Error   struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		} `json:"error"`
+	}
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
+	}
+
+	if response.Error.Code != "missing_parameter" {
+		t.Errorf("expected error code=missing_parameter, got %s", response.Error.Code)
+	}
+
+	if response.Success != false {
+		t.Errorf("expected success=false, got %v", response.Success)
+	}
+}
+
+func TestInternationalBroadcasterScheduleEndpoint_ValidRequest(t *testing.T) {
+	if os.Getenv("INTEGRATION_TESTS") != "1" {
+		t.Skip("Skipping integration test (set INTEGRATION_TESTS=1 to run)")
+	}
+
+	handler := NewStatsHandler()
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/stats/internationalbroadcasterschedule?LeagueID=00&Season=2025", nil)
+	w := httptest.NewRecorder()
+
+	handler.ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("expected status 200, got %d", w.Code)
+	}
+
+	var response map[string]interface{}
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
+	}
+
+	if games, ok := response["Games"].([]interface{}); !ok {
+		t.Errorf("expected Games array in response")
+	} else {
+		t.Logf("Got %d games in schedule", len(games))
+	}
+}
+
+func TestInternationalBroadcasterScheduleEndpoint_WithOptionalParams(t *testing.T) {
+	if os.Getenv("INTEGRATION_TESTS") != "1" {
+		t.Skip("Skipping integration test (set INTEGRATION_TESTS=1 to run)")
+	}
+
+	handler := NewStatsHandler()
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/stats/internationalbroadcasterschedule?LeagueID=00&Season=2025&RegionID=1", nil)
+	w := httptest.NewRecorder()
+
+	handler.ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("expected status 200, got %d", w.Code)
+	}
+}

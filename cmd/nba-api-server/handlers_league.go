@@ -622,3 +622,40 @@ func (h *StatsHandler) handleLeagueDashTeamClutchV2(w http.ResponseWriter, r *ht
 
 	writeSuccess(w, resp)
 }
+
+func (h *StatsHandler) handleInternationalBroadcasterSchedule(w http.ResponseWriter, r *http.Request) {
+	leagueIDStr := r.URL.Query().Get("LeagueID")
+	if leagueIDStr == "" {
+		leagueIDStr = "00"
+	}
+	leagueID := parameters.LeagueID(leagueIDStr)
+
+	season := r.URL.Query().Get("Season")
+	if season == "" {
+		writeError(w, http.StatusBadRequest, "missing_parameter", "Season is required")
+		return
+	}
+
+	req := endpoints.InternationalBroadcasterScheduleRequest{
+		LeagueID: leagueID,
+		Season:   season,
+	}
+
+	if regionID := r.URL.Query().Get("RegionID"); regionID != "" {
+		req.RegionID = &regionID
+	}
+	if date := r.URL.Query().Get("Date"); date != "" {
+		req.Date = &date
+	}
+	if est := r.URL.Query().Get("EST"); est != "" {
+		req.EST = &est
+	}
+
+	resp, err := endpoints.GetInternationalBroadcasterSchedule(r.Context(), h.client, req)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		return
+	}
+
+	writeSuccess(w, resp)
+}

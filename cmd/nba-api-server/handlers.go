@@ -341,6 +341,8 @@ func (h *StatsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.handleTeamNextNGames(w, r)
 	case "teamyearoveryearsplits":
 		h.handleTeamYearOverYearSplits(w, r)
+	case "internationalbroadcasterschedule":
+		h.handleInternationalBroadcasterSchedule(w, r)
 
 	default:
 		writeError(w, http.StatusNotFound, "endpoint_not_found", "Endpoint not supported: "+endpoint)
