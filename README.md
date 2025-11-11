@@ -6,20 +6,20 @@ A type-safe Go library and HTTP API server for accessing NBA statistics from sta
 
 **World's first complete NBA API implementation in Go!**
 
-- ✅ **139/139 endpoints** (100% coverage)
-- ✅ **All categories complete**: Box Scores, Player, Team, League, Game, Advanced
+- ✅ **140 endpoints** (100%+ coverage - all NBA Stats API endpoints plus international schedule)
+- ✅ **All categories complete**: Box Scores, Player, Team, League, Game, Advanced, International
 - ✅ **Dual access**: Native Go SDK + HTTP REST API for any language
 - ✅ **Production-ready**: Zero bugs, type-safe, fully tested
-- ✅ **Complete feature parity** with Python nba_api
+- ✅ **Complete feature parity** with Python nba_api + additional features
 
 See [Migration Guide](./docs/MIGRATION_GUIDE.md) to migrate from Python nba_api to Go.
 
 ## Features
 
 ### Core Features
-- **🏆 139 Stats API endpoints** - 100% COVERAGE! (Complete feature parity with Python nba_api)
+- **🏆 140 Stats API endpoints** - 100%+ COVERAGE! (Complete feature parity with Python nba_api + international schedule)
 - **Go SDK** - Type-safe library for direct Go integration
-- **HTTP API Server** - Complete REST API with all 139 endpoints for any language
+- **HTTP API Server** - Complete REST API with all 140 endpoints for any language
 - **Docker/Podman Ready** - Multi-stage containerization (< 20MB images)
 - **Live API** - Real-time game data and scoreboards
 - **Static Data** - Pre-loaded player and team datasets with search (5,135 players, 30 teams)
@@ -409,10 +409,10 @@ Based on the [ADR](./docs/adr/001-go-replication-strategy.md), the library is be
 - [x] Phase 1: Foundation (HTTP client, middleware, models)
 - [x] Phase 2: Core Stats API (initial endpoints)
 - [x] Phase 3: Live API (Scoreboard endpoint)
-- [x] Phase 4: Additional Endpoints - ✅ **100% COMPLETE (139/139 endpoints)**
+- [x] Phase 4: Additional Endpoints - ✅ **100% COMPLETE (140 endpoints including international schedule)**
 - [x] Phase 5: Performance Optimization (benchmarks complete)
 - [x] Code generation tooling (completed)
-- [x] HTTP API Server - ✅ **100% COMPLETE (All 139 endpoints exposed)**
+- [x] HTTP API Server - ✅ **100% COMPLETE (All 140 endpoints exposed)**
 - [x] Migration guide from Python nba_api - ✅ **COMPLETE (887 lines)**
 - [x] HTTP API client examples - ✅ **COMPLETE (Python, JavaScript, Bash)**
 - [x] Integration test suite - ✅ **COMPLETE (60+ tests)**

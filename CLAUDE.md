@@ -4,9 +4,9 @@ This file provides guidance to Claude Code when working with the nba-api-go repo
 
 ## Repository Overview
 
-**nba-api-go** is a production-ready Go SDK and HTTP API server providing type-safe access to all 139 NBA Stats API endpoints. The project emphasizes maintainability, minimal dependencies, and solo engineer viability.
+**nba-api-go** is a production-ready Go SDK and HTTP API server providing type-safe access to 140 NBA Stats API endpoints (all standard endpoints plus international broadcast schedule). The project emphasizes maintainability, minimal dependencies, and solo engineer viability.
 
-**Current Status**: Ready for v1.0.0 release
+**Current Status**: v1.1.0 - Stable with new international schedule endpoint
 **Grade**: A (93/100) - Production-ready with excellent maintainability
 **Maintenance Burden**: ~1.6 hours/week
 
@@ -14,7 +14,7 @@ This file provides guidance to Claude Code when working with the nba-api-go repo
 
 ### Core Components
 
-- **SDK Library** (`pkg/stats/`): Type-safe Go SDK with 139 endpoints
+- **SDK Library** (`pkg/stats/`): Type-safe Go SDK with 140 endpoints
 - **HTTP API Server** (`cmd/nba-api-server/`): REST API exposing all endpoints
 - **Code Generator** (`cmd/generator/`): Generates endpoints from NBA.com API analysis
 - **Static Data** (`pkg/stats/static/`): 5,135 players, 30 teams (no external DB needed)
@@ -213,7 +213,7 @@ See `docs/DEPLOYMENT.md` for:
 
 ### API Stability
 
-**Current: v1.0.0** - Stable with strict semver guarantees
+**Current: v1.1.0** - Stable with strict semver guarantees
 
 **Breaking changes** require:
 - Major version bump

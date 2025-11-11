@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2025-11-07
+
+### Added
+- **New endpoint**: `InternationalBroadcasterSchedule` - Access international broadcast schedules for NBA games
+  - SDK endpoint: `endpoints.GetInternationalBroadcasterSchedule()`
+  - HTTP API route: `/api/v1/stats/internationalbroadcasterschedule`
+  - Supports filtering by Season, LeagueID, RegionID, Date, and EST parameters
+  - Returns detailed game information including broadcasters, teams, dates, and times
+  - Useful for tracking which international broadcasters are showing games
+- Example program: `examples/international_broadcast_schedule/` demonstrating broadcast schedule usage
+- Comprehensive test coverage for new endpoint:
+  - Unit tests for parameter validation
+  - Integration tests for 2024 and 2025 seasons
+  - Contract test with fixture for schema stability
+  - HTTP handler tests for error cases and valid requests
+
+### Changed
+- HTTP API server version updated to 1.1.0
+- Now supports 140/139+ NBA Stats API endpoints (added 1 additional international schedule endpoint)
+
+### Notes
+- Season parameter format: "2025" corresponds to 2025-26 season
+- Returns 409+ scheduled games with international broadcast information for 2025-26 season
+- All tests passing with `go test ./...`
+
 ## [1.0.0] - 2025-11-05
 
 **STABLE RELEASE** - This release marks the project as production-ready with comprehensive testing, documentation, and stability guarantees.
@@ -162,6 +187,25 @@ First public release of the NBA API Go SDK. Provides type-safe access to NBA sta
 
 ## Upgrade Guide
 
+### From 1.0.0 to 1.1.0
+
+**No breaking changes!** This is a minor release adding a new endpoint.
+
+**What's New:**
+- `InternationalBroadcasterSchedule` endpoint for accessing international broadcast schedules
+- Example program demonstrating broadcast schedule usage
+- Comprehensive tests for the new endpoint
+
+**Migration Steps:**
+1. Update dependency: `go get github.com/n-ae/nba-api-go@v1.1.0`
+2. No code changes required for existing code
+3. Optionally use the new endpoint: `endpoints.GetInternationalBroadcasterSchedule()`
+
+**New Features:**
+- Track which international broadcasters are showing NBA games
+- Filter by Season, LeagueID, RegionID, Date, and EST
+- Access game schedules with detailed broadcaster information
+
 ### From 0.9.0 to 1.0.0
 
 **No breaking changes!** This is a stability release with no API changes.
@@ -215,7 +259,8 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to suggest changes or report issues.
 
-[Unreleased]: https://github.com/n-ae/nba-api-go/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/n-ae/nba-api-go/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/n-ae/nba-api-go/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/n-ae/nba-api-go/compare/v0.9.0...v1.0.0
 [0.9.0]: https://github.com/n-ae/nba-api-go/compare/v0.3.0...v0.9.0
 [0.3.0]: https://github.com/n-ae/nba-api-go/compare/v0.2.0...v0.3.0
