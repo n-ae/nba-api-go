@@ -179,7 +179,7 @@ func (s *Server) handleHealth() http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(resp)
+		_ = json.NewEncoder(w).Encode(resp)
 	}
 }
 
@@ -189,7 +189,7 @@ func (s *Server) handleMetrics() http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(snapshot)
+		_ = json.NewEncoder(w).Encode(snapshot)
 	}
 }
 
