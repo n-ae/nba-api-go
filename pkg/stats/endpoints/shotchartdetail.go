@@ -92,16 +92,16 @@ type ShotChartDetailResponse struct {
 func GetShotChartDetail(ctx context.Context, client *stats.Client, req ShotChartDetailRequest) (*models.Response[*ShotChartDetailResponse], error) {
 	params := url.Values{}
 	if req.PlayerID != nil {
-		params.Set("PlayerID", string(*req.PlayerID))
+		params.Set("PlayerID", *req.PlayerID)
 	}
 	if req.TeamID != nil {
-		params.Set("TeamID", string(*req.TeamID))
+		params.Set("TeamID", *req.TeamID)
 	}
 	if req.GameID != nil {
-		params.Set("GameID", string(*req.GameID))
+		params.Set("GameID", *req.GameID)
 	}
 	if req.Season == "" {
-		return nil, fmt.Errorf("Season is required")
+		return nil, fmt.Errorf("season is required")
 	}
 	params.Set("Season", string(req.Season))
 	if req.SeasonType == "" {
@@ -112,73 +112,73 @@ func GetShotChartDetail(ctx context.Context, client *stats.Client, req ShotChart
 		params.Set("LeagueID", string(*req.LeagueID))
 	}
 	if req.ContextMeasure != nil {
-		params.Set("ContextMeasure", string(*req.ContextMeasure))
+		params.Set("ContextMeasure", *req.ContextMeasure)
 	}
 	if req.DateFrom != nil {
-		params.Set("DateFrom", string(*req.DateFrom))
+		params.Set("DateFrom", *req.DateFrom)
 	}
 	if req.DateTo != nil {
-		params.Set("DateTo", string(*req.DateTo))
+		params.Set("DateTo", *req.DateTo)
 	}
 	if req.OpponentTeamID != nil {
-		params.Set("OpponentTeamID", string(*req.OpponentTeamID))
+		params.Set("OpponentTeamID", *req.OpponentTeamID)
 	}
 	if req.Period != nil {
-		params.Set("Period", string(*req.Period))
+		params.Set("Period", *req.Period)
 	}
 	if req.RookieYear != nil {
-		params.Set("RookieYear", string(*req.RookieYear))
+		params.Set("RookieYear", *req.RookieYear)
 	}
 	if req.VsConference != nil {
-		params.Set("VsConference", string(*req.VsConference))
+		params.Set("VsConference", *req.VsConference)
 	}
 	if req.VsDivision != nil {
-		params.Set("VsDivision", string(*req.VsDivision))
+		params.Set("VsDivision", *req.VsDivision)
 	}
 	if req.Position != nil {
-		params.Set("Position", string(*req.Position))
+		params.Set("Position", *req.Position)
 	}
 	if req.GameSegment != nil {
-		params.Set("GameSegment", string(*req.GameSegment))
+		params.Set("GameSegment", *req.GameSegment)
 	}
 	if req.LastNGames != nil {
-		params.Set("LastNGames", string(*req.LastNGames))
+		params.Set("LastNGames", *req.LastNGames)
 	}
 	if req.Location != nil {
-		params.Set("Location", string(*req.Location))
+		params.Set("Location", *req.Location)
 	}
 	if req.Month != nil {
-		params.Set("Month", string(*req.Month))
+		params.Set("Month", *req.Month)
 	}
 	if req.Outcome != nil {
-		params.Set("Outcome", string(*req.Outcome))
+		params.Set("Outcome", *req.Outcome)
 	}
 	if req.SeasonSegment != nil {
-		params.Set("SeasonSegment", string(*req.SeasonSegment))
+		params.Set("SeasonSegment", *req.SeasonSegment)
 	}
 	if req.AheadBehind != nil {
-		params.Set("AheadBehind", string(*req.AheadBehind))
+		params.Set("AheadBehind", *req.AheadBehind)
 	}
 	if req.ClutchTime != nil {
-		params.Set("ClutchTime", string(*req.ClutchTime))
+		params.Set("ClutchTime", *req.ClutchTime)
 	}
 	if req.PointDiff != nil {
-		params.Set("PointDiff", string(*req.PointDiff))
+		params.Set("PointDiff", *req.PointDiff)
 	}
 	if req.RangeType != nil {
-		params.Set("RangeType", string(*req.RangeType))
+		params.Set("RangeType", *req.RangeType)
 	}
 	if req.StartPeriod != nil {
-		params.Set("StartPeriod", string(*req.StartPeriod))
+		params.Set("StartPeriod", *req.StartPeriod)
 	}
 	if req.EndPeriod != nil {
-		params.Set("EndPeriod", string(*req.EndPeriod))
+		params.Set("EndPeriod", *req.EndPeriod)
 	}
 	if req.StartRange != nil {
-		params.Set("StartRange", string(*req.StartRange))
+		params.Set("StartRange", *req.StartRange)
 	}
 	if req.EndRange != nil {
-		params.Set("EndRange", string(*req.EndRange))
+		params.Set("EndRange", *req.EndRange)
 	}
 
 	var rawResp rawStatsResponse

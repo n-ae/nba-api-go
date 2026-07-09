@@ -65,7 +65,7 @@ type LeagueGameLogResponse struct {
 func GetLeagueGameLog(ctx context.Context, client *stats.Client, req LeagueGameLogRequest) (*models.Response[*LeagueGameLogResponse], error) {
 	params := url.Values{}
 	if req.Season == "" {
-		return nil, fmt.Errorf("Season is required")
+		return nil, fmt.Errorf("season is required")
 	}
 	params.Set("Season", string(req.Season))
 	if req.SeasonType != nil {
@@ -75,22 +75,22 @@ func GetLeagueGameLog(ctx context.Context, client *stats.Client, req LeagueGameL
 		params.Set("LeagueID", string(*req.LeagueID))
 	}
 	if req.PlayerOrTeam != nil {
-		params.Set("PlayerOrTeam", string(*req.PlayerOrTeam))
+		params.Set("PlayerOrTeam", *req.PlayerOrTeam)
 	}
 	if req.Counter != nil {
-		params.Set("Counter", string(*req.Counter))
+		params.Set("Counter", *req.Counter)
 	}
 	if req.Sorter != nil {
-		params.Set("Sorter", string(*req.Sorter))
+		params.Set("Sorter", *req.Sorter)
 	}
 	if req.Direction != nil {
-		params.Set("Direction", string(*req.Direction))
+		params.Set("Direction", *req.Direction)
 	}
 	if req.DateFrom != nil {
-		params.Set("DateFrom", string(*req.DateFrom))
+		params.Set("DateFrom", *req.DateFrom)
 	}
 	if req.DateTo != nil {
-		params.Set("DateTo", string(*req.DateTo))
+		params.Set("DateTo", *req.DateTo)
 	}
 
 	var rawResp rawStatsResponse

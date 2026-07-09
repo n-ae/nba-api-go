@@ -69,10 +69,10 @@ func GetLeagueLeadersV2(ctx context.Context, client *stats.Client, req LeagueLea
 		params.Set("PerMode", string(*req.PerMode))
 	}
 	if req.Scope != nil {
-		params.Set("Scope", string(*req.Scope))
+		params.Set("Scope", *req.Scope)
 	}
 	if req.StatCategory != nil {
-		params.Set("StatCategory", string(*req.StatCategory))
+		params.Set("StatCategory", *req.StatCategory)
 	}
 	if req.LeagueID != nil {
 		params.Set("LeagueID", string(*req.LeagueID))

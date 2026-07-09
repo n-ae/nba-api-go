@@ -74,10 +74,10 @@ func GetPlayerGameLogs(ctx context.Context, client *stats.Client, req PlayerGame
 		params.Set("LeagueID", string(*req.LeagueID))
 	}
 	if req.DateFrom != nil {
-		params.Set("DateFrom", string(*req.DateFrom))
+		params.Set("DateFrom", *req.DateFrom)
 	}
 	if req.DateTo != nil {
-		params.Set("DateTo", string(*req.DateTo))
+		params.Set("DateTo", *req.DateTo)
 	}
 
 	var rawResp rawStatsResponse

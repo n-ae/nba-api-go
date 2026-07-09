@@ -66,7 +66,7 @@ type TeamGameLogsResponse struct {
 func GetTeamGameLogs(ctx context.Context, client *stats.Client, req TeamGameLogsRequest) (*models.Response[*TeamGameLogsResponse], error) {
 	params := url.Values{}
 	if req.Season == "" {
-		return nil, fmt.Errorf("Season is required")
+		return nil, fmt.Errorf("season is required")
 	}
 	params.Set("Season", string(req.Season))
 	if req.SeasonType == "" {
@@ -77,13 +77,13 @@ func GetTeamGameLogs(ctx context.Context, client *stats.Client, req TeamGameLogs
 		params.Set("LeagueID", string(*req.LeagueID))
 	}
 	if req.TeamID != nil {
-		params.Set("TeamID", string(*req.TeamID))
+		params.Set("TeamID", *req.TeamID)
 	}
 	if req.DateFrom != nil {
-		params.Set("DateFrom", string(*req.DateFrom))
+		params.Set("DateFrom", *req.DateFrom)
 	}
 	if req.DateTo != nil {
-		params.Set("DateTo", string(*req.DateTo))
+		params.Set("DateTo", *req.DateTo)
 	}
 
 	var rawResp rawStatsResponse

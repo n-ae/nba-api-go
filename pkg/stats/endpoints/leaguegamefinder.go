@@ -80,46 +80,46 @@ func GetLeagueGameFinder(ctx context.Context, client *stats.Client, req LeagueGa
 		params.Set("SeasonType", string(*req.SeasonType))
 	}
 	if req.PlayerOrTeam != nil {
-		params.Set("PlayerOrTeam", string(*req.PlayerOrTeam))
+		params.Set("PlayerOrTeam", *req.PlayerOrTeam)
 	}
 	if req.PlayerID != nil {
-		params.Set("PlayerID", string(*req.PlayerID))
+		params.Set("PlayerID", *req.PlayerID)
 	}
 	if req.TeamID != nil {
-		params.Set("TeamID", string(*req.TeamID))
+		params.Set("TeamID", *req.TeamID)
 	}
 	if req.VsTeamID != nil {
-		params.Set("VsTeamID", string(*req.VsTeamID))
+		params.Set("VsTeamID", *req.VsTeamID)
 	}
 	if req.Outcome != nil {
-		params.Set("Outcome", string(*req.Outcome))
+		params.Set("Outcome", *req.Outcome)
 	}
 	if req.Location != nil {
-		params.Set("Location", string(*req.Location))
+		params.Set("Location", *req.Location)
 	}
 	if req.DateFrom != nil {
-		params.Set("DateFrom", string(*req.DateFrom))
+		params.Set("DateFrom", *req.DateFrom)
 	}
 	if req.DateTo != nil {
-		params.Set("DateTo", string(*req.DateTo))
+		params.Set("DateTo", *req.DateTo)
 	}
 	if req.VsConference != nil {
-		params.Set("VsConference", string(*req.VsConference))
+		params.Set("VsConference", *req.VsConference)
 	}
 	if req.VsDivision != nil {
-		params.Set("VsDivision", string(*req.VsDivision))
+		params.Set("VsDivision", *req.VsDivision)
 	}
 	if req.GameSegment != nil {
-		params.Set("GameSegment", string(*req.GameSegment))
+		params.Set("GameSegment", *req.GameSegment)
 	}
 	if req.Period != nil {
-		params.Set("Period", string(*req.Period))
+		params.Set("Period", *req.Period)
 	}
 	if req.LastNGames != nil {
-		params.Set("LastNGames", string(*req.LastNGames))
+		params.Set("LastNGames", *req.LastNGames)
 	}
 	if req.PORound != nil {
-		params.Set("PORound", string(*req.PORound))
+		params.Set("PORound", *req.PORound)
 	}
 
 	var rawResp rawStatsResponse

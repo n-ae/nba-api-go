@@ -54,7 +54,7 @@ func GetLeagueDashPtTeamDefend(ctx context.Context, client *stats.Client, req Le
 		params.Set("LeagueID", string(*req.LeagueID))
 	}
 	if req.DefenseCategory != nil {
-		params.Set("DefenseCategory", string(*req.DefenseCategory))
+		params.Set("DefenseCategory", *req.DefenseCategory)
 	}
 
 	var rawResp rawStatsResponse

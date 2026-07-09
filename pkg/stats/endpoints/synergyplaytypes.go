@@ -67,10 +67,10 @@ func GetSynergyPlayTypes(ctx context.Context, client *stats.Client, req SynergyP
 		params.Set("LeagueID", string(*req.LeagueID))
 	}
 	if req.PlayerOrTeam != nil {
-		params.Set("PlayerOrTeam", string(*req.PlayerOrTeam))
+		params.Set("PlayerOrTeam", *req.PlayerOrTeam)
 	}
 	if req.PlayType != nil {
-		params.Set("PlayType", string(*req.PlayType))
+		params.Set("PlayType", *req.PlayType)
 	}
 
 	var rawResp rawStatsResponse

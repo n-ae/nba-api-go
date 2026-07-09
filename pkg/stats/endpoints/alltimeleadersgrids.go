@@ -79,7 +79,7 @@ func GetAllTimeLeadersGrids(ctx context.Context, client *stats.Client, req AllTi
 		params.Set("SeasonType", string(*req.SeasonType))
 	}
 	if req.TopX != nil {
-		params.Set("TopX", string(*req.TopX))
+		params.Set("TopX", *req.TopX)
 	}
 
 	var rawResp rawStatsResponse

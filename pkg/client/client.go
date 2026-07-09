@@ -115,6 +115,7 @@ func (c *Client) Get(ctx context.Context, endpoint string, params url.Values) (*
 	if err != nil {
 		return nil, fmt.Errorf("request failed: %w", err)
 	}
+	//nolint:errcheck
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)

@@ -157,7 +157,7 @@ func GetPlayerDashPtShots(ctx context.Context, client *stats.Client, req PlayerD
 	if req.PlayerID == "" {
 		return nil, fmt.Errorf("PlayerID is required")
 	}
-	params.Set("PlayerID", string(req.PlayerID))
+	params.Set("PlayerID", req.PlayerID)
 	if req.Season != nil {
 		params.Set("Season", string(*req.Season))
 	}

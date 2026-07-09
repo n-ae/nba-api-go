@@ -41,17 +41,17 @@ type LeagueStandingsV3Standings struct {
 	ThreePTSOrLess          float64 `json:"ThreePTSOrLess"`
 	TenPTSOrMore            float64 `json:"TenPTSOrMore"`
 	LongHomeStreak          string  `json:"LongHomeStreak"`
-	strLongHomeStreak       string  `json:"strLongHomeStreak"`
+	StrLongHomeStreak       string  `json:"strLongHomeStreak"`
 	LongRoadStreak          string  `json:"LongRoadStreak"`
-	strLongRoadStreak       string  `json:"strLongRoadStreak"`
+	StrLongRoadStreak       string  `json:"strLongRoadStreak"`
 	LongWinStreak           string  `json:"LongWinStreak"`
 	LongLossStreak          string  `json:"LongLossStreak"`
 	CurrentHomeStreak       string  `json:"CurrentHomeStreak"`
-	strCurrentHomeStreak    string  `json:"strCurrentHomeStreak"`
+	StrCurrentHomeStreak    string  `json:"strCurrentHomeStreak"`
 	CurrentRoadStreak       string  `json:"CurrentRoadStreak"`
-	strCurrentRoadStreak    string  `json:"strCurrentRoadStreak"`
+	StrCurrentRoadStreak    string  `json:"strCurrentRoadStreak"`
 	CurrentStreak           string  `json:"CurrentStreak"`
-	strCurrentStreak        string  `json:"strCurrentStreak"`
+	StrCurrentStreak        string  `json:"strCurrentStreak"`
 	ConferenceGamesBack     string  `json:"ConferenceGamesBack"`
 	ClinchedConferenceTitle string  `json:"ClinchedConferenceTitle"`
 	ClinchedDivisionTitle   string  `json:"ClinchedDivisionTitle"`
@@ -73,14 +73,14 @@ type LeagueStandingsV3Standings struct {
 	PointsPG                string  `json:"PointsPG"`
 	OppPointsPG             string  `json:"OppPointsPG"`
 	DiffPointsPG            string  `json:"DiffPointsPG"`
-	vsEast                  float64 `json:"vsEast"`
-	vsAtlantic              string  `json:"vsAtlantic"`
-	vsCentral               string  `json:"vsCentral"`
-	vsSoutheast             float64 `json:"vsSoutheast"`
-	vsWest                  string  `json:"vsWest"`
-	vsNorthwest             string  `json:"vsNorthwest"`
-	vsPacific               string  `json:"vsPacific"`
-	vsSouthwest             string  `json:"vsSouthwest"`
+	VsEast                  float64 `json:"vsEast"`
+	VsAtlantic              string  `json:"vsAtlantic"`
+	VsCentral               string  `json:"vsCentral"`
+	VsSoutheast             float64 `json:"vsSoutheast"`
+	VsWest                  string  `json:"vsWest"`
+	VsNorthwest             string  `json:"vsNorthwest"`
+	VsPacific               string  `json:"vsPacific"`
+	VsSouthwest             string  `json:"vsSouthwest"`
 	Jan                     string  `json:"Jan"`
 	Feb                     string  `json:"Feb"`
 	Mar                     string  `json:"Mar"`
@@ -147,17 +147,17 @@ func GetLeagueStandingsV3(ctx context.Context, client *stats.Client, req LeagueS
 					ThreePTSOrLess:          toFloat(row[20]),
 					TenPTSOrMore:            toFloat(row[21]),
 					LongHomeStreak:          toString(row[22]),
-					strLongHomeStreak:       toString(row[23]),
+					StrLongHomeStreak:       toString(row[23]),
 					LongRoadStreak:          toString(row[24]),
-					strLongRoadStreak:       toString(row[25]),
+					StrLongRoadStreak:       toString(row[25]),
 					LongWinStreak:           toString(row[26]),
 					LongLossStreak:          toString(row[27]),
 					CurrentHomeStreak:       toString(row[28]),
-					strCurrentHomeStreak:    toString(row[29]),
+					StrCurrentHomeStreak:    toString(row[29]),
 					CurrentRoadStreak:       toString(row[30]),
-					strCurrentRoadStreak:    toString(row[31]),
+					StrCurrentRoadStreak:    toString(row[31]),
 					CurrentStreak:           toString(row[32]),
-					strCurrentStreak:        toString(row[33]),
+					StrCurrentStreak:        toString(row[33]),
 					ConferenceGamesBack:     toString(row[34]),
 					ClinchedConferenceTitle: toString(row[35]),
 					ClinchedDivisionTitle:   toString(row[36]),
@@ -179,14 +179,14 @@ func GetLeagueStandingsV3(ctx context.Context, client *stats.Client, req LeagueS
 					PointsPG:                toString(row[52]),
 					OppPointsPG:             toString(row[53]),
 					DiffPointsPG:            toString(row[54]),
-					vsEast:                  toFloat(row[55]),
-					vsAtlantic:              toString(row[56]),
-					vsCentral:               toString(row[57]),
-					vsSoutheast:             toFloat(row[58]),
-					vsWest:                  toString(row[59]),
-					vsNorthwest:             toString(row[60]),
-					vsPacific:               toString(row[61]),
-					vsSouthwest:             toString(row[62]),
+					VsEast:                  toFloat(row[55]),
+					VsAtlantic:              toString(row[56]),
+					VsCentral:               toString(row[57]),
+					VsSoutheast:             toFloat(row[58]),
+					VsWest:                  toString(row[59]),
+					VsNorthwest:             toString(row[60]),
+					VsPacific:               toString(row[61]),
+					VsSouthwest:             toString(row[62]),
 					Jan:                     toString(row[63]),
 					Feb:                     toString(row[64]),
 					Mar:                     toString(row[65]),

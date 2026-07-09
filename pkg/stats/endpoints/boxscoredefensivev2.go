@@ -61,21 +61,21 @@ func GetBoxScoreDefensiveV2(ctx context.Context, client *stats.Client, req BoxSc
 	if req.GameID == "" {
 		return nil, fmt.Errorf("GameID is required")
 	}
-	params.Set("GameID", string(req.GameID))
+	params.Set("GameID", req.GameID)
 	if req.StartPeriod != nil {
-		params.Set("StartPeriod", string(*req.StartPeriod))
+		params.Set("StartPeriod", *req.StartPeriod)
 	}
 	if req.EndPeriod != nil {
-		params.Set("EndPeriod", string(*req.EndPeriod))
+		params.Set("EndPeriod", *req.EndPeriod)
 	}
 	if req.StartRange != nil {
-		params.Set("StartRange", string(*req.StartRange))
+		params.Set("StartRange", *req.StartRange)
 	}
 	if req.EndRange != nil {
-		params.Set("EndRange", string(*req.EndRange))
+		params.Set("EndRange", *req.EndRange)
 	}
 	if req.RangeType != nil {
-		params.Set("RangeType", string(*req.RangeType))
+		params.Set("RangeType", *req.RangeType)
 	}
 
 	var rawResp rawStatsResponse

@@ -47,11 +47,11 @@ func GetCommonAllPlayers(ctx context.Context, client *stats.Client, req CommonAl
 		params.Set("LeagueID", string(*req.LeagueID))
 	}
 	if req.Season == "" {
-		return nil, fmt.Errorf("Season is required")
+		return nil, fmt.Errorf("season is required")
 	}
 	params.Set("Season", string(req.Season))
 	if req.IsOnlyCurrentSeason != nil {
-		params.Set("IsOnlyCurrentSeason", string(*req.IsOnlyCurrentSeason))
+		params.Set("IsOnlyCurrentSeason", *req.IsOnlyCurrentSeason)
 	}
 
 	var rawResp rawStatsResponse

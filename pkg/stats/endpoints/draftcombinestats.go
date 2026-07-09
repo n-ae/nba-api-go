@@ -55,7 +55,7 @@ func GetDraftCombineStats(ctx context.Context, client *stats.Client, req DraftCo
 		params.Set("LeagueID", string(*req.LeagueID))
 	}
 	if req.SeasonYear != nil {
-		params.Set("SeasonYear", string(*req.SeasonYear))
+		params.Set("SeasonYear", *req.SeasonYear)
 	}
 
 	var rawResp rawStatsResponse

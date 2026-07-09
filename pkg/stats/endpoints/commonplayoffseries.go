@@ -38,11 +38,11 @@ func GetCommonPlayoffSeries(ctx context.Context, client *stats.Client, req Commo
 		params.Set("LeagueID", string(*req.LeagueID))
 	}
 	if req.Season == "" {
-		return nil, fmt.Errorf("Season is required")
+		return nil, fmt.Errorf("season is required")
 	}
 	params.Set("Season", string(req.Season))
 	if req.SeriesID != nil {
-		params.Set("SeriesID", string(*req.SeriesID))
+		params.Set("SeriesID", *req.SeriesID)
 	}
 
 	var rawResp rawStatsResponse

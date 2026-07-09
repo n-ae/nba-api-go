@@ -49,7 +49,7 @@ func GetCommonAllPlayersV2(ctx context.Context, client *stats.Client, req Common
 		params.Set("Season", string(*req.Season))
 	}
 	if req.IsOnlyCurrentSeason != nil {
-		params.Set("IsOnlyCurrentSeason", string(*req.IsOnlyCurrentSeason))
+		params.Set("IsOnlyCurrentSeason", *req.IsOnlyCurrentSeason)
 	}
 
 	var rawResp rawStatsResponse

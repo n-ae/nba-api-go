@@ -202,21 +202,21 @@ func GetPlayerDashboardByShootingSplits(ctx context.Context, client *stats.Clien
 	if req.PlayerID == "" {
 		return nil, fmt.Errorf("PlayerID is required")
 	}
-	params.Set("PlayerID", string(req.PlayerID))
+	params.Set("PlayerID", req.PlayerID)
 	if req.MeasureType != nil {
-		params.Set("MeasureType", string(*req.MeasureType))
+		params.Set("MeasureType", *req.MeasureType)
 	}
 	if req.PerMode != nil {
 		params.Set("PerMode", string(*req.PerMode))
 	}
 	if req.PlusMinus != nil {
-		params.Set("PlusMinus", string(*req.PlusMinus))
+		params.Set("PlusMinus", *req.PlusMinus)
 	}
 	if req.PaceAdjust != nil {
-		params.Set("PaceAdjust", string(*req.PaceAdjust))
+		params.Set("PaceAdjust", *req.PaceAdjust)
 	}
 	if req.Rank != nil {
-		params.Set("Rank", string(*req.Rank))
+		params.Set("Rank", *req.Rank)
 	}
 	if req.Season != nil {
 		params.Set("Season", string(*req.Season))

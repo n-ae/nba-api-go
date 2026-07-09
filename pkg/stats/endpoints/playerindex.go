@@ -58,10 +58,10 @@ func GetPlayerIndex(ctx context.Context, client *stats.Client, req PlayerIndexRe
 		params.Set("Season", string(*req.Season))
 	}
 	if req.TeamID != nil {
-		params.Set("TeamID", string(*req.TeamID))
+		params.Set("TeamID", *req.TeamID)
 	}
 	if req.Historical != nil {
-		params.Set("Historical", string(*req.Historical))
+		params.Set("Historical", *req.Historical)
 	}
 
 	var rawResp rawStatsResponse

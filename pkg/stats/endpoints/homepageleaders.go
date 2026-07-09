@@ -67,16 +67,16 @@ func GetHomepageLeaders(ctx context.Context, client *stats.Client, req HomepageL
 		params.Set("LeagueID", string(*req.LeagueID))
 	}
 	if req.PlayerOrTeam != nil {
-		params.Set("PlayerOrTeam", string(*req.PlayerOrTeam))
+		params.Set("PlayerOrTeam", *req.PlayerOrTeam)
 	}
 	if req.GameScope != nil {
-		params.Set("GameScope", string(*req.GameScope))
+		params.Set("GameScope", *req.GameScope)
 	}
 	if req.PlayerScope != nil {
-		params.Set("PlayerScope", string(*req.PlayerScope))
+		params.Set("PlayerScope", *req.PlayerScope)
 	}
 	if req.Stat != nil {
-		params.Set("Stat", string(*req.Stat))
+		params.Set("Stat", *req.Stat)
 	}
 
 	var rawResp rawStatsResponse

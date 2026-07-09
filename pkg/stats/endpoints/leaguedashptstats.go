@@ -57,10 +57,10 @@ func GetLeagueDashPtStats(ctx context.Context, client *stats.Client, req LeagueD
 		params.Set("LeagueID", string(*req.LeagueID))
 	}
 	if req.PlayerOrTeam != nil {
-		params.Set("PlayerOrTeam", string(*req.PlayerOrTeam))
+		params.Set("PlayerOrTeam", *req.PlayerOrTeam)
 	}
 	if req.PtMeasureType != nil {
-		params.Set("PtMeasureType", string(*req.PtMeasureType))
+		params.Set("PtMeasureType", *req.PtMeasureType)
 	}
 
 	var rawResp rawStatsResponse

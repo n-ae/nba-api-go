@@ -71,13 +71,13 @@ func GetLeagueDashLineups(ctx context.Context, client *stats.Client, req LeagueD
 		params.Set("SeasonType", string(*req.SeasonType))
 	}
 	if req.MeasureType != nil {
-		params.Set("MeasureType", string(*req.MeasureType))
+		params.Set("MeasureType", *req.MeasureType)
 	}
 	if req.PerMode != nil {
 		params.Set("PerMode", string(*req.PerMode))
 	}
 	if req.GroupQuantity != nil {
-		params.Set("GroupQuantity", string(*req.GroupQuantity))
+		params.Set("GroupQuantity", *req.GroupQuantity)
 	}
 	if req.LeagueID != nil {
 		params.Set("LeagueID", string(*req.LeagueID))

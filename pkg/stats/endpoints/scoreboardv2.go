@@ -150,12 +150,12 @@ func GetScoreboardV2(ctx context.Context, client *stats.Client, req ScoreboardV2
 	if req.GameDate == "" {
 		return nil, fmt.Errorf("GameDate is required")
 	}
-	params.Set("GameDate", string(req.GameDate))
+	params.Set("GameDate", req.GameDate)
 	if req.LeagueID != nil {
 		params.Set("LeagueID", string(*req.LeagueID))
 	}
 	if req.DayOffset != nil {
-		params.Set("DayOffset", string(*req.DayOffset))
+		params.Set("DayOffset", *req.DayOffset)
 	}
 
 	var rawResp rawStatsResponse

@@ -59,7 +59,7 @@ func GetPlayerYearByYearStats(ctx context.Context, client *stats.Client, req Pla
 	if req.PlayerID == "" {
 		return nil, fmt.Errorf("PlayerID is required")
 	}
-	params.Set("PlayerID", string(req.PlayerID))
+	params.Set("PlayerID", req.PlayerID)
 	if req.PerMode != nil {
 		params.Set("PerMode", string(*req.PerMode))
 	}

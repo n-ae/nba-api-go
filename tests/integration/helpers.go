@@ -4,8 +4,6 @@ import (
 	"os"
 	"testing"
 	"time"
-
-	"github.com/n-ae/nba-api-go/pkg/stats/parameters"
 )
 
 // Test constants for known stable IDs
@@ -26,42 +24,10 @@ func skipIfNotIntegration(t *testing.T) {
 	}
 }
 
-// assertNotEmpty fails the test if a slice is empty
-func assertNotEmpty(t *testing.T, slice interface{}, fieldName string) {
-	t.Helper()
-
-	switch v := slice.(type) {
-	case []interface{}:
-		if len(v) == 0 {
-			t.Errorf("%s should not be empty", fieldName)
-		}
-	case nil:
-		t.Errorf("%s should not be nil", fieldName)
-	}
-}
-
 // assertNoError fails the test if err is not nil
 func assertNoError(t *testing.T, err error, message string) {
 	t.Helper()
 	if err != nil {
 		t.Fatalf("%s: %v", message, err)
 	}
-}
-
-// Helper functions to create pointers for parameter types
-func seasonPtr(s string) *parameters.Season {
-	season := parameters.Season(s)
-	return &season
-}
-
-func seasonTypePtr(s parameters.SeasonType) *parameters.SeasonType {
-	return &s
-}
-
-func leagueIDPtr(l parameters.LeagueID) *parameters.LeagueID {
-	return &l
-}
-
-func perModePtr(p parameters.PerMode) *parameters.PerMode {
-	return &p
 }

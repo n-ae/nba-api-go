@@ -40,7 +40,7 @@ func GetPlayerNextNGames(ctx context.Context, client *stats.Client, req PlayerNe
 	if req.PlayerID == "" {
 		return nil, fmt.Errorf("PlayerID is required")
 	}
-	params.Set("PlayerID", string(req.PlayerID))
+	params.Set("PlayerID", req.PlayerID)
 	if req.Season != nil {
 		params.Set("Season", string(*req.Season))
 	}
@@ -48,7 +48,7 @@ func GetPlayerNextNGames(ctx context.Context, client *stats.Client, req PlayerNe
 		params.Set("SeasonType", string(*req.SeasonType))
 	}
 	if req.NumberOfGames != nil {
-		params.Set("NumberOfGames", string(*req.NumberOfGames))
+		params.Set("NumberOfGames", *req.NumberOfGames)
 	}
 	if req.LeagueID != nil {
 		params.Set("LeagueID", string(*req.LeagueID))

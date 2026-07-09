@@ -139,7 +139,10 @@ func findPlayers(pattern string, fieldExtractor func(Player) string) ([]Player, 
 
 func stripAccents(s string) string {
 	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
-	result, _, _ := transform.String(t, s)
+	result, _, err := transform.String(t, s)
+	if err != nil {
+		return s
+	}
 	return result
 }
 

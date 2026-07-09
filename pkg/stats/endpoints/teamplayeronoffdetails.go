@@ -59,9 +59,9 @@ func GetTeamPlayerOnOffDetails(ctx context.Context, client *stats.Client, req Te
 	if req.TeamID == "" {
 		return nil, fmt.Errorf("TeamID is required")
 	}
-	params.Set("TeamID", string(req.TeamID))
+	params.Set("TeamID", req.TeamID)
 	if req.MeasureType != nil {
-		params.Set("MeasureType", string(*req.MeasureType))
+		params.Set("MeasureType", *req.MeasureType)
 	}
 	if req.PerMode != nil {
 		params.Set("PerMode", string(*req.PerMode))

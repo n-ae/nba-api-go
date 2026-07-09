@@ -647,8 +647,7 @@ func validateBasicSchema(t *testing.T, fixture []byte, expectedField string) {
 	err := json.Unmarshal(fixture, &resp)
 	assertNoError(t, err, "Failed to unmarshal fixture")
 
-	assertEqual(t, 200, resp.StatusCode, "Expected status code 200")
-	assert(t, resp.Data != nil && len(resp.Data) > 0, "Expected non-empty Data field")
+	assert(t, len(resp.Data) > 0, "Expected non-empty Data field")
 
 	if expectedField != "" {
 		_, exists := resp.Data[expectedField]

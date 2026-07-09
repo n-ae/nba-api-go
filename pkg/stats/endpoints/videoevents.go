@@ -17,14 +17,14 @@ type VideoEventsRequest struct {
 
 // VideoEventsVideo represents the Video result set for VideoEvents
 type VideoEventsVideo struct {
-	uuid string `json:"uuid"`
-	vl   string `json:"vl"`
-	vt   string `json:"vt"`
-	gc   string `json:"gc"`
-	surl string `json:"surl"`
-	durl string `json:"durl"`
-	vurl string `json:"vurl"`
-	purl string `json:"purl"`
+	UUID string `json:"uuid"`
+	VL   string `json:"vl"`
+	VT   string `json:"vt"`
+	GC   string `json:"gc"`
+	SURL string `json:"surl"`
+	DURL string `json:"durl"`
+	VURL string `json:"vurl"`
+	PURL string `json:"purl"`
 }
 
 // VideoEventsResponse contains the response data from the VideoEvents endpoint
@@ -36,13 +36,13 @@ type VideoEventsResponse struct {
 func GetVideoEvents(ctx context.Context, client *stats.Client, req VideoEventsRequest) (*models.Response[*VideoEventsResponse], error) {
 	params := url.Values{}
 	if req.GameID == "" {
-		return nil, fmt.Errorf("GameID is required")
+		return nil, fmt.Errorf("gameID is required")
 	}
-	params.Set("GameID", string(req.GameID))
+	params.Set("GameID", req.GameID)
 	if req.GameEventID == "" {
-		return nil, fmt.Errorf("GameEventID is required")
+		return nil, fmt.Errorf("gameEventID is required")
 	}
-	params.Set("GameEventID", string(req.GameEventID))
+	params.Set("GameEventID", req.GameEventID)
 
 	var rawResp rawStatsResponse
 	if err := client.GetJSON(ctx, "videoevents", params, &rawResp); err != nil {
@@ -55,14 +55,14 @@ func GetVideoEvents(ctx context.Context, client *stats.Client, req VideoEventsRe
 		for _, row := range rawResp.ResultSets[0].RowSet {
 			if len(row) >= 8 {
 				item := VideoEventsVideo{
-					uuid: toString(row[0]),
-					vl:   toString(row[1]),
-					vt:   toString(row[2]),
-					gc:   toString(row[3]),
-					surl: toString(row[4]),
-					durl: toString(row[5]),
-					vurl: toString(row[6]),
-					purl: toString(row[7]),
+					UUID: toString(row[0]),
+					VL:   toString(row[1]),
+					VT:   toString(row[2]),
+					GC:   toString(row[3]),
+					SURL: toString(row[4]),
+					DURL: toString(row[5]),
+					VURL: toString(row[6]),
+					PURL: toString(row[7]),
 				}
 				response.Video = append(response.Video, item)
 			}

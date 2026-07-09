@@ -68,7 +68,7 @@ func GetTeamPlayerDashboard(ctx context.Context, client *stats.Client, req TeamP
 	if req.TeamID == "" {
 		return nil, fmt.Errorf("TeamID is required")
 	}
-	params.Set("TeamID", string(req.TeamID))
+	params.Set("TeamID", req.TeamID)
 	if req.Season != nil {
 		params.Set("Season", string(*req.Season))
 	}
@@ -82,7 +82,7 @@ func GetTeamPlayerDashboard(ctx context.Context, client *stats.Client, req TeamP
 		params.Set("LeagueID", string(*req.LeagueID))
 	}
 	if req.MeasureType != nil {
-		params.Set("MeasureType", string(*req.MeasureType))
+		params.Set("MeasureType", *req.MeasureType)
 	}
 
 	var rawResp rawStatsResponse

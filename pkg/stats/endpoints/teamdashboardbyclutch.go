@@ -100,21 +100,21 @@ func GetTeamDashboardByClutch(ctx context.Context, client *stats.Client, req Tea
 	if req.TeamID == "" {
 		return nil, fmt.Errorf("TeamID is required")
 	}
-	params.Set("TeamID", string(req.TeamID))
+	params.Set("TeamID", req.TeamID)
 	if req.MeasureType != nil {
-		params.Set("MeasureType", string(*req.MeasureType))
+		params.Set("MeasureType", *req.MeasureType)
 	}
 	if req.PerMode != nil {
 		params.Set("PerMode", string(*req.PerMode))
 	}
 	if req.PlusMinus != nil {
-		params.Set("PlusMinus", string(*req.PlusMinus))
+		params.Set("PlusMinus", *req.PlusMinus)
 	}
 	if req.PaceAdjust != nil {
-		params.Set("PaceAdjust", string(*req.PaceAdjust))
+		params.Set("PaceAdjust", *req.PaceAdjust)
 	}
 	if req.Rank != nil {
-		params.Set("Rank", string(*req.Rank))
+		params.Set("Rank", *req.Rank)
 	}
 	if req.Season != nil {
 		params.Set("Season", string(*req.Season))

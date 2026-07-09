@@ -90,12 +90,12 @@ func GetBoxScoreMatchupsV3(ctx context.Context, client *stats.Client, req BoxSco
 	if req.GameID == "" {
 		return nil, fmt.Errorf("GameID is required")
 	}
-	params.Set("GameID", string(req.GameID))
+	params.Set("GameID", req.GameID)
 	if req.StartPeriod != nil {
-		params.Set("StartPeriod", string(*req.StartPeriod))
+		params.Set("StartPeriod", *req.StartPeriod)
 	}
 	if req.EndPeriod != nil {
-		params.Set("EndPeriod", string(*req.EndPeriod))
+		params.Set("EndPeriod", *req.EndPeriod)
 	}
 
 	var rawResp rawStatsResponse

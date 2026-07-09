@@ -44,18 +44,26 @@ func Get{{.Name}}(ctx context.Context, client *stats.Client, req {{.Name}}Reques
 {{- range .Parameters}}
 {{- if .Required}}
 	if req.{{.Name}} == "" {
-		return nil, fmt.Errorf("{{.Name}} is required")
+		return nil, fmt.Errorf("%s is required", "{{.Name}}")
 	}
+{{- if eq .Type "string"}}
+	params.Set("{{.Name}}", req.{{.Name}})
+{{- else}}
 	params.Set("{{.Name}}", string(req.{{.Name}}))
+{{- end}}
 {{- else}}
 	if req.{{.Name}} != nil {
+{{- if eq .Type "string"}}
+		params.Set("{{.Name}}", *req.{{.Name}})
+{{- else}}
 		params.Set("{{.Name}}", string(*req.{{.Name}}))
+{{- end}}
 	}
 {{- end}}
 {{- end}}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "/{{.Endpoint}}", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "{{.Endpoint}}", params, &rawResp); err != nil {
 		return nil, err
 	}
 

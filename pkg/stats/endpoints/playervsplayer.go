@@ -143,11 +143,11 @@ func GetPlayerVsPlayer(ctx context.Context, client *stats.Client, req PlayerVsPl
 	if req.PlayerID == "" {
 		return nil, fmt.Errorf("PlayerID is required")
 	}
-	params.Set("PlayerID", string(req.PlayerID))
+	params.Set("PlayerID", req.PlayerID)
 	if req.VsPlayerID == "" {
 		return nil, fmt.Errorf("VsPlayerID is required")
 	}
-	params.Set("VsPlayerID", string(req.VsPlayerID))
+	params.Set("VsPlayerID", req.VsPlayerID)
 	if req.Season != nil {
 		params.Set("Season", string(*req.Season))
 	}

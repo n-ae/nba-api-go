@@ -76,7 +76,7 @@ func GetCommonPlayerInfoV2(ctx context.Context, client *stats.Client, req Common
 	if req.PlayerID == "" {
 		return nil, fmt.Errorf("PlayerID is required")
 	}
-	params.Set("PlayerID", string(req.PlayerID))
+	params.Set("PlayerID", req.PlayerID)
 	if req.LeagueID != nil {
 		params.Set("LeagueID", string(*req.LeagueID))
 	}

@@ -50,7 +50,7 @@ func GetPlayerFantasyProfile(ctx context.Context, client *stats.Client, req Play
 	if req.PlayerID == "" {
 		return nil, fmt.Errorf("PlayerID is required")
 	}
-	params.Set("PlayerID", string(req.PlayerID))
+	params.Set("PlayerID", req.PlayerID)
 
 	var rawResp rawStatsResponse
 	if err := client.GetJSON(ctx, "playerfantasyprofile", params, &rawResp); err != nil {

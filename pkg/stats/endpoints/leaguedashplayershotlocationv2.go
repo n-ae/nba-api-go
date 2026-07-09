@@ -60,7 +60,7 @@ func GetLeagueDashPlayerShotLocationV2(ctx context.Context, client *stats.Client
 		params.Set("PerMode", string(*req.PerMode))
 	}
 	if req.DistanceRange != nil {
-		params.Set("DistanceRange", string(*req.DistanceRange))
+		params.Set("DistanceRange", *req.DistanceRange)
 	}
 	if req.LeagueID != nil {
 		params.Set("LeagueID", string(*req.LeagueID))

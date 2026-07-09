@@ -62,6 +62,7 @@ func WithRetry(config RetryConfig) Middleware {
 				}
 
 				if attempt < config.MaxRetries {
+					//nolint:errcheck
 					resp.Body.Close()
 					continue
 				}

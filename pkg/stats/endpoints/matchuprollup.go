@@ -59,10 +59,10 @@ func GetMatchupRollup(ctx context.Context, client *stats.Client, req MatchupRoll
 		params.Set("LeagueID", string(*req.LeagueID))
 	}
 	if req.DefPlayerID != nil {
-		params.Set("DefPlayerID", string(*req.DefPlayerID))
+		params.Set("DefPlayerID", *req.DefPlayerID)
 	}
 	if req.OffPlayerID != nil {
-		params.Set("OffPlayerID", string(*req.OffPlayerID))
+		params.Set("OffPlayerID", *req.OffPlayerID)
 	}
 
 	var rawResp rawStatsResponse

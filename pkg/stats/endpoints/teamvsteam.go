@@ -64,11 +64,11 @@ func GetTeamVsTeam(ctx context.Context, client *stats.Client, req TeamVsTeamRequ
 	if req.TeamID == "" {
 		return nil, fmt.Errorf("TeamID is required")
 	}
-	params.Set("TeamID", string(req.TeamID))
+	params.Set("TeamID", req.TeamID)
 	if req.VsTeamID == "" {
 		return nil, fmt.Errorf("VsTeamID is required")
 	}
-	params.Set("VsTeamID", string(req.VsTeamID))
+	params.Set("VsTeamID", req.VsTeamID)
 	if req.Season != nil {
 		params.Set("Season", string(*req.Season))
 	}
@@ -76,7 +76,7 @@ func GetTeamVsTeam(ctx context.Context, client *stats.Client, req TeamVsTeamRequ
 		params.Set("SeasonType", string(*req.SeasonType))
 	}
 	if req.MeasureType != nil {
-		params.Set("MeasureType", string(*req.MeasureType))
+		params.Set("MeasureType", *req.MeasureType)
 	}
 	if req.PerMode != nil {
 		params.Set("PerMode", string(*req.PerMode))

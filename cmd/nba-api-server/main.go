@@ -179,7 +179,9 @@ func (s *Server) handleHealth() http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		_ = json.NewEncoder(w).Encode(resp)
+		if err := json.NewEncoder(w).Encode(resp); err != nil {
+			log.Printf("Error encoding health response: %v", err)
+		}
 	}
 }
 
@@ -189,7 +191,9 @@ func (s *Server) handleMetrics() http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		_ = json.NewEncoder(w).Encode(snapshot)
+		if err := json.NewEncoder(w).Encode(snapshot); err != nil {
+			log.Printf("Error encoding metrics response: %v", err)
+		}
 	}
 }
 

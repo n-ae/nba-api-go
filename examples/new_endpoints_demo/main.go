@@ -53,6 +53,9 @@ func main() {
 		"total_new_endpoints": 8,
 		"compilation_status":  "success",
 	}
-	data, _ := json.MarshalIndent(summary, "", "  ")
+	data, err := json.MarshalIndent(summary, "", "  ")
+	if err != nil {
+		log.Fatalf("Error marshaling summary: %v", err)
+	}
 	fmt.Println(string(data))
 }

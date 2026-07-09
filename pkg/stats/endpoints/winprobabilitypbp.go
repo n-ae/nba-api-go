@@ -55,9 +55,9 @@ func GetWinProbabilityPBP(ctx context.Context, client *stats.Client, req WinProb
 	if req.GameID == "" {
 		return nil, fmt.Errorf("GameID is required")
 	}
-	params.Set("GameID", string(req.GameID))
+	params.Set("GameID", req.GameID)
 	if req.RunType != nil {
-		params.Set("RunType", string(*req.RunType))
+		params.Set("RunType", *req.RunType)
 	}
 
 	var rawResp rawStatsResponse

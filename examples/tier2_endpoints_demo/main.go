@@ -74,6 +74,9 @@ func main() {
 		},
 	}
 
-	data, _ := json.MarshalIndent(summary, "", "  ")
+	data, err := json.MarshalIndent(summary, "", "  ")
+	if err != nil {
+		log.Fatalf("Error marshaling summary: %v", err)
+	}
 	fmt.Printf("\n%s\n", string(data))
 }

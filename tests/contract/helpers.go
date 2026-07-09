@@ -1,10 +1,8 @@
 package contract
 
 import (
-	"encoding/json"
 	"os"
 	"path/filepath"
-	"reflect"
 	"testing"
 
 	"github.com/n-ae/nba-api-go/pkg/stats/parameters"
@@ -75,134 +73,11 @@ func assert(t *testing.T, condition bool, message string) {
 	}
 }
 
-// assertEqual fails if expected != actual
-func assertEqual(t *testing.T, expected, actual interface{}, message string) {
-	t.Helper()
-	if !reflect.DeepEqual(expected, actual) {
-		t.Fatalf("%s: expected %v, got %v", message, expected, actual)
-	}
-}
-
-// assertGreaterThan fails if value <= threshold
-func assertGreaterThan(t *testing.T, value, threshold int, message string) {
-	t.Helper()
-	if value <= threshold {
-		t.Fatalf("%s: expected > %d, got %d", message, threshold, value)
-	}
-}
-
-// compareSchemas compares two JSON structures and reports differences
-func compareSchemas(t *testing.T, expected, actual []byte) {
-	t.Helper()
-
-	var expectedMap, actualMap map[string]interface{}
-
-	if err := json.Unmarshal(expected, &expectedMap); err != nil {
-		t.Fatalf("Failed to unmarshal expected JSON: %v", err)
-	}
-
-	if err := json.Unmarshal(actual, &actualMap); err != nil {
-		t.Fatalf("Failed to unmarshal actual JSON: %v", err)
-	}
-
-	differences := findSchemaDifferences(expectedMap, actualMap, "")
-	if len(differences) > 0 {
-		t.Errorf("Schema differences detected:\n")
-		for _, diff := range differences {
-			t.Errorf("  - %s\n", diff)
-		}
-	}
-}
-
-// findSchemaDifferences recursively compares two maps and returns differences
-func findSchemaDifferences(expected, actual map[string]interface{}, path string) []string {
-	var diffs []string
-
-	// Check for missing keys in actual
-	for key := range expected {
-		newPath := path + "." + key
-		if path == "" {
-			newPath = key
-		}
-
-		if _, exists := actual[key]; !exists {
-			diffs = append(diffs, newPath+" missing in actual response")
-			continue
-		}
-
-		// Check types match
-		expectedType := reflect.TypeOf(expected[key])
-		actualType := reflect.TypeOf(actual[key])
-
-		if expectedType != actualType {
-			diffs = append(diffs, newPath+" type changed: "+expectedType.String()+" -> "+actualType.String())
-			continue
-		}
-
-		// Recursively check nested objects
-		if expectedMap, ok := expected[key].(map[string]interface{}); ok {
-			if actualMap, ok := actual[key].(map[string]interface{}); ok {
-				diffs = append(diffs, findSchemaDifferences(expectedMap, actualMap, newPath)...)
-			}
-		}
-
-		// Recursively check arrays
-		if expectedSlice, ok := expected[key].([]interface{}); ok {
-			if actualSlice, ok := actual[key].([]interface{}); ok {
-				if len(expectedSlice) > 0 && len(actualSlice) > 0 {
-					// Compare first element schemas
-					if expMap, ok := expectedSlice[0].(map[string]interface{}); ok {
-						if actMap, ok := actualSlice[0].(map[string]interface{}); ok {
-							diffs = append(diffs, findSchemaDifferences(expMap, actMap, newPath+"[0]")...)
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// Check for new keys in actual
-	for key := range actual {
-		newPath := path + "." + key
-		if path == "" {
-			newPath = key
-		}
-
-		if _, exists := expected[key]; !exists {
-			diffs = append(diffs, newPath+" added in actual response (new field)")
-		}
-	}
-
-	return diffs
-}
-
-// prettyJSON formats JSON for readable output
-func prettyJSON(t *testing.T, data []byte) string {
-	t.Helper()
-
-	var v interface{}
-	if err := json.Unmarshal(data, &v); err != nil {
-		return string(data)
-	}
-
-	pretty, err := json.MarshalIndent(v, "", "  ")
-	if err != nil {
-		return string(data)
-	}
-
-	return string(pretty)
-}
-
 // Helper functions for pointer conversions
 
 // stringPtr returns a pointer to the given string
 func stringPtr(s string) *string {
 	return &s
-}
-
-// intPtr returns a pointer to the given int
-func intPtr(i int) *int {
-	return &i
 }
 
 // perModePtr returns a pointer to PerMode

@@ -64,7 +64,7 @@ func GetCommonTeamRosterV2(ctx context.Context, client *stats.Client, req Common
 	if req.TeamID == "" {
 		return nil, fmt.Errorf("TeamID is required")
 	}
-	params.Set("TeamID", string(req.TeamID))
+	params.Set("TeamID", req.TeamID)
 	if req.Season != nil {
 		params.Set("Season", string(*req.Season))
 	}

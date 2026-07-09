@@ -42,7 +42,7 @@ func GetPlayerCareerByCollege(ctx context.Context, client *stats.Client, req Pla
 		params.Set("LeagueID", string(*req.LeagueID))
 	}
 	if req.College != nil {
-		params.Set("College", string(*req.College))
+		params.Set("College", *req.College)
 	}
 
 	var rawResp rawStatsResponse

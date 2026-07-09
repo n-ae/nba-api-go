@@ -62,7 +62,7 @@ func GetPlayerCompare(ctx context.Context, client *stats.Client, req PlayerCompa
 	if req.PlayerIDList == "" {
 		return nil, fmt.Errorf("PlayerIDList is required")
 	}
-	params.Set("PlayerIDList", string(req.PlayerIDList))
+	params.Set("PlayerIDList", req.PlayerIDList)
 	if req.Season != nil {
 		params.Set("Season", string(*req.Season))
 	}

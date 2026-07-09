@@ -58,7 +58,7 @@ func GetBoxScorePlayerTrackV2(ctx context.Context, client *stats.Client, req Box
 	if req.GameID == "" {
 		return nil, fmt.Errorf("GameID is required")
 	}
-	params.Set("GameID", string(req.GameID))
+	params.Set("GameID", req.GameID)
 
 	var rawResp rawStatsResponse
 	if err := client.GetJSON(ctx, "boxscoreplayertrackv2", params, &rawResp); err != nil {

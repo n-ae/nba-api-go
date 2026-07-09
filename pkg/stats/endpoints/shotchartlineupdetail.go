@@ -74,16 +74,16 @@ func GetShotChartLineupDetail(ctx context.Context, client *stats.Client, req Sho
 		params.Set("SeasonType", string(*req.SeasonType))
 	}
 	if req.TeamID != nil {
-		params.Set("TeamID", string(*req.TeamID))
+		params.Set("TeamID", *req.TeamID)
 	}
 	if req.GroupID != nil {
-		params.Set("GroupID", string(*req.GroupID))
+		params.Set("GroupID", *req.GroupID)
 	}
 	if req.LeagueID != nil {
 		params.Set("LeagueID", string(*req.LeagueID))
 	}
 	if req.ContextMeasure != nil {
-		params.Set("ContextMeasure", string(*req.ContextMeasure))
+		params.Set("ContextMeasure", *req.ContextMeasure)
 	}
 
 	var rawResp rawStatsResponse

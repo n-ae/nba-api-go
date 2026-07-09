@@ -56,10 +56,10 @@ func GetLeaguePlayerOnDetails(ctx context.Context, client *stats.Client, req Lea
 		params.Set("LeagueID", string(*req.LeagueID))
 	}
 	if req.TeamID != nil {
-		params.Set("TeamID", string(*req.TeamID))
+		params.Set("TeamID", *req.TeamID)
 	}
 	if req.PlayerID != nil {
-		params.Set("PlayerID", string(*req.PlayerID))
+		params.Set("PlayerID", *req.PlayerID)
 	}
 
 	var rawResp rawStatsResponse

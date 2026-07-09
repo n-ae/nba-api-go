@@ -101,11 +101,11 @@ func GetTeamVsPlayer(ctx context.Context, client *stats.Client, req TeamVsPlayer
 	if req.TeamID == "" {
 		return nil, fmt.Errorf("TeamID is required")
 	}
-	params.Set("TeamID", string(req.TeamID))
+	params.Set("TeamID", req.TeamID)
 	if req.VsPlayerID == "" {
 		return nil, fmt.Errorf("VsPlayerID is required")
 	}
-	params.Set("VsPlayerID", string(req.VsPlayerID))
+	params.Set("VsPlayerID", req.VsPlayerID)
 	if req.Season != nil {
 		params.Set("Season", string(*req.Season))
 	}

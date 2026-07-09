@@ -71,19 +71,19 @@ func GetLeagueDashPlayerClutchV2(ctx context.Context, client *stats.Client, req 
 		params.Set("SeasonType", string(*req.SeasonType))
 	}
 	if req.MeasureType != nil {
-		params.Set("MeasureType", string(*req.MeasureType))
+		params.Set("MeasureType", *req.MeasureType)
 	}
 	if req.PerMode != nil {
 		params.Set("PerMode", string(*req.PerMode))
 	}
 	if req.ClutchTime != nil {
-		params.Set("ClutchTime", string(*req.ClutchTime))
+		params.Set("ClutchTime", *req.ClutchTime)
 	}
 	if req.AheadBehind != nil {
-		params.Set("AheadBehind", string(*req.AheadBehind))
+		params.Set("AheadBehind", *req.AheadBehind)
 	}
 	if req.PointDiff != nil {
-		params.Set("PointDiff", string(*req.PointDiff))
+		params.Set("PointDiff", *req.PointDiff)
 	}
 	if req.LeagueID != nil {
 		params.Set("LeagueID", string(*req.LeagueID))

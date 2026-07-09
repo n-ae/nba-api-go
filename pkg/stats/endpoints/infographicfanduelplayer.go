@@ -43,7 +43,7 @@ func GetInfographicFanDuelPlayer(ctx context.Context, client *stats.Client, req 
 	if req.PlayerID == "" {
 		return nil, fmt.Errorf("PlayerID is required")
 	}
-	params.Set("PlayerID", string(req.PlayerID))
+	params.Set("PlayerID", req.PlayerID)
 
 	var rawResp rawStatsResponse
 	if err := client.GetJSON(ctx, "infographicfanduelplayer", params, &rawResp); err != nil {
