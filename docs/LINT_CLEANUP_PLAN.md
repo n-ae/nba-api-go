@@ -1,7 +1,7 @@
 # Lint Cleanup Plan
 
 **Status**: Not started (tracking doc only)
-**Created**: 2026-07-09, alongside the `GameRotation` column-offset fix (v1.1.2)
+**Created**: 2026-07-09, alongside the `GameRotation` column-offset fix (v1.1.3)
 **Owner**: unassigned
 
 ## Background
@@ -10,7 +10,7 @@
 golangci-lint v1 config schema, but the installed toolchain
 (`golangci-lint 2.12.2`) requires the v2 schema and fails to load the old
 config with `unsupported version of the configuration: ""`. This was fixed as
-part of the `GameRotation` bugfix (v1.1.2) by migrating `.golangci.yml` to
+part of the `GameRotation` bugfix (v1.1.3) by migrating `.golangci.yml` to
 `version: "2"` (see git history for that commit).
 
 Running the migrated config for the first time surfaced **413 pre-existing

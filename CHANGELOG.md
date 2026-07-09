@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.1.2] - 2026-07-09
+## [1.1.3] - 2026-07-09
 
 ### Fixed
 - **`GameRotation` endpoint**: the SDK parsed the `gamerotation` result sets assuming 11 columns, but the live NBA.com API returns 12 columns with `TEAM_CITY` inserted at index 2. This shifted every field from `TEAM_NAME` onward by one column and silently dropped the true `USG_PCT` value entirely. `GameRotationAwayTeam`/`GameRotationHomeTeam` now include `TEAM_CITY` and read all columns at their correct offsets.
@@ -272,8 +272,8 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to suggest changes or report issues.
 
-[Unreleased]: https://github.com/n-ae/nba-api-go/compare/v1.1.2...HEAD
-[1.1.2]: https://github.com/n-ae/nba-api-go/compare/v1.1.1...v1.1.2
+[Unreleased]: https://github.com/n-ae/nba-api-go/compare/v1.1.3...HEAD
+[1.1.3]: https://github.com/n-ae/nba-api-go/compare/v1.1.1...v1.1.3
 [1.1.0]: https://github.com/n-ae/nba-api-go/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/n-ae/nba-api-go/compare/v0.9.0...v1.0.0
 [0.9.0]: https://github.com/n-ae/nba-api-go/compare/v0.3.0...v0.9.0
