@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-07-09
+
+### Fixed
+- **`GameRotation` endpoint**: the SDK parsed the `gamerotation` result sets assuming 11 columns, but the live NBA.com API returns 12 columns with `TEAM_CITY` inserted at index 2. This shifted every field from `TEAM_NAME` onward by one column and silently dropped the true `USG_PCT` value entirely. `GameRotationAwayTeam`/`GameRotationHomeTeam` now include `TEAM_CITY` and read all columns at their correct offsets.
+- `PLAYER_LAST` on `GameRotationAwayTeam`/`GameRotationHomeTeam` was incorrectly typed `float64` (a name field parsed with `toFloat`, always yielding `0`); corrected to `string`.
+
+### Added
+- Regression test (`pkg/stats/endpoints/gamerotation_test.go`) covering the 12-column `gamerotation` response shape, including a short-row guard case.
+- `stats.Config.BaseURL` — allows pointing the stats client at a custom base URL (e.g. a test server), enabling the new regression test.
+
+### Changed
+- Migrated `.golangci.yml` to the golangci-lint v2 config schema (the v1 config was silently failing to load under the installed v2 toolchain, so `make lint` had not been running). Disabled `govet`'s `fieldalignment` check, which reorders generated struct fields for memory-layout efficiency at the cost of the generator's intentional NBA API column ordering — see `docs/LINT_CLEANUP_PLAN.md` for the full rationale and the plan for the remaining pre-existing lint debt this migration exposed.
+
 ## [1.1.0] - 2025-11-07
 
 ### Added
@@ -259,7 +272,8 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to suggest changes or report issues.
 
-[Unreleased]: https://github.com/n-ae/nba-api-go/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/n-ae/nba-api-go/compare/v1.1.2...HEAD
+[1.1.2]: https://github.com/n-ae/nba-api-go/compare/v1.1.1...v1.1.2
 [1.1.0]: https://github.com/n-ae/nba-api-go/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/n-ae/nba-api-go/compare/v0.9.0...v1.0.0
 [0.9.0]: https://github.com/n-ae/nba-api-go/compare/v0.3.0...v0.9.0

@@ -14,14 +14,20 @@ type Client struct {
 }
 
 type Config struct {
+	BaseURL     string
 	Headers     map[string]string
 	Timeout     int
 	Middlewares []middleware.Middleware
 }
 
 func NewClient(config Config) *Client {
+	baseURL := config.BaseURL
+	if baseURL == "" {
+		baseURL = StatsBaseURL
+	}
+
 	clientConfig := client.Config{
-		BaseURL: StatsBaseURL,
+		BaseURL: baseURL,
 	}
 
 	if len(config.Middlewares) > 0 {
