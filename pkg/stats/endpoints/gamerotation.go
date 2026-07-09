@@ -16,7 +16,21 @@ type GameRotationRequest struct {
 	LeagueID *parameters.LeagueID
 }
 
-// GameRotationAwayTeam represents the AwayTeam result set for GameRotation
+// GameRotationAwayTeam represents the AwayTeam result set for GameRotation.
+//
+// Field order/types verified 2026-07-09 against a live gamerotation response
+// (headers: GAME_ID, TEAM_ID, TEAM_CITY, TEAM_NAME, PERSON_ID, PLAYER_FIRST,
+// PLAYER_LAST, IN_TIME_REAL, OUT_TIME_REAL, PLAYER_PTS, PT_DIFF, USG_PCT —
+// 12 columns). The previous version of this struct/parser was missing
+// TEAM_CITY entirely, shifting every field from TEAM_NAME onward by one
+// column (PERSON_ID held TEAM_NAME's value, PLAYER_LAST held PLAYER_FIRST's,
+// IN_TIME_REAL held PLAYER_LAST's, etc.), mistyped PLAYER_LAST as float64
+// (it's a name string, e.g. "Hardaway Jr."; toFloat() on that silently
+// returned 0), and mistyped PT_DIFF as string (it's numeric, e.g. -6).
+// IN_TIME_REAL/OUT_TIME_REAL are tenths-of-a-second elapsed since game
+// start, continuous across periods (not reset per quarter) — confirmed
+// against real data (a full-quarter stint ends at 7200, i.e. 720.0s =
+// 12:00 of game time).
 type GameRotationAwayTeam struct {
 	GAME_ID       string  `json:"GAME_ID"`
 	TEAM_ID       int     `json:"TEAM_ID"`
@@ -28,11 +42,12 @@ type GameRotationAwayTeam struct {
 	IN_TIME_REAL  string  `json:"IN_TIME_REAL"`
 	OUT_TIME_REAL string  `json:"OUT_TIME_REAL"`
 	PLAYER_PTS    float64 `json:"PLAYER_PTS"`
-	PT_DIFF       string  `json:"PT_DIFF"`
+	PT_DIFF       float64 `json:"PT_DIFF"`
 	USG_PCT       float64 `json:"USG_PCT"`
 }
 
-// GameRotationHomeTeam represents the HomeTeam result set for GameRotation
+// GameRotationHomeTeam represents the HomeTeam result set for GameRotation.
+// See GameRotationAwayTeam's doc comment — same column layout, same fix.
 type GameRotationHomeTeam struct {
 	GAME_ID       string  `json:"GAME_ID"`
 	TEAM_ID       int     `json:"TEAM_ID"`
@@ -44,7 +59,7 @@ type GameRotationHomeTeam struct {
 	IN_TIME_REAL  string  `json:"IN_TIME_REAL"`
 	OUT_TIME_REAL string  `json:"OUT_TIME_REAL"`
 	PLAYER_PTS    float64 `json:"PLAYER_PTS"`
-	PT_DIFF       string  `json:"PT_DIFF"`
+	PT_DIFF       float64 `json:"PT_DIFF"`
 	USG_PCT       float64 `json:"USG_PCT"`
 }
 
@@ -86,7 +101,7 @@ func GetGameRotation(ctx context.Context, client *stats.Client, req GameRotation
 					IN_TIME_REAL:  toString(row[7]),
 					OUT_TIME_REAL: toString(row[8]),
 					PLAYER_PTS:    toFloat(row[9]),
-					PT_DIFF:       toString(row[10]),
+					PT_DIFF:       toFloat(row[10]),
 					USG_PCT:       toFloat(row[11]),
 				}
 				response.AwayTeam = append(response.AwayTeam, item)
@@ -108,7 +123,7 @@ func GetGameRotation(ctx context.Context, client *stats.Client, req GameRotation
 					IN_TIME_REAL:  toString(row[7]),
 					OUT_TIME_REAL: toString(row[8]),
 					PLAYER_PTS:    toFloat(row[9]),
-					PT_DIFF:       toString(row[10]),
+					PT_DIFF:       toFloat(row[10]),
 					USG_PCT:       toFloat(row[11]),
 				}
 				response.HomeTeam = append(response.HomeTeam, item)
