@@ -20,7 +20,7 @@ func TestGetGameRotation_ColumnOffsets(t *testing.T) {
 				"name": "AwayTeam",
 				"headers": ["GAME_ID", "TEAM_ID", "TEAM_CITY", "TEAM_NAME", "PERSON_ID", "PLAYER_FIRST", "PLAYER_LAST", "IN_TIME_REAL", "OUT_TIME_REAL", "PLAYER_PTS", "PT_DIFF", "USG_PCT"],
 				"rowSet": [
-					["0022300001", 1610612745, "Houston", "Rockets", 201142, "Kevin", "Durant", "0", "5830", 5, "-3", 24.6],
+					["0022300001", 1610612745, "Houston", "Rockets", 201142, "Kevin", "Durant", "0", "5830", 5, -3, 24.6],
 					["0022300001", 1610612745, "Houston", "Rockets"]
 				]
 			},
@@ -28,7 +28,7 @@ func TestGetGameRotation_ColumnOffsets(t *testing.T) {
 				"name": "HomeTeam",
 				"headers": ["GAME_ID", "TEAM_ID", "TEAM_CITY", "TEAM_NAME", "PERSON_ID", "PLAYER_FIRST", "PLAYER_LAST", "IN_TIME_REAL", "OUT_TIME_REAL", "PLAYER_PTS", "PT_DIFF", "USG_PCT"],
 				"rowSet": [
-					["0022300001", 1610612744, "Golden State", "Warriors", 201939, "Stephen", "Curry", "120", "7200", 12, "5", 31.2]
+					["0022300001", 1610612744, "Golden State", "Warriors", 201939, "Stephen", "Curry", "120", "7200", 12, 5, 31.2]
 				]
 			}
 		]
@@ -64,7 +64,7 @@ func TestGetGameRotation_ColumnOffsets(t *testing.T) {
 		IN_TIME_REAL:  "0",
 		OUT_TIME_REAL: "5830",
 		PLAYER_PTS:    5,
-		PT_DIFF:       "-3",
+		PT_DIFF:       -3,
 		USG_PCT:       24.6,
 	}
 	if away != wantAway {
@@ -87,7 +87,7 @@ func TestGetGameRotation_ColumnOffsets(t *testing.T) {
 		IN_TIME_REAL:  "120",
 		OUT_TIME_REAL: "7200",
 		PLAYER_PTS:    12,
-		PT_DIFF:       "5",
+		PT_DIFF:       5,
 		USG_PCT:       31.2,
 	}
 	if home != wantHome {

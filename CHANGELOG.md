@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.6] - 2026-07-11
+
+### Added
+- `DateOfBirth()` accessor methods on `PlayerInfo` (`CommonPlayerInfo`), `CommonPlayerInfoV2CommonPlayerInfo`, `CommonTeamRosterCommonTeamRoster`, and `CommonTeamRosterV2CommonTeamRoster`. These parse the raw `BIRTHDATE`/`BIRTH_DATE` string (format differs by endpoint) into a `time.Time`. The existing raw string fields are unchanged.
+
+### Fixed
+- `gamerotation_test.go` failed to compile after `PT_DIFF` was changed to `float64` in 1.1.3 — the test's expected struct literals still used string values (`"-3"`, `"5"`) and its mock JSON response body quoted `PT_DIFF` as a string, which `toFloat` silently parses as `0`. Both now use numeric literals, matching the documented real API shape.
+- `cmd/nba-api-server`'s `version` constant was still `"1.1.3"` despite tags through `v1.1.5`; bumped to match this release.
+
 ## [1.1.3] - 2026-07-09
 
 ### Fixed
