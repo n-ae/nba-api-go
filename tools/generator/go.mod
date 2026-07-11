@@ -1,3 +1,3 @@
 module github.com/n-ae/nba-api-go/tools/generator
 
-go 1.25.3
+go 1.26.5

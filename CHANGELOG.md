@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.7] - 2026-07-11
+
+### Changed
+- Bumped `go` directive (both `go.mod` and `tools/generator/go.mod`) from 1.25.3 to 1.26.5.
+- Updated `golang.org/x/text` v0.30.0 → v0.40.0 and `golang.org/x/time` v0.14.0 → v0.15.0.
+- Updated `Containerfile` base image from `golang:1.25-alpine` to `golang:1.26-alpine`.
+
+### Documentation
+- README: added a "Get Player Info (with Date of Birth)" example demonstrating the `DateOfBirth()` accessor methods added in 1.1.6.
+
 ## [1.1.6] - 2026-07-11
 
 ### Added

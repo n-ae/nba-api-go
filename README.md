@@ -231,6 +231,30 @@ func main() {
 }
 ```
 
+### Get Player Info (with Date of Birth)
+
+```go
+req := endpoints.CommonPlayerInfoRequest{
+    PlayerID: "203999", // Nikola Jokić
+}
+
+resp, err := endpoints.CommonPlayerInfo(context.Background(), client, req)
+if err != nil {
+    log.Fatal(err)
+}
+
+info := resp.Data.CommonPlayerInfo[0]
+dob, err := info.DateOfBirth()
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Printf("%s was born on %s\n", info.DisplayFirstLast, dob.Format("January 2, 2006"))
+```
+
+`DateOfBirth()` parses the endpoint's raw birthdate string into a `time.Time`. It's also
+available on `CommonPlayerInfoV2CommonPlayerInfo`, `CommonTeamRosterCommonTeamRoster`, and
+`CommonTeamRosterV2CommonTeamRoster` — each parses that endpoint's specific date format.
+
 ## Architecture
 
 The library is organized into the following packages:
