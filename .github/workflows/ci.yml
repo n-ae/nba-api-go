@@ -29,7 +29,13 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
-          version: latest
+          # Pinned, not "latest": with install-mode: binary (the action's
+          # default), "latest" resolved to a stale v1.64.8 build (Go 1.24)
+          # that refuses to lint a module declaring go 1.26.5 - the same
+          # class of toolchain mismatch this project's own CHANGELOG flags
+          # elsewhere. Pin to a version verified locally against this
+          # module (`golangci-lint version`) and bump deliberately.
+          version: v2.12.2
 
       - name: test-examples
         run: make test-examples
