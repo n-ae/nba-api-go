@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-07-20
+
 ### Added
 - `.github/dependabot.yml` watching the `github-actions` ecosystem and both `gomod` modules (root and `tools/generator`) - automates the check that this session had to do by hand after `golangci-lint-action@v6`/`actions/checkout@v4`/`actions/setup-go@v5` all turned out to be stale. Requires Dependabot to be turned on for this repo in GitHub Settings (Code security and analysis) - the config alone doesn't enable it; as of this change, Dependabot alerts are confirmed disabled at the repo level.
 - Facade-level regression tests (`stats.TestNewClient_DefaultHeadersReachTheWire`, `live.TestNewClient_DefaultHeadersReachTheWire`) asserting the actual `User-Agent`/`Referer`/`Accept` bytes an `httptest.Server` receives from a default-config client, not just that some middleware ran.
@@ -301,6 +303,28 @@ First public release of the NBA API Go SDK. Provides type-safe access to NBA sta
 
 ## Upgrade Guide
 
+### From 1.2.0 to 1.3.0
+
+**No breaking changes.** This release rebuilds the verification infrastructure identified as missing in the 2026-07-19 maintainability assessment; the public API is unchanged.
+
+**What's New:**
+- The built-in middleware constructors (`WithRetry`, `WithPerHostRateLimit`, `WithHeaders`, `WithUserAgent`, `WithReferer`, `WithAccept`, `WithLogging`) are now importable from `pkg/client/middleware` (previously unexported at `internal/middleware`).
+- `stats.Config.AdditionalMiddlewares` / `live.Config.AdditionalMiddlewares` layer custom middleware on top of the default chain without having to reconstruct it by hand.
+- The `tools/generator` CLI actually runs now (`cd tools/generator && go run . -endpoint X`); templates are embedded via `go:embed` instead of resolved relative to the working directory.
+- `cmd/nba-api-server`'s `Season` query parameter defaults to the current NBA season instead of a hardcoded stale literal.
+- CI now runs `go test -race` on the concurrency-bearing packages and lints/tests `tools/generator` as its own module.
+
+**Fixed:**
+- Default `stats`/`live` clients were sending `User-Agent: nba-api-go/1.0` instead of the intended browser-style value, since v1.1.7 - see the `[1.3.0]` section above for the mechanism.
+- `client.NewClient` could alias a caller's `Config.Headers` map; it's now cloned at construction.
+
+**Migration Steps:**
+1. Update dependency: `go get github.com/n-ae/nba-api-go@v1.3.0`
+2. No code changes required.
+3. If you were relying on the incorrect default `User-Agent` value (`nba-api-go/1.0`) for some reason, set it explicitly via `Config.Headers`.
+
+See the `[1.3.0]` section above for the full list of changes.
+
 ### From 1.1.7 to 1.2.0
 
 **Two source-breaking changes, both narrowly scoped and neither ever shipped working in a tagged release before now:**
@@ -398,7 +422,8 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to suggest changes or report issues.
 
-[Unreleased]: https://github.com/n-ae/nba-api-go/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/n-ae/nba-api-go/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/n-ae/nba-api-go/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/n-ae/nba-api-go/compare/v1.1.7...v1.2.0
 [1.1.7]: https://github.com/n-ae/nba-api-go/compare/v1.1.6...v1.1.7
 [1.1.6]: https://github.com/n-ae/nba-api-go/compare/v1.1.5...v1.1.6
