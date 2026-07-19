@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `.github/dependabot.yml` watching the `github-actions` ecosystem and both `gomod` modules (root and `tools/generator`) - automates the check that this session had to do by hand after `golangci-lint-action@v6`/`actions/checkout@v4`/`actions/setup-go@v5` all turned out to be stale. Requires Dependabot to be turned on for this repo in GitHub Settings (Code security and analysis) - the config alone doesn't enable it; as of this change, Dependabot alerts are confirmed disabled at the repo level.
+
 ### Changed
 - CI: bumped `actions/checkout` (v4 → v7) and `actions/setup-go` (v5 → v7) - both were triggering a "Node 20 deprecated" warning on every run, the same class of staleness that caused `golangci-lint-action@v6` to silently fail to support this project's v2 lint config. No breaking changes applied to either for this project's minimal usage (plain checkout, `go-version-file: go.mod`).
 - README: added a CI status badge linking to the Actions workflow, now that it actually passes.

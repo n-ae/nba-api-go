@@ -1,0 +1,24 @@
+# Automates the kind of check this project already does manually and
+# quarterly (see CLAUDE.md's Maintenance Calendar): opens a PR when a
+# GitHub Action or a direct Go dependency goes stale, instead of relying
+# on someone noticing a red CI run - which is exactly how the
+# golangci-lint-action/checkout/setup-go staleness got found this time.
+#
+# Requires Dependabot to be enabled for this repository (GitHub Settings
+# -> Code security and analysis) - this file alone does not turn it on.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "gomod"
+    directory: "/tools/generator"
+    schedule:
+      interval: "weekly"
