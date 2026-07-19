@@ -29,16 +29,18 @@ jobs:
       - name: golangci-lint
         # v6 of this action only supports golangci-lint v1.x and rejects a
         # v2.x version string outright; .golangci.yml here is the v2
-        # config schema, so v7 is required, not optional.
+        # config schema, so v7+ is required, not optional. (Bumped 7->9
+        # by Dependabot, PR #1 - all checks passed before merge.)
         uses: golangci/golangci-lint-action@v9
         with:
-          # Pinned, not "latest": on v6 (before the v7 bump above),
-          # "latest" silently resolved to the newest *v1.x* release
-          # (v1.64.8, built with Go 1.24), which then refused to lint a
-          # module declaring go 1.26.5 - the same class of toolchain
-          # mismatch this project's own CHANGELOG flags elsewhere. Pin to
-          # a version verified locally against this module
-          # (`golangci-lint version`) and bump deliberately.
+          # Pinned, not "latest": on v6, "latest" silently resolved to
+          # the newest *v1.x* release (v1.64.8, built with Go 1.24),
+          # which then refused to lint a module declaring go 1.26.5 - the
+          # same class of toolchain mismatch this project's own CHANGELOG
+          # flags elsewhere. Pin to a version verified locally against
+          # this module (`golangci-lint version`) and bump deliberately -
+          # Dependabot will propose bumps here too; verify against a real
+          # CI run before merging, not just the action version above.
           version: v2.12.2
 
       - name: test-examples
