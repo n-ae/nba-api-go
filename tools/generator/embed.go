@@ -11,3 +11,9 @@ import "embed"
 //
 //go:embed templates/*.tmpl
 var templatesFS embed.FS
+
+// fieldTypesFS embeds fieldtypes.json, the canonical field-name -> Go-type
+// dictionary. See loadFieldTypes in generator.go for how it's used.
+//
+//go:embed fieldtypes.json
+var fieldTypesFS embed.FS

@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"text/template"
 )
 
@@ -169,17 +170,61 @@ func (g *Generator) processMetadata(metadata EndpointMetadata) EndpointMetadata 
 	return metadata
 }
 
-// inferFieldTypes infers Go types from NBA API field names
+var (
+	fieldTypesOnce sync.Once
+	fieldTypes     map[string]string
+	fieldTypesErr  error
+)
+
+// loadFieldTypes parses the embedded fieldtypes.json dictionary once and
+// caches the result. This is the canonical, hand-reviewed field-name -> Go
+// type mapping - see fieldGoType for how it's consulted.
+func loadFieldTypes() (map[string]string, error) {
+	fieldTypesOnce.Do(func() {
+		data, err := fieldTypesFS.ReadFile("fieldtypes.json")
+		if err != nil {
+			fieldTypesErr = fmt.Errorf("failed to read embedded fieldtypes.json: %w", err)
+			return
+		}
+		fieldTypesErr = json.Unmarshal(data, &fieldTypes)
+	})
+	return fieldTypes, fieldTypesErr
+}
+
+// fieldGoType returns the Go type for a field, preferring the explicit,
+// hand-reviewed fieldtypes.json entry over inferGoType's heuristic. Per the
+// v2.0.0 plan in docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md,
+// inference is demoted to a fallback used only for fields not yet in the
+// dictionary - falling back prints a warning to stderr rather than silently
+// trusting the heuristic, since several of its outputs are documented,
+// confirmed-wrong data-corruption bugs (see TestInferGoType).
+func fieldGoType(fieldName string) string {
+	types, err := loadFieldTypes()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "warning: failed to load fieldtypes.json (%v); falling back to inferGoType for %q\n", err, fieldName)
+		return inferGoType(fieldName)
+	}
+	if goType, ok := types[fieldName]; ok {
+		return goType
+	}
+	inferred := inferGoType(fieldName)
+	fmt.Fprintf(os.Stderr, "warning: %q has no explicit entry in fieldtypes.json; falling back to inferGoType's guess (%q) - verify against a live response and add it to fieldtypes.json\n", fieldName, inferred)
+	return inferred
+}
+
+// inferFieldTypes resolves Go types for NBA API field names via fieldGoType
+// (the name is historical; despite it, resolution now prefers the explicit
+// fieldtypes.json dictionary and only infers as a fallback).
 func inferFieldTypes(fields []string) []FieldTypeInfo {
-	fieldTypes := make([]FieldTypeInfo, len(fields))
+	result := make([]FieldTypeInfo, len(fields))
 	for i, field := range fields {
-		fieldTypes[i] = FieldTypeInfo{
+		result[i] = FieldTypeInfo{
 			Name:    field,
-			GoType:  inferGoType(field),
+			GoType:  fieldGoType(field),
 			JSONTag: field,
 		}
 	}
-	return fieldTypes
+	return result
 }
 
 // inferGoType infers the Go type from a field name using NBA API conventions

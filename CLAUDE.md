@@ -6,7 +6,7 @@ This file provides guidance to Claude Code when working with the nba-api-go repo
 
 **nba-api-go** is a production-ready Go SDK and HTTP API server providing type-safe access to 141 NBA Stats API endpoints (all standard endpoints plus international broadcast schedule). The project emphasizes maintainability, minimal dependencies, and solo engineer viability.
 
-**Current Status**: `main` is at the latest tagged release, `v1.3.0`.
+**Current Status**: `main` is ahead of the latest tagged release (`v1.3.0`) with v2.0.0 work in progress (explicit generator type metadata landed; full 141-endpoint regeneration and the other v2.0.0 items are not yet done) - see `CHANGELOG.md`'s `[Unreleased]` section.
 **Grade**: See `docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md` for the current assessment of record - do not hardcode a grade here, it goes stale the moment a new assessment lands and nobody remembers to update this file (see that file's own docs-consolidation section for the fix: archive the superseded assessment in the same commit as the new one).
 **Maintenance Burden**: ~1.6 hours/week for the hand-written core; the generated-endpoint surface currently needs more than that until the verification backlog in the current assessment is cleared - see that document's "Is this too complex for one person?" section.
 
@@ -133,14 +133,27 @@ The generator (`tools/generator/` - a separate Go module, its own `go.mod`)
 turns hand-written JSON metadata (`tools/generator/metadata/*.json`:
 endpoint name, parameters, result-set field names) into Go source via
 `text/template`. There is no automated NBA.com response analyzer - field
-names and types come from reading the live API response yourself (or an
-existing Python `nba_api` endpoint definition) and writing the metadata by
-hand; `inferGoType` in `tools/generator/generator.go` then infers a Go
-type for each field name from naming conventions (documented rule by rule
-in `tools/generator/generator_test.go`'s `TestInferGoType` - including
-several known-wrong cases that produce real data-corruption bugs; see the
-current assessment for the list before trusting an inferred type without
-checking it).
+names come from reading the live API response yourself (or an existing
+Python `nba_api` endpoint definition) and writing the metadata by hand.
+
+Field **types** now come from `tools/generator/fieldtypes.json` - an
+explicit, hand-reviewed `{"FIELD_NAME": "goType"}` dictionary, the
+"explicit per-field type metadata" item from the v2.0.0 plan in the
+current assessment. `inferGoType` in `tools/generator/generator.go` is
+demoted to a fallback used only when a field has no `fieldtypes.json`
+entry (falling back prints a warning to stderr); its naming-convention
+heuristic gets some field families wrong in ways that corrupt data
+(documented rule by rule in `tools/generator/generator_test.go`'s
+`TestInferGoType`, with the fix verified in
+`TestFieldTypesOverridesKnownWrongInference`).
+`TestAllMetadataFieldsHaveExplicitTypes` fails CI if any field referenced
+by committed metadata has no `fieldtypes.json` entry. **This dictionary
+seeds from `inferGoType`'s own output plus confirmed corrections found by
+reading each affected field's context in the committed metadata (34
+fields so far) - it is not yet independently verified against 854 live
+NBA.com responses.** Treat it as a large improvement over blind inference,
+not a completed audit; the regeneration in the next assessment revision is
+where remaining drift will surface via the contract tests.
 
 **Generated files** (not safe to hand-edit and later regenerate over -
 regeneration from current metadata does not reproduce several committed
@@ -187,7 +200,7 @@ When NBA.com adds a new endpoint:
 1. Inspect the live response (or the equivalent Python `nba_api` endpoint) to get the endpoint path, parameters, and result-set field names.
 2. Write a metadata JSON file under `tools/generator/metadata/` (see `tools/generator/README.md` for the format).
 3. Generate code: `cd tools/generator && go run . -metadata metadata/newendpoint.json`.
-4. Review every inferred field type against the actual response - `inferGoType`'s heuristic gets some field families wrong (see "How It Works" above).
+4. Add each new field name's verified type to `tools/generator/fieldtypes.json` - don't trust `inferGoType`'s fallback guess (see "How It Works" above); `TestAllMetadataFieldsHaveExplicitTypes` fails CI until you do.
 5. Add integration test in `tests/integration/`.
 6. Add example in `examples/`.
 7. Update `CHANGELOG.md`.

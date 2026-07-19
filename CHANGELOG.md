@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `tools/generator/fieldtypes.json` - an explicit, hand-reviewed `{"FIELD_NAME": "goType"}` dictionary covering all 854 field names referenced by committed `tools/generator/metadata/*.json`, the "explicit per-field type metadata" item from the v2.0.0 plan in `docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md`. The generator's `fieldGoType` now consults this dictionary before ever calling `inferGoType`; `inferGoType` is demoted to a fallback used only for fields with no dictionary entry, and falling back prints a warning to stderr. `TestAllMetadataFieldsHaveExplicitTypes` fails CI if any metadata field lacks an entry, so a new endpoint can't ship on an unreviewed guess.
+- The dictionary corrects 34 fields beyond the 9 `knownWrong` cases `TestInferGoType` already documented, found by reading each field's surrounding context in its metadata file (not live-verified against NBA.com - see the caveat below): 6 more textual range-bucket fields typed `int` instead of `string` (`SHOT_DIST_RANGE`, `SHOT_ZONE_RANGE`, `TOUCH_TIME_RANGE`, plus the 3 already documented), `FG_PCT_MID_RANGE` typed `int` instead of `float64` (a percentage, not a range bucket, despite containing `_RANGE`), 4 more zone shooting percentages typed `string` instead of `float64` (`FG_PCT_ABOVE_BREAK_3`, `FG_PCT_BACKCOURT`, `FG_PCT_LEFT_CORNER_3`, `FG_PCT_RIGHT_CORNER_3`, same bug class as the already-documented `FG_PCT_RA`/`FG_PCT_IN_PAINT`), `PCT`/`WinPCT` typed `string` instead of `float64`, 13 `PCT_<STAT>` "share of team total" fields (`PCT_FGM`, `PCT_FGA`, `PCT_FG3M`, `PCT_FG3A`, `PCT_FTM`, `PCT_FTA`, `PCT_AST_2PM`, `PCT_AST_3PM`, `PCT_AST_FGM`, `PCT_UAST_2PM`, `PCT_UAST_3PM`, `PCT_UAST_FGM`, `PCT_BLKA`) typed `int` instead of `float64` because the FGM/FGA suffix sub-rule fires on any field ending in `m`/`a`, `PERCENTILE` typed `string` instead of `float64`, and `GENERALMANAGER` (a person's name) typed `int` instead of `string` because `"generalmanager"` contains the substring `"age"`.
+- `tools/generator/generator_test.go`'s `TestFieldTypesOverridesKnownWrongInference` proves the dictionary actually corrects each of the above cases (fails if `inferGoType` alone would already give the right answer, so a stale/redundant entry gets caught too).
+
+### Note
+- **This is infrastructure only - no generated code has changed yet.** `pkg/stats/endpoints/*.go` still has the old (partly wrong) types; regenerating all 141 endpoints from the corrected dictionary is the next v2.0.0 item and is itself a breaking change (public struct field types), tracked separately.
+- The 34 corrections above come from reading field names in context (e.g. `GENERALMANAGER` sitting next to `OWNER`/`HEADCOACH` in `TeamDetails.TeamBackground`), not from replaying live or recorded NBA.com responses. Treat `fieldtypes.json` as a large improvement over `inferGoType` alone, not a completed field-by-field audit - the contract tests (`tests/contract/`) are what catches remaining drift once fixtures exist.
+
 ## [1.3.0] - 2026-07-20
 
 ### Added

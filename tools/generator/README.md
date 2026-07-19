@@ -70,6 +70,30 @@ The generator expects JSON metadata in this format:
 ]
 ```
 
+## Field Types
+
+Result-set field types come from `fieldtypes.json` - a flat, hand-reviewed
+`{"FIELD_NAME": "goType"}` dictionary embedded into the generator binary.
+This is the canonical, explicit source of truth for what Go type a given
+NBA API field name maps to (`string`, `int`, or `float64`).
+
+`inferGoType` in `generator.go` still exists as a **fallback only**, used
+when a field name has no entry in `fieldtypes.json`. Its name-pattern
+heuristic gets some field families wrong in ways that silently corrupt
+data - see `TestInferGoType` in `generator_test.go` for the documented,
+confirmed-wrong cases (e.g. `DISPLAY_FIRST_LAST` inferred as `float64`
+turns `"Nikola Jokić"` into `0`; `SHOT_CLOCK_RANGE` inferred as `int` turns
+`"24-22"` into `0`). Falling back prints a warning to stderr - if you see
+one, it means a field is running on an unreviewed guess.
+
+`TestAllMetadataFieldsHaveExplicitTypes` (in `generator_test.go`) fails CI
+if any field referenced by a committed `metadata/*.json` file has no
+`fieldtypes.json` entry, so this can't silently regress.
+
+**Adding a new field**: verify its true type against a live (or recorded)
+NBA.com response - not by trusting `inferGoType`'s guess - then add it to
+`fieldtypes.json`.
+
 ## Creating Metadata
 
 ### From Python nba_api
