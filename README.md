@@ -16,6 +16,16 @@ A type-safe Go library and HTTP API server for accessing NBA statistics from sta
 
 See [Migration Guide](./docs/MIGRATION_GUIDE.md) to migrate from Python nba_api to Go.
 
+## ⚠️ Known type defects in generated fields
+
+The generator infers a Go type for each field from its NBA.com column name (e.g. names containing common stat abbreviations are typed `float64`), and that heuristic gets some fields wrong in already-generated, committed code. Read the value silently instead of erroring:
+
+- **Display-name fields typed `float64`.** `DISPLAY_FIRST_LAST`, `DISPLAY_LAST_COMMA_FIRST`, `DISPLAY_FI_LAST`, `PLAYER_NAME_LAST_FIRST`, and similar fields contain a name string (e.g. `"Nikola Jokić"`); the field is declared `float64`, and parsing a name string produces `0`, not an error.
+- **Textual range-bucket fields typed `int`.** `SHOT_CLOCK_RANGE`, `DRIBBLE_RANGE`, `CLOSE_DEF_DIST_RANGE`, `TOUCH_TIME_RANGE`, `SHOT_DIST_RANGE`, and `SHOT_ZONE_RANGE` hold text buckets (e.g. `"24-22"`, `"Very Tight"`); the field is declared `int`, and parsing text produces `0`.
+- **Decimal percentage/rating fields typed `string`.** A number of fields matching rating/frequency/percentage naming patterns (e.g. `FG_PCT_RA`, `FG_PCT_IN_PAINT` in `LeagueDashPlayerShotLocations`) are declared `string` and formatted with `%.0f`, so a value like `0.357` is stored as `"0"` - the decimal precision is lost, not merely stringified.
+
+These are public struct field types in already-tagged releases, so correcting them is a source-breaking change and is deferred to a planned major version rather than silently patched. Until then: **treat any field in these three families as unreliable, and verify field-by-field against a live response for any endpoint your application depends on.** See the [maintainability assessment](./docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md) for the full analysis and fix plan, and [CHANGELOG.md](./CHANGELOG.md) for what has and hasn't shipped.
+
 ## Features
 
 ### Core Features
