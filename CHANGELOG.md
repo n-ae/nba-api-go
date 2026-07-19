@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- CI: bumped `actions/checkout` (v4 → v7) and `actions/setup-go` (v5 → v7) - both were triggering a "Node 20 deprecated" warning on every run, the same class of staleness that caused `golangci-lint-action@v6` to silently fail to support this project's v2 lint config. No breaking changes applied to either for this project's minimal usage (plain checkout, `go-version-file: go.mod`).
+- README: added a CI status badge linking to the Actions workflow, now that it actually passes.
+
 ## [1.2.0] - 2026-07-19
 
 ### Added

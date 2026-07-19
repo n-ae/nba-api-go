@@ -1,5 +1,7 @@
 # nba-api-go
 
+[![CI](https://github.com/n-ae/nba-api-go/actions/workflows/ci.yml/badge.svg)](https://github.com/n-ae/nba-api-go/actions/workflows/ci.yml)
+
 A type-safe Go library and HTTP API server for accessing NBA statistics from stats.nba.com. Features **100% endpoint coverage** with complete feature parity to the Python [nba_api](https://github.com/swar/nba_api) library.
 
 ## 🏆 100% Coverage Achievement
