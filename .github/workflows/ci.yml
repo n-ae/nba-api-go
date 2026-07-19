@@ -27,14 +27,18 @@ jobs:
         run: go test ./...
 
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
+        # v6 of this action only supports golangci-lint v1.x and rejects a
+        # v2.x version string outright; .golangci.yml here is the v2
+        # config schema, so v7 is required, not optional.
+        uses: golangci/golangci-lint-action@v7
         with:
-          # Pinned, not "latest": with install-mode: binary (the action's
-          # default), "latest" resolved to a stale v1.64.8 build (Go 1.24)
-          # that refuses to lint a module declaring go 1.26.5 - the same
-          # class of toolchain mismatch this project's own CHANGELOG flags
-          # elsewhere. Pin to a version verified locally against this
-          # module (`golangci-lint version`) and bump deliberately.
+          # Pinned, not "latest": on v6 (before the v7 bump above),
+          # "latest" silently resolved to the newest *v1.x* release
+          # (v1.64.8, built with Go 1.24), which then refused to lint a
+          # module declaring go 1.26.5 - the same class of toolchain
+          # mismatch this project's own CHANGELOG flags elsewhere. Pin to
+          # a version verified locally against this module
+          # (`golangci-lint version`) and bump deliberately.
           version: v2.12.2
 
       - name: test-examples
