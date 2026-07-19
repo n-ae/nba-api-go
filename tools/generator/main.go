@@ -5,13 +5,34 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
+	"runtime"
 )
+
+// defaultOutputDir resolves to <repo-root>/pkg/stats/endpoints regardless
+// of the process's working directory, using the compile-time-known
+// location of this source file rather than a path relative to CWD. The
+// documented workflow is `cd tools/generator && go run . -endpoint X`, but
+// a CWD-relative default ("pkg/stats/endpoints") would then resolve under
+// tools/generator/ instead of the repo root - this file lives at
+// tools/generator/main.go, so its directory's grandparent is the repo
+// root.
+func defaultOutputDir() string {
+	_, thisFile, _, ok := runtime.Caller(0)
+	if !ok {
+		// Practically unreachable for a normally compiled binary; fall
+		// back to the old CWD-relative behavior rather than fail outright.
+		return filepath.Join("pkg", "stats", "endpoints")
+	}
+	repoRoot := filepath.Dir(filepath.Dir(filepath.Dir(thisFile)))
+	return filepath.Join(repoRoot, "pkg", "stats", "endpoints")
+}
 
 func main() {
 	var (
 		endpoint     = flag.String("endpoint", "", "Endpoint name to generate (e.g., PlayerGameLog)")
 		metadataFile = flag.String("metadata", "", "Path to metadata JSON file")
-		outputDir    = flag.String("output", "pkg/stats/endpoints", "Output directory for generated files")
+		outputDir    = flag.String("output", defaultOutputDir(), "Output directory for generated files (default: <repo-root>/pkg/stats/endpoints, resolved independently of the working directory)")
 		dryRun       = flag.Bool("dry-run", false, "Print generated code without writing files")
 	)
 

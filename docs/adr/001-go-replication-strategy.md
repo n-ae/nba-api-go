@@ -315,7 +315,7 @@ func (p PerMode) Validate() error {
 
 ### 5. Technology Choices
 
-- **Go version:** 1.21+ (for improved error handling and generics)
+- **Go version:** 1.21+ at the time of this decision (for improved error handling and generics); the `go` directive in `go.mod` has since moved to 1.26.5 - this ADR records the original rationale for choosing Go generics-era tooling, not the current minimum
 - **HTTP library:** Standard library `net/http`
 - **JSON parsing:** Standard library `encoding/json` with custom unmarshaling where needed
 - **Testing:** Standard library `testing` + `testify/assert` for assertions

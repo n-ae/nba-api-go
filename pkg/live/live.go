@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/n-ae/nba-api-go/internal/middleware"
 	"github.com/n-ae/nba-api-go/pkg/client"
+	"github.com/n-ae/nba-api-go/pkg/client/middleware"
 )
 
 const (
@@ -20,17 +20,25 @@ type Client struct {
 // for pointing the client at a test server. Headers, Timeout, and
 // MaxResponseBytes forward directly to the underlying client.Config; a
 // zero Timeout means the client default (30s), and a zero
-// MaxResponseBytes means client.DefaultMaxResponseBytes. A
-// caller-supplied Middlewares replaces the default chain entirely rather
-// than extending it - use append(live.DefaultMiddlewares(),
+// MaxResponseBytes means client.DefaultMaxResponseBytes.
+//
+// A caller-supplied Middlewares replaces the default chain entirely
+// rather than extending it - use append(live.DefaultMiddlewares(),
 // yourMiddleware...) if you want the defaults plus your own additions
-// instead of replacing them outright.
+// instead of replacing them outright. AdditionalMiddlewares is the same
+// idea as an explicit Config field instead of a manual append: it's
+// appended after whichever chain Middlewares resolves to (the defaults
+// if Middlewares is empty, or your override if it isn't). The built-in
+// constructors (WithUserAgent, WithPerHostRateLimit, ...) live in the
+// importable pkg/client/middleware package if you want to reconfigure
+// rate limits rather than only add to them.
 type Config struct {
-	BaseURL          string
-	Headers          http.Header
-	Timeout          time.Duration
-	MaxResponseBytes int64
-	Middlewares      []client.Middleware
+	BaseURL               string
+	Headers               http.Header
+	Timeout               time.Duration
+	MaxResponseBytes      int64
+	Middlewares           []client.Middleware
+	AdditionalMiddlewares []client.Middleware
 }
 
 // DefaultMiddlewares returns the middleware chain NewClient uses when
@@ -61,6 +69,9 @@ func NewClient(config Config) *Client {
 		clientConfig.Middlewares = config.Middlewares
 	} else {
 		clientConfig.Middlewares = DefaultMiddlewares()
+	}
+	if len(config.AdditionalMiddlewares) > 0 {
+		clientConfig.Middlewares = append(clientConfig.Middlewares, config.AdditionalMiddlewares...)
 	}
 
 	return &Client{

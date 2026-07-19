@@ -6,9 +6,9 @@ This file provides guidance to Claude Code when working with the nba-api-go repo
 
 **nba-api-go** is a production-ready Go SDK and HTTP API server providing type-safe access to 141 NBA Stats API endpoints (all standard endpoints plus international broadcast schedule). The project emphasizes maintainability, minimal dependencies, and solo engineer viability.
 
-**Current Status**: v1.2.0
-**Grade**: A (93/100) - Production-ready with excellent maintainability
-**Maintenance Burden**: ~1.6 hours/week
+**Current Status**: `main` is ahead of the latest tagged release (`v1.2.0`); see `CHANGELOG.md`'s `[Unreleased]` section for what's changed since.
+**Grade**: See `docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md` for the current assessment of record - do not hardcode a grade here, it goes stale the moment a new assessment lands and nobody remembers to update this file (see that file's own docs-consolidation section for the fix: archive the superseded assessment in the same commit as the new one).
+**Maintenance Burden**: ~1.6 hours/week for the hand-written core; the generated-endpoint surface currently needs more than that until the verification backlog in the current assessment is cleared - see that document's "Is this too complex for one person?" section.
 
 ## Project Architecture
 
@@ -16,7 +16,7 @@ This file provides guidance to Claude Code when working with the nba-api-go repo
 
 - **SDK Library** (`pkg/stats/`): Type-safe Go SDK with 141 endpoints
 - **HTTP API Server** (`cmd/nba-api-server/`): REST API exposing all endpoints
-- **Code Generator** (`cmd/generator/`): Generates endpoints from NBA.com API analysis
+- **Code Generator** (`tools/generator/`): Generates endpoint code from hand-written metadata (a separate Go module - see "Code Generation System" below)
 - **Static Data** (`pkg/stats/static/`): 5,135 players, 30 teams (no external DB needed)
 
 ### Key Design Principles
@@ -33,7 +33,7 @@ This file provides guidance to Claude Code when working with the nba-api-go repo
 ```bash
 # Quick health check (5 minutes)
 go test ./...                    # All unit tests
-make test-examples              # Verify all 14 examples compile
+make test-examples              # Verify all 15 examples compile
 make lint                       # golangci-lint
 go run ./cmd/nba-api-server     # Start HTTP server
 curl http://localhost:8080/health
@@ -57,16 +57,20 @@ go build -o bin/nba-api-server ./cmd/nba-api-server
 # Production build (optimized)
 make build
 
-# Generator tool
-go build -o bin/generator ./cmd/generator
+# Generator tool (separate Go module - must build from within its own directory)
+cd tools/generator && go build -o bin/generator .
 ```
 
 ### Common Tasks
 
 ```bash
-# Add new endpoint (if NBA.com adds one)
-./bin/generator analyze https://stats.nba.com/stats/NewEndpoint
-./bin/generator generate NewEndpoint
+# Add new endpoint (if NBA.com adds one) - see "Code Generation System"
+# below for the real generator CLI; there is no automated NBA.com
+# response analyzer, metadata is written by hand.
+cd tools/generator
+go run . -endpoint NewEndpoint -dry-run   # preview
+go run . -endpoint NewEndpoint            # write pkg/stats/endpoints/newendpoint.go
+cd -
 go test ./pkg/stats/endpoints/... -run TestNewEndpoint
 
 # Update dependencies (quarterly)
@@ -125,33 +129,53 @@ make lint
 
 ### How It Works
 
-The generator (`cmd/generator/`) analyzes live NBA.com API responses and generates type-safe Go code.
+The generator (`tools/generator/` - a separate Go module, its own `go.mod`)
+turns hand-written JSON metadata (`tools/generator/metadata/*.json`:
+endpoint name, parameters, result-set field names) into Go source via
+`text/template`. There is no automated NBA.com response analyzer - field
+names and types come from reading the live API response yourself (or an
+existing Python `nba_api` endpoint definition) and writing the metadata by
+hand; `inferGoType` in `tools/generator/generator.go` then infers a Go
+type for each field name from naming conventions (documented rule by rule
+in `tools/generator/generator_test.go`'s `TestInferGoType` - including
+several known-wrong cases that produce real data-corruption bugs; see the
+current assessment for the list before trusting an inferred type without
+checking it).
 
-**Generated files** (DO NOT EDIT MANUALLY):
+**Generated files** (not safe to hand-edit and later regenerate over -
+regeneration from current metadata does not reproduce several committed
+files byte-for-byte; see the current assessment's "regeneration" findings
+before assuming any given file matches what the generator would produce
+today):
 ```
 pkg/stats/endpoints/
 ├── playercareerstats.go       # Generated endpoint
 ├── playergamelog.go           # Generated endpoint
-└── ... (137 more)
+└── ... (140 more)
 ```
 
-**Template files** (edit these to change generation):
+**Template file** (edit this to change generation):
 ```
-cmd/generator/templates/
-├── endpoint.go.tmpl           # Endpoint code template
-└── test.go.tmpl              # Test code template
+tools/generator/templates/
+└── endpoint.tmpl               # Endpoint code template (embedded via go:embed)
 ```
 
 ### Regenerating Endpoints
 
 ```bash
-# Regenerate single endpoint
-./bin/generator generate PlayerCareerStats
+cd tools/generator
 
-# Regenerate all (rarely needed, takes time)
-./bin/generator generate-all
+# Preview without writing
+go run . -endpoint PlayerCareerStats -dry-run
 
-# After regeneration
+# Write to pkg/stats/endpoints/ (default -output resolves to
+# <repo-root>/pkg/stats/endpoints regardless of your working directory)
+go run . -endpoint PlayerCareerStats
+
+# From an existing metadata file covering one or more endpoints
+go run . -metadata metadata/tier1_batch.json
+
+cd -
 go test ./pkg/stats/endpoints/...
 make test-examples
 ```
@@ -160,38 +184,43 @@ make test-examples
 
 When NBA.com adds a new endpoint:
 
-1. Analyze the endpoint: `./bin/generator analyze https://stats.nba.com/stats/NewEndpoint`
-2. Review analysis output for parameters and response structure
-3. Generate code: `./bin/generator generate NewEndpoint`
-4. Add integration test in `tests/integration/`
-5. Add example in `examples/`
-6. Update CHANGELOG.md
+1. Inspect the live response (or the equivalent Python `nba_api` endpoint) to get the endpoint path, parameters, and result-set field names.
+2. Write a metadata JSON file under `tools/generator/metadata/` (see `tools/generator/README.md` for the format).
+3. Generate code: `cd tools/generator && go run . -metadata metadata/newendpoint.json`.
+4. Review every inferred field type against the actual response - `inferGoType`'s heuristic gets some field families wrong (see "How It Works" above).
+5. Add integration test in `tests/integration/`.
+6. Add example in `examples/`.
+7. Update `CHANGELOG.md`.
 
 ## HTTP API Server
 
 ### Running Locally
+
+The server has no command-line flags. Configuration is via environment
+variables only, read in `cmd/nba-api-server/main.go`:
+
+- `PORT` (default `8080`) - listens on `:$PORT`, all interfaces (there is no separate host/bind-address setting - `-host`/`-port`/`-rate-limit`/`-rate-burst` flags don't exist, despite examples that may circulate suggesting otherwise)
+- `LOG_LEVEL` (default `info`) - currently read and logged at startup but does not filter or change log output
+- Per-IP rate limiting is hardcoded (100 req/s, burst 200; see `cmd/nba-api-server/main.go`'s `NewRateLimiter` call) - not configurable without a code change
 
 ```bash
 # Development mode
 go run ./cmd/nba-api-server
 
 # Production mode
-./bin/nba-api-server -port 8080 -host 0.0.0.0
-
-# With custom rate limiting
-./bin/nba-api-server -rate-limit 100 -rate-burst 10
+PORT=8080 ./bin/nba-api-server
 ```
 
 ### Key Endpoints
 
 - `GET /health` - Health check (always returns 200 OK if server running)
-- `GET /metrics` - Prometheus-compatible metrics
-- `GET /api/v1/playercareerstats` - Example stats endpoint
-- `GET /api/v1/scoreboard` - Live game data
+- `GET /metrics` - JSON metrics (request counts, response times, error rates) - not a Prometheus exposition-format endpoint despite `DEPLOYMENT.md`'s Prometheus scrape example; adapt or add a dedicated exporter if you need that
+- `GET /api/v1/stats/playercareerstats` - Example stats endpoint (all Stats API routes live under `/api/v1/stats/`)
+- `GET /api/v1/stats/scoreboardv2` - Scoreboard data (there is no separate `/live` route; this server only exposes the Stats API's `ScoreboardV2`/`ScoreboardV3`, not `pkg/live`)
 
 ### Deployment Options
 
-See `docs/DEPLOYMENT.md` for:
+See `DEPLOYMENT.md` for:
 - systemd service setup
 - Container deployment (Containerfile included)
 - Kubernetes manifests
@@ -213,7 +242,7 @@ See `docs/DEPLOYMENT.md` for:
 
 ### API Stability
 
-**Current: v1.2.0** - Stable with strict semver guarantees
+**Latest tagged release: v1.2.0.** Note that v1.2.0 itself shipped a source-breaking change in a minor release (`stats.Config`/`live.Config` field types, `models.NewAPIError`/`HTTPStatusToError` signatures) - see `CHANGELOG.md`'s retroactive compatibility note under `[1.2.0]`. Treat the "strict semver" promise below as the target, not an unconditional guarantee of the historical record.
 
 **Breaking changes** require:
 - Major version bump
@@ -255,16 +284,16 @@ The upstream NBA.com API has quirks:
 
 - `README.md` - Quick start, installation, examples
 - `docs/API_USAGE.md` - Detailed SDK usage guide
-- `docs/PYTHON_MIGRATION.md` - For nba_api (Python) users
-- `docs/DEPLOYMENT.md` - Production deployment guide
+- `docs/MIGRATION_GUIDE.md` - For nba_api (Python) users
+- `DEPLOYMENT.md` - Production deployment guide
 - `CHANGELOG.md` - Version history and upgrade guides
-- `examples/` - 14 working example programs
+- `examples/` - 15 working example programs, plus `examples/http-api-client/` (non-Go, curl/Python/JS)
 
 ### For Maintainers
 
 - `docs/MAINTENANCE.md` - **START HERE** - Operational runbook
-- `docs/MAINTAINABILITY_ASSESSMENT.md` - Solo engineer viability analysis
-- `docs/IMPROVEMENTS_COMPLETED.md` - What we've fixed
+- `docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md` - Current maintainability assessment (supersedes prior assessments, which live in `docs/archive/` with supersession banners)
+- `docs/REPOSITORY_ASSESSMENT_2026-07-19_2363f46.md` - Companion direct repository review, same revision
 - `docs/adr/` - Architecture decision records
 - `CONTRIBUTING.md` - How to contribute
 
@@ -322,10 +351,10 @@ The upstream NBA.com API has quirks:
 4. Test with integration tests to isolate issue
 
 ### "Generator fails"
-1. Verify NBA.com endpoint URL is correct
-2. Check if endpoint requires authentication (some do)
-3. Review NBA.com website for endpoint deprecation
-4. Try with `-debug` flag for detailed output
+1. Confirm you're running from `tools/generator/` (`cd tools/generator && go run . ...`) - it's a separate Go module, so `go run ./tools/generator` from the repo root fails with "main module does not contain package"
+2. If using `-metadata`, verify the JSON file path and that it parses (`go run . -metadata path/to/file.json -dry-run` to check without writing)
+3. If an inferred field type looks wrong, that's a known heuristic limitation, not necessarily a bug - see `TestInferGoType` in `tools/generator/generator_test.go` for the documented cases, and fix the type by hand in the generated file rather than trusting `inferGoType` blindly
+4. There is no `-debug` flag or NBA.com-URL-based `analyze` subcommand - see "Code Generation System" above for the real CLI
 
 ## Emergency Procedures
 
@@ -402,27 +431,33 @@ See `CONTRIBUTING.md` for full guidelines. Quick checklist:
 
 ### File Structure
 ```
-nba-api-go/
+nba-api-go/                       # root Go module
 ├── cmd/
-│   ├── nba-api-server/         # HTTP API server (main)
-│   └── generator/              # Code generator tool
+│   └── nba-api-server/          # HTTP API server (main)
 ├── pkg/
+│   ├── client/                  # Core HTTP client
+│   │   └── middleware/          # Built-in middleware (retry, rate limit, headers)
 │   ├── stats/
-│   │   ├── endpoints/          # Generated endpoint code
-│   │   ├── parameters/         # Type-safe parameters
-│   │   └── static/            # Player/team data
-│   └── client/                # HTTP client middleware
+│   │   ├── endpoints/           # Generated endpoint code
+│   │   ├── parameters/          # Type-safe parameters
+│   │   └── static/              # Player/team data
+│   ├── live/                    # NBA Live Data API client
+│   └── models/                  # Common data structures and error types
+├── tools/
+│   └── generator/                # Code generator (separate Go module, its own go.mod)
 ├── tests/
-│   ├── integration/           # Live API tests
-│   └── contract/              # Schema validation tests
-├── examples/                  # 14 working examples
-└── docs/                     # Documentation
+│   ├── integration/              # Live API tests
+│   └── contract/                 # Schema validation tests (offline, gitignored fixtures)
+├── examples/                    # 15 working Go examples, plus a non-Go http-api-client/
+└── docs/                        # Documentation
 ```
 
 ### Import Paths
 ```go
 import (
     "github.com/n-ae/nba-api-go/pkg/client"
+    "github.com/n-ae/nba-api-go/pkg/client/middleware"
+    "github.com/n-ae/nba-api-go/pkg/stats"
     "github.com/n-ae/nba-api-go/pkg/stats/endpoints"
     "github.com/n-ae/nba-api-go/pkg/stats/parameters"
     "github.com/n-ae/nba-api-go/pkg/stats/static"
@@ -431,19 +466,19 @@ import (
 
 ### Common Parameter Patterns
 ```go
-// Using parameters package for type safety
-params := &endpoints.PlayerCareerStatsParams{
+// Endpoint functions take a plain (non-pointer) Request struct; optional
+// fields use the parameters package's types directly, not *string/*T
+// helper constructors.
+req := endpoints.PlayerCareerStatsRequest{
     PlayerID: "203999",
-    PerMode:  parameters.PerModePtr(parameters.PerModeTotals),
+    PerMode:  parameters.PerModePerGame,
+    LeagueID: parameters.LeagueIDNBA,
 }
-
-// Optional parameters use pointer types
-params.Season = parameters.StringPtr("2023-24")
 ```
 
 ### Error Handling Pattern
 ```go
-response, err := endpoints.PlayerCareerStats(ctx, client, params)
+response, err := endpoints.PlayerCareerStats(ctx, client, req)
 if err != nil {
     // Check if API error vs network error
     return fmt.Errorf("failed to fetch stats: %w", err)
@@ -465,14 +500,14 @@ if err != nil {
 
 ## Version Information
 
-**Current Version**: 1.0.0 (Stable Release)
-**Go Version**: 1.21+
-**Stability**: Production-ready with semver guarantees
+**Latest tagged release**: v1.2.0 (`main` has unreleased changes ahead of it - see `CHANGELOG.md`'s `[Unreleased]` section)
+**Go Version**: 1.26.5+ (the `go` directive in `go.mod`; older toolchains cannot build this module)
+**Stability**: See the Versioning/API Stability section above - v1.2.0 itself contained a source-breaking change in a minor release, documented with a retroactive compatibility note in `CHANGELOG.md`
 
 See `CHANGELOG.md` for full version history.
 
 ---
 
-**Last Updated**: 2025-11-05
-**Maintainability Grade**: A (93/100)
-**Next Review**: 2026-02-05 (quarterly)
+**This file last updated**: 2026-07-20 (docs consolidation pass; see `docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md` section 7)
+**Maintainability grade**: tracked in the current assessment (see the header of this file), not duplicated here
+**Next assessment**: due whenever the verification-infrastructure backlog in the current assessment's v1.3.0/v2.0.0 plan meaningfully changes, or quarterly, whichever comes first

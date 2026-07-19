@@ -254,10 +254,10 @@ git push origin v0.10.0
 go mod why golang.org/x/text
 
 # 2. Check Go version compatibility
-go version  # Must be 1.21+
+go version  # Must be 1.26.5+ (the go directive in go.mod)
 
-# 3. Rollback if needed
-go get golang.org/x/text@v0.30.0
+# 3. Rollback if needed - substitute the version go.mod had before your update
+go get golang.org/x/text@vX.Y.Z
 
 # 4. Report issue upstream if bug
 ```
@@ -272,10 +272,10 @@ go build ./cmd/nba-api-server
 podman build -t nba-api-go:test .
 
 # 3. Check Go version in Containerfile
-# Must match go.mod requirement (1.21+)
+# Must match go.mod requirement (1.26.5+); Containerfile currently pins golang:1.26-alpine
 
 # 4. Common fixes:
-#    - Update golang:1.25-alpine to latest
+#    - Bump the golang:1.26-alpine base image if go.mod's minimum moves past it
 #    - Ensure go.mod/go.sum copied before build
 #    - Check CGO_ENABLED=0 for static binary
 ```

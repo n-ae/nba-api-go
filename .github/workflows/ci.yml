@@ -26,6 +26,13 @@ jobs:
       - name: go test
         run: go test ./...
 
+      - name: go test -race
+        # Scoped to the packages with meaningful concurrency (shared
+        # clients, middleware, background health polling, per-IP rate
+        # limiting) rather than ./... - keeps runtime bounded while still
+        # covering everywhere a data race would actually matter.
+        run: go test -race ./pkg/client/... ./pkg/stats/... ./pkg/live/... ./cmd/nba-api-server/...
+
       - name: golangci-lint
         # v6 of this action only supports golangci-lint v1.x and rejects a
         # v2.x version string outright; .golangci.yml here is the v2
@@ -54,6 +61,25 @@ jobs:
         # propose gomod bumps, but this is a `go run` tool version, not a
         # go.mod dependency, so it must be bumped here by hand).
         run: go run golang.org/x/vuln/cmd/govulncheck@v1.6.0 ./...
+
+      # tools/generator is a separate Go module (its own go.mod, not part
+      # of the root module's package tree - see docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md
+      # finding #10), so it needs its own vet/test/lint/build steps rather
+      # than being reached by the root module's `go vet ./...`/`go test
+      # ./...`/golangci-lint runs above.
+      - name: generator go vet
+        working-directory: tools/generator
+        run: go vet ./...
+
+      - name: generator go test
+        working-directory: tools/generator
+        run: go test ./...
+
+      - name: generator golangci-lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.12.2
+          working-directory: tools/generator
 
       - name: build generator tool
         working-directory: tools/generator

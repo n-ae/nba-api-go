@@ -21,7 +21,6 @@ func TestHealthChecker_Start_DoesNotBlock(t *testing.T) {
 	hc := NewHealthChecker(stats.NewDefaultClient())
 
 	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 
 	done := make(chan struct{})
 	go func() {
@@ -33,6 +32,25 @@ func TestHealthChecker_Start_DoesNotBlock(t *testing.T) {
 	case <-done:
 	case <-time.After(50 * time.Millisecond):
 		t.Fatal("Start blocked instead of returning immediately")
+	}
+
+	// Start's background goroutine runs an initial hc.check(ctx) before
+	// entering its ticker loop (see Start's doc comment), so at this
+	// point a check is still in flight on another goroutine. Cancel now
+	// and wait for it to observe cancellation and settle Status(), so
+	// that goroutine's work (and its reads of any test-mutable package
+	// state, e.g. nowFunc) can't still be running once this test
+	// function returns and the next test starts - the same failure mode
+	// TestHealthChecker_Check_ParentCancellationAbortsPromptly asserts
+	// resolves quickly on its own, relied on here to bound the wait.
+	cancel()
+	deadline := time.After(3 * time.Second)
+	for hc.Status() == nbaAPIStatusUnknown {
+		select {
+		case <-deadline:
+			t.Fatal("background check did not settle Status() after cancellation")
+		case <-time.After(time.Millisecond):
+		}
 	}
 }
 

@@ -211,7 +211,6 @@ The HTTP API is optimized for:
 
 - [Migration Guide](../../docs/MIGRATION_GUIDE.md) - Complete Python/JavaScript examples
 - [API Usage Guide](../../docs/API_USAGE.md) - Detailed HTTP API documentation
-- [100% Coverage Achievement](../../HTTP_API_100_PERCENT_ACHIEVEMENT.md) - Complete endpoint list
 
 ## Common Use Cases
 

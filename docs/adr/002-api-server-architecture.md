@@ -113,7 +113,7 @@ resp, err := endpoints.PlayerGameLog(ctx, client, req)
 #### 3. Container Deployment (New)
 
 **File:** `Containerfile` (Podman-compatible)
-**Base image:** `golang:1.21-alpine` (build) → `alpine:latest` (runtime)
+**Base image:** `golang:1.26-alpine` (build) → `alpine:latest` (runtime)
 **Multi-stage:** Yes (small final image)
 **Exposed port:** 8080
 
@@ -221,8 +221,8 @@ nba-api-go/
 
 **Configuration:** Environment variables only
 - `PORT` - HTTP port (default: 8080)
-- `NBA_API_TIMEOUT` - Request timeout (default: 30s)
-- `LOG_LEVEL` - Logging level (default: info)
+- `LOG_LEVEL` - Logging level (default: info); currently read and logged at startup but does not yet filter or change log output - see the current maintainability assessment
+- `NBA_API_TIMEOUT` - **Documented here and in `docker-compose.yml` but not currently read by `cmd/nba-api-server`.** The upstream request timeout is presently the SDK's own default (`client.DefaultTimeout`, 30s), not configurable via this variable. Amend this ADR to drop the variable, or implement it - do not leave both the ADR and `docker-compose.yml` claiming a knob that does nothing; see the current maintainability assessment for the full finding.
 
 #### ✅ Container-First for Non-Go Users
 

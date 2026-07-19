@@ -30,7 +30,7 @@ func (h *StatsHandler) handlePlayByPlayV2(w http.ResponseWriter, r *http.Request
 }
 
 func (h *StatsHandler) handleShotChartDetail(w http.ResponseWriter, r *http.Request) {
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 
 	teamID := getQueryOrDefault(r, "TeamID", "0")
@@ -149,7 +149,7 @@ func (h *StatsHandler) handlePlayByPlayV3(w http.ResponseWriter, r *http.Request
 }
 
 func (h *StatsHandler) handleShotChartLineupDetail(w http.ResponseWriter, r *http.Request) {
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 	teamID := r.URL.Query().Get("TeamID")
 	groupID := r.URL.Query().Get("GroupID")

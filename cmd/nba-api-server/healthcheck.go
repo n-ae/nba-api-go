@@ -7,6 +7,7 @@ import (
 
 	"github.com/n-ae/nba-api-go/pkg/stats"
 	"github.com/n-ae/nba-api-go/pkg/stats/endpoints"
+	"github.com/n-ae/nba-api-go/pkg/stats/parameters"
 )
 
 const (
@@ -71,7 +72,7 @@ func (hc *HealthChecker) check(parent context.Context) {
 	ctx, cancel := context.WithTimeout(parent, 3*time.Second)
 	defer cancel()
 
-	req := endpoints.CommonAllPlayersRequest{Season: "2023-24"}
+	req := endpoints.CommonAllPlayersRequest{Season: parameters.Season(currentSeasonDefault())}
 	if _, err := endpoints.GetCommonAllPlayers(ctx, hc.client, req); err != nil {
 		hc.status.Store(nbaAPIStatusDegraded)
 		return
