@@ -273,12 +273,12 @@ available on `CommonPlayerInfoV2CommonPlayerInfo`, `CommonTeamRosterCommonTeamRo
 The library is organized into the following packages:
 
 - **pkg/client** - Core HTTP client with middleware support
+- **pkg/client/middleware** - Built-in middleware (retry, rate limiting, headers, logging)
 - **pkg/stats** - NBA Stats API client and endpoints
 - **pkg/live** - NBA Live Data API client and endpoints
 - **pkg/models** - Common data structures and error types
 - **pkg/stats/static** - Static player and team data with search
 - **pkg/stats/parameters** - Type-safe parameter definitions
-- **internal/middleware** - HTTP middleware (rate limiting, retry, logging)
 
 ### Middleware
 
@@ -286,14 +286,20 @@ The client supports composable middleware for cross-cutting concerns. The
 seam itself — `client.Middleware`, `client.RoundTripper`,
 `client.RoundTripperFunc`, and `client.Chain` — lives in the importable
 `pkg/client` package, so you can write your own middleware without
-depending on anything internal to this module:
+depending on anything internal to this module. The built-in constructors
+(`WithRetry`, `RetryConfig`/`DefaultRetryConfig`, `WithPerHostRateLimit`,
+`WithHeaders`, `WithUserAgent`, `WithReferer`, `WithAccept`, and the
+`WithLogging` family) live in the importable `pkg/client/middleware`
+package too, so you can reconfigure them - not just add alongside them:
 
 ```go
 import (
     "context"
     "net/http"
+    "time"
 
     "github.com/n-ae/nba-api-go/pkg/client"
+    "github.com/n-ae/nba-api-go/pkg/client/middleware"
     "github.com/n-ae/nba-api-go/pkg/stats"
 )
 
@@ -307,19 +313,29 @@ func withRequestID(id string) client.Middleware {
     }
 }
 
-// stats.Config.Middlewares REPLACES the default chain (retry, the headers
-// NBA.com's API expects, and a per-host rate limit) rather than extending
-// it, so use stats.DefaultMiddlewares() as a base if you want those plus
-// your own additions.
+// AdditionalMiddlewares layers your own middleware on top of the default
+// chain (retry, the headers NBA.com's API expects, and a per-host rate
+// limit) without replacing it - no need to call DefaultMiddlewares()
+// yourself.
 statsClient := stats.NewClient(stats.Config{
-    Middlewares: append(stats.DefaultMiddlewares(), withRequestID("abc123")),
+    AdditionalMiddlewares: []client.Middleware{withRequestID("abc123")},
+})
+
+// To reconfigure a built-in instead of just adding to it - e.g. a
+// stricter retry budget - set Middlewares explicitly (this REPLACES the
+// default chain, so re-add anything else you still want from it):
+retryConfig := middleware.DefaultRetryConfig()
+retryConfig.MaxRetries = 1
+statsClient = stats.NewClient(stats.Config{
+    Middlewares: []client.Middleware{
+        middleware.WithRetry(retryConfig),
+        middleware.WithPerHostRateLimit(3, 5),
+    },
 })
 ```
 
-`pkg/live` has the equivalent `live.DefaultMiddlewares()`. The concrete
-built-in middlewares (retry, per-host rate limiting, the default NBA
-headers) stay internal — write your own via `client.Middleware` for
-anything the defaults don't cover.
+`pkg/live` has the equivalent `live.DefaultMiddlewares()` and
+`AdditionalMiddlewares`.
 
 ## Static Data
 

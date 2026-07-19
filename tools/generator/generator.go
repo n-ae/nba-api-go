@@ -9,6 +9,15 @@ import (
 	"text/template"
 )
 
+// Go type names inferGoType and toParamType return, as constants so the
+// same literal isn't repeated (and potentially mistyped) at each of
+// inferGoType's ~15 return sites.
+const (
+	goTypeString  = "string"
+	goTypeInt     = "int"
+	goTypeFloat64 = "float64"
+)
+
 type Generator struct {
 	outputDir string
 	templates map[string]*template.Template
@@ -82,7 +91,7 @@ func (g *Generator) GenerateSingleEndpoint(name string, dryRun bool) error {
 	return g.generateEndpoint(metadata, dryRun)
 }
 
-func (g *Generator) generateEndpoint(metadata EndpointMetadata, dryRun bool) error {
+func (g *Generator) generateEndpoint(metadata EndpointMetadata, dryRun bool) (err error) {
 	tmpl, err := g.loadTemplate("endpoint")
 	if err != nil {
 		return err
@@ -98,7 +107,11 @@ func (g *Generator) generateEndpoint(metadata EndpointMetadata, dryRun bool) err
 	if err != nil {
 		return fmt.Errorf("failed to create file: %w", err)
 	}
-	defer f.Close()
+	defer func() {
+		if cerr := f.Close(); cerr != nil && err == nil {
+			err = fmt.Errorf("failed to close %s: %w", filename, cerr)
+		}
+	}()
 
 	return tmpl.Execute(f, metadata)
 }
@@ -108,29 +121,13 @@ func (g *Generator) loadTemplate(name string) (*template.Template, error) {
 		return tmpl, nil
 	}
 
-	tmplPath := filepath.Join("tools", "generator", "templates", name+".tmpl")
-	tmpl, err := template.ParseFiles(tmplPath)
+	tmpl, err := template.ParseFS(templatesFS, "templates/"+name+".tmpl")
 	if err != nil {
 		return nil, fmt.Errorf("failed to load template %s: %w", name, err)
 	}
 
 	g.templates[name] = tmpl
 	return tmpl, nil
-}
-
-func toGoType(pythonType string) string {
-	switch pythonType {
-	case "str", "string":
-		return "string"
-	case "int", "integer":
-		return "int"
-	case "float":
-		return "float64"
-	case "bool", "boolean":
-		return "bool"
-	default:
-		return "string"
-	}
 }
 
 func toParamType(paramType string) string {
@@ -144,7 +141,7 @@ func toParamType(paramType string) string {
 	case "PerMode":
 		return "parameters.PerMode"
 	default:
-		return "string"
+		return goTypeString
 	}
 }
 
@@ -154,7 +151,7 @@ func (g *Generator) processMetadata(metadata EndpointMetadata) EndpointMetadata 
 	for i := range metadata.Parameters {
 		originalType := metadata.Parameters[i].Type
 		metadata.Parameters[i].Type = toParamType(originalType)
-		if metadata.Parameters[i].Type != "string" && metadata.Parameters[i].Type != originalType {
+		if metadata.Parameters[i].Type != goTypeString && metadata.Parameters[i].Type != originalType {
 			hasParameterTypes = true
 		}
 		if metadata.Parameters[i].Required {
@@ -191,7 +188,7 @@ func inferGoType(fieldName string) string {
 
 	// Percentage fields are always float64
 	if strings.HasSuffix(lower, "_pct") || strings.HasSuffix(lower, "_percentage") {
-		return "float64"
+		return goTypeFloat64
 	}
 
 	// ID fields - check for specific patterns
@@ -199,14 +196,14 @@ func inferGoType(fieldName string) string {
 		// Most IDs are strings (e.g., GAME_ID, SEASON_ID)
 		// But PLAYER_ID, TEAM_ID are typically int
 		if strings.Contains(lower, "player") || strings.Contains(lower, "team") {
-			return "int"
+			return goTypeInt
 		}
-		return "string"
+		return goTypeString
 	}
 
 	// Date fields are strings
 	if strings.Contains(lower, "date") {
-		return "string"
+		return goTypeString
 	}
 
 	// Text/name fields are strings
@@ -215,17 +212,17 @@ func inferGoType(fieldName string) string {
 		strings.HasSuffix(lower, "_tricode") || strings.Contains(lower, "nickname") ||
 		strings.Contains(lower, "matchup") || strings.Contains(lower, "comment") ||
 		strings.Contains(lower, "position") {
-		return "string"
+		return goTypeString
 	}
 
 	// Win/Loss indicator
 	if lower == "wl" || lower == "w_l" {
-		return "string"
+		return goTypeString
 	}
 
 	// Season-related fields
 	if strings.Contains(lower, "season") && !strings.Contains(lower, "id") {
-		return "string"
+		return goTypeString
 	}
 
 	// Statistical fields - most are numbers
@@ -240,47 +237,47 @@ func inferGoType(fieldName string) string {
 		if strings.Contains(lower, abbrev) {
 			// MIN (minutes) is typically float64
 			if strings.Contains(lower, "min") && !strings.Contains(lower, "game") {
-				return "float64"
+				return goTypeFloat64
 			}
 			// Made/Attempted stats can be int or float depending on context
 			// For box scores, they're typically int
 			if strings.HasSuffix(lower, "m") || strings.HasSuffix(lower, "a") {
-				return "int"
+				return goTypeInt
 			}
 			// Most other stats are float64 (especially averages)
 			if strings.Contains(lower, "avg") || strings.Contains(lower, "per") {
-				return "float64"
+				return goTypeFloat64
 			}
 			// Game counts are int
 			if lower == "gp" || lower == "gs" {
-				return "int"
+				return goTypeInt
 			}
 			// Default for stats is float64
-			return "float64"
+			return goTypeFloat64
 		}
 	}
 
 	// Age is int
 	if strings.Contains(lower, "age") {
-		return "int"
+		return goTypeInt
 	}
 
 	// Rank is int
 	if strings.Contains(lower, "rank") {
-		return "int"
+		return goTypeInt
 	}
 
 	// Sequence/period numbers are int
 	if strings.Contains(lower, "sequence") || strings.Contains(lower, "period") ||
 		strings.Contains(lower, "range") {
-		return "int"
+		return goTypeInt
 	}
 
 	// Status codes are typically int
 	if strings.Contains(lower, "status") && strings.HasSuffix(lower, "_id") {
-		return "int"
+		return goTypeInt
 	}
 
 	// Default to string for safety
-	return "string"
+	return goTypeString
 }

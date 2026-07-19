@@ -68,7 +68,7 @@ sudo systemctl status nba-api
 Create `Dockerfile`:
 
 ```dockerfile
-FROM golang:1.21-alpine AS builder
+FROM golang:1.26-alpine AS builder
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
@@ -207,7 +207,7 @@ Response includes:
 
 #### Prometheus
 
-The `/metrics` endpoint can be scraped by Prometheus. Add to `prometheus.yml`:
+**`/metrics` currently returns a JSON snapshot, not the Prometheus text exposition format** - Prometheus's `scrape_configs` below will fail to parse it as-is. Either poll the JSON endpoint with a tool that understands JSON (a sidecar exporter, a custom scrape script), or wait for/contribute a Prometheus-format `/metrics` variant. The `scrape_configs` shape is left here as a placeholder for when that exists:
 
 ```yaml
 scrape_configs:

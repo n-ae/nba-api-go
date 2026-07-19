@@ -30,8 +30,11 @@ linters:
       disable:
         - shadow
         # fieldalignment fights the generator's intentional field order
-        # (mirrors NBA API column order for readability). See
-        # docs/LINT_CLEANUP_PLAN.md for the full rationale.
+        # (mirrors NBA API column order for readability), and flagged
+        # ~310 struct-alignment issues across the generated endpoints
+        # when first tried - not worth reordering fields away from NBA's
+        # own column order for a memory-layout win these structs don't
+        # need.
         - fieldalignment
 
     misspell:

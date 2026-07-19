@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
 	"github.com/n-ae/nba-api-go/pkg/stats"
@@ -360,6 +361,38 @@ func getQueryOrDefault(r *http.Request, key, defaultValue string) string {
 		return value
 	}
 	return defaultValue
+}
+
+// nowFunc is the source of "now" for currentSeasonDefault. Tests override
+// it to pin a fixed date instead of depending on the actual wall clock, so
+// assertions near the season-rollover boundary (October) don't become
+// order- or date-dependent.
+var nowFunc = time.Now
+
+// currentSeasonDefault returns the NBA season string (e.g. "2025-26")
+// most likely to have the data a caller expects when they omit ?Season=.
+// NBA seasons start in October and run into the following June's
+// playoffs; before October, the previous season - the most recently
+// completed or still-finishing one - is the more useful default than a
+// season that hasn't tipped off yet.
+func currentSeasonDefault() string {
+	now := nowFunc()
+	year := now.Year()
+	if now.Month() < time.October {
+		year--
+	}
+	return string(parameters.NewSeason(year))
+}
+
+// getSeasonOrDefault returns the request's Season query parameter, or
+// currentSeasonDefault() if omitted. Centralizes what used to be over a
+// hundred call sites each hardcoding a literal season string directly
+// (see docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md
+// finding #11) - a season rollover, or a change to the default-selection
+// rule itself, is now a one-place change instead of a five-file
+// search-and-replace.
+func getSeasonOrDefault(r *http.Request) string {
+	return getQueryOrDefault(r, "Season", currentSeasonDefault())
 }
 
 func stringPtr(s string) *string {

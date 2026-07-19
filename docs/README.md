@@ -15,8 +15,8 @@ Complete documentation for the nba-api-go project.
 
 ### Development
 - **[Contributing Guide](../CONTRIBUTING.md)** - How to contribute to the project
-- **[Code Generation Guide](../MANUAL_REGENERATION_GUIDE.md)** - Regenerating endpoint code
-- **[Maintainability Assessment](../MAINTAINABILITY.md)** - Project maintainability analysis
+- **[Current Maintainability Assessment](./MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md)** - Project maintainability analysis of record
+- **[Current Repository Review](./REPOSITORY_ASSESSMENT_2026-07-19_2363f46.md)** - Companion direct repository review, same revision
 
 ## 🏗️ Architecture
 
@@ -32,7 +32,6 @@ Complete documentation for the nba-api-go project.
 
 ### Testing
 - **[Integration Tests](../tests/integration/README.md)** - SDK integration test suite
-- **[HTTP API Tests](../tests/http-api/README.md)** - HTTP server integration tests
 
 ### Tools
 - **[Code Generator](../tools/generator/README.md)** - Endpoint generator documentation
@@ -68,7 +67,7 @@ These are kept for reference but may be outdated.
 → Check [Contributing Guide](../CONTRIBUTING.md) and [ADR-001](./adr/001-go-replication-strategy.md)
 
 **Regenerate endpoint code**
-→ Follow [Code Generation Guide](../MANUAL_REGENERATION_GUIDE.md)
+→ Follow `CLAUDE.md`'s "Code Generation System" section and [Code Generator](../tools/generator/README.md); the old manual per-field workaround in [archive/MANUAL_REGENERATION_GUIDE.md](./archive/MANUAL_REGENERATION_GUIDE.md) is superseded now that the generator runs as documented
 
 **Understand performance**
 → Review [Benchmarks](./BENCHMARKS.md)

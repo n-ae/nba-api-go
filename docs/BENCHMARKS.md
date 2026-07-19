@@ -7,7 +7,7 @@ Benchmark results for nba-api-go running on Apple M2 Pro.
 - **CPU**: Apple M2 Pro
 - **OS**: macOS (darwin)
 - **Architecture**: arm64
-- **Go Version**: 1.21+
+- **Go Version**: 1.26.5+ (module's current minimum; benchmark numbers below predate this and haven't been re-run against it - treat as indicative, not current measurements)
 
 ## Client Benchmarks
 

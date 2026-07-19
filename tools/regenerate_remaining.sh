@@ -14,7 +14,11 @@ OUTPUT_DIR="pkg/stats/endpoints"
 # Build generator if needed
 if [ ! -f "$GENERATOR" ]; then
     echo "📦 Building generator..."
-    go build -o "$GENERATOR" ./tools/generator
+    # tools/generator is a separate Go module (its own go.mod, not part of
+    # the root module's package tree), so `go build ./tools/generator` from
+    # the repo root fails with "main module ... does not contain package
+    # ...". Build it in its own module directory instead.
+    (cd tools/generator && go build -o bin/generator .)
     echo "✅ Generator built"
     echo ""
 fi

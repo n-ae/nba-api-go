@@ -139,7 +139,7 @@ GET /api/v1/stats/playergamelog?PlayerID={id}&Season={season}
 
 **Parameters:**
 - `PlayerID` (required) - Player ID (e.g., "2544" for LeBron James)
-- `Season` (optional) - Season year (default: "2023-24")
+- `Season` (optional) - Season year (default: the current NBA season, e.g. "2025-26"; computed server-side from today's date - seasons run October through June, so before October the previous season is used)
 - `SeasonType` (optional) - "Regular Season" or "Playoffs" (default: "Regular Season")
 
 **Example:**
@@ -189,7 +189,7 @@ GET /api/v1/stats/leaguestandings?Season={season}
 ```
 
 **Parameters:**
-- `Season` (optional) - Season year (default: "2023-24")
+- `Season` (optional) - Season year (default: the current NBA season, e.g. "2025-26"; computed server-side from today's date - seasons run October through June, so before October the previous season is used)
 - `SeasonType` (optional) - "Regular Season" or "Playoffs" (default: "Regular Season")
 
 **Example:**
@@ -207,7 +207,7 @@ GET /api/v1/stats/commonteamroster?TeamID={id}
 
 **Parameters:**
 - `TeamID` (required) - Team ID (e.g., "1610612747" for Lakers)
-- `Season` (optional) - Season year (default: "2023-24")
+- `Season` (optional) - Season year (default: the current NBA season, e.g. "2025-26"; computed server-side from today's date - seasons run October through June, so before October the previous season is used)
 
 **Example:**
 ```bash
@@ -240,7 +240,7 @@ GET /api/v1/stats/leagueleaders?Season={season}
 ```
 
 **Parameters:**
-- `Season` (optional) - Season year (default: "2023-24")
+- `Season` (optional) - Season year (default: the current NBA season, e.g. "2025-26"; computed server-side from today's date - seasons run October through June, so before October the previous season is used)
 - `SeasonType` (optional) - "Regular Season" or "Playoffs"
 - `PerMode` (optional) - "PerGame", "Totals", or "Per36"
 
@@ -274,7 +274,7 @@ GET /api/v1/stats/leaguedashteamstats?Season={season}
 ```
 
 **Parameters:**
-- `Season` (optional) - Season year (default: "2023-24")
+- `Season` (optional) - Season year (default: the current NBA season, e.g. "2025-26"; computed server-side from today's date - seasons run October through June, so before October the previous season is used)
 - `SeasonType` (optional) - "Regular Season" or "Playoffs"
 - `PerMode` (optional) - "PerGame", "Totals", or "Per36"
 
@@ -292,7 +292,7 @@ GET /api/v1/stats/leaguedashplayerstats?Season={season}
 ```
 
 **Parameters:**
-- `Season` (optional) - Season year (default: "2023-24")
+- `Season` (optional) - Season year (default: the current NBA season, e.g. "2025-26"; computed server-side from today's date - seasons run October through June, so before October the previous season is used)
 - `SeasonType` (optional) - "Regular Season" or "Playoffs"
 - `PerMode` (optional) - "PerGame", "Totals", or "Per36"
 

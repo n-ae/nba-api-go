@@ -35,7 +35,7 @@ go run . -endpoint TeamInfoCommon -dry-run
 
 - `-endpoint <name>` - Generate a single endpoint
 - `-metadata <file>` - Generate from metadata JSON file
-- `-output <dir>` - Output directory (default: pkg/stats/endpoints)
+- `-output <dir>` - Output directory (default: `<repo-root>/pkg/stats/endpoints`, resolved from this file's own location so it's correct regardless of the working directory you run `go run .` from)
 - `-dry-run` - Print generated code without writing files
 
 ## Metadata Format

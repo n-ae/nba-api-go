@@ -35,6 +35,8 @@ go.work.sum
 *~
 /bin
 /nba-api-server
+/tools/generator/bin/
+/tools/generator/generator
 
 # OS artifacts
 .DS_Store

@@ -617,7 +617,7 @@ The Go library provides 100% coverage of all Python nba_api endpoints:
 - franchisehistory
 - And 20 more...
 
-See the complete list in [HTTP_API_100_PERCENT_ACHIEVEMENT.md](../HTTP_API_100_PERCENT_ACHIEVEMENT.md).
+See `pkg/stats/endpoints/` for the complete, current endpoint list (the linked achievement doc this used to point to no longer exists).
 
 ---
 

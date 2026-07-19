@@ -8,8 +8,20 @@ import (
 	"testing"
 	"time"
 
-	"github.com/n-ae/nba-api-go/internal/middleware"
+	"github.com/n-ae/nba-api-go/pkg/client"
+	"github.com/n-ae/nba-api-go/pkg/client/middleware"
 )
+
+// withHeader is a small test middleware that sets a fixed header on every
+// request, used to prove AdditionalMiddlewares actually runs.
+func withHeader(key, value string) client.Middleware {
+	return func(next client.RoundTripper) client.RoundTripper {
+		return client.RoundTripperFunc(func(ctx context.Context, req *http.Request) (*http.Response, error) {
+			req.Header.Set(key, value)
+			return next.RoundTrip(ctx, req)
+		})
+	}
+}
 
 // noRetry is a passthrough middleware used to isolate a single request
 // attempt from the default retry chain when a test cares about the
@@ -125,5 +137,70 @@ func TestNewClient_ForwardsMaxResponseBytes(t *testing.T) {
 
 	if _, err := c.client.Get(context.Background(), "test", url.Values{}); err == nil {
 		t.Fatal("expected an error for a 100-byte body against a forwarded 10-byte MaxResponseBytes, got nil")
+	}
+}
+
+// TestNewClient_AdditionalMiddlewaresAppendToDefaults proves
+// AdditionalMiddlewares runs alongside DefaultMiddlewares (Config.Middlewares
+// left empty) rather than requiring the caller to manually
+// append(DefaultMiddlewares(), ...) to get both.
+func TestNewClient_AdditionalMiddlewaresAppendToDefaults(t *testing.T) {
+	var gotUserAgent, gotCustomHeader string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotUserAgent = r.Header.Get("User-Agent")
+		gotCustomHeader = r.Header.Get("X-Custom")
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{}`))
+	}))
+	defer srv.Close()
+
+	c := NewClient(Config{
+		BaseURL:               srv.URL,
+		AdditionalMiddlewares: []client.Middleware{withHeader("X-Custom", "added")},
+	})
+
+	if _, err := c.client.Get(context.Background(), "test", url.Values{}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	const wantUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+	if gotUserAgent != wantUserAgent {
+		t.Errorf("User-Agent = %q, want %q (defaults should still apply)", gotUserAgent, wantUserAgent)
+	}
+	if gotCustomHeader != "added" {
+		t.Errorf("X-Custom = %q, want %q (AdditionalMiddlewares should have run)", gotCustomHeader, "added")
+	}
+}
+
+// TestNewClient_AdditionalMiddlewaresLayerOnExplicitOverride proves
+// AdditionalMiddlewares still runs when Config.Middlewares is also set
+// (an explicit override, which on its own replaces the defaults
+// entirely) - AdditionalMiddlewares layers on top of whichever chain
+// Middlewares resolves to, not only the default one.
+func TestNewClient_AdditionalMiddlewaresLayerOnExplicitOverride(t *testing.T) {
+	var gotOverrideHeader, gotCustomHeader string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotOverrideHeader = r.Header.Get("X-Override")
+		gotCustomHeader = r.Header.Get("X-Custom")
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{}`))
+	}))
+	defer srv.Close()
+
+	c := NewClient(Config{
+		BaseURL:               srv.URL,
+		Middlewares:           []client.Middleware{withHeader("X-Override", "explicit")},
+		AdditionalMiddlewares: []client.Middleware{withHeader("X-Custom", "added")},
+	})
+
+	if _, err := c.client.Get(context.Background(), "test", url.Values{}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if gotOverrideHeader != "explicit" {
+		t.Errorf("X-Override = %q, want %q (explicit Middlewares should still apply)", gotOverrideHeader, "explicit")
+	}
+	if gotCustomHeader != "added" {
+		t.Errorf("X-Custom = %q, want %q (AdditionalMiddlewares should layer on top of an explicit override too)", gotCustomHeader, "added")
 	}
 }

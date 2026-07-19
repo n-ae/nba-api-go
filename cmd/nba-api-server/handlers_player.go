@@ -14,7 +14,7 @@ func (h *StatsHandler) handlePlayerGameLog(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 
 	req := endpoints.PlayerGameLogRequest{
@@ -105,7 +105,7 @@ func (h *StatsHandler) handlePlayerDashboardByGeneralSplits(w http.ResponseWrite
 		return
 	}
 
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 	perMode := parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))
 
@@ -134,7 +134,7 @@ func (h *StatsHandler) handlePlayerDashboardByShootingSplits(w http.ResponseWrit
 		return
 	}
 
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 	perMode := parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))
 
@@ -163,7 +163,7 @@ func (h *StatsHandler) handlePlayerDashboardByOpponent(w http.ResponseWriter, r 
 		return
 	}
 
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 	perMode := parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))
 
@@ -192,7 +192,7 @@ func (h *StatsHandler) handlePlayerDashboardByClutch(w http.ResponseWriter, r *h
 		return
 	}
 
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 	perMode := parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))
 
@@ -215,7 +215,7 @@ func (h *StatsHandler) handlePlayerDashboardByClutch(w http.ResponseWriter, r *h
 }
 
 func (h *StatsHandler) handlePlayerGameLogs(w http.ResponseWriter, r *http.Request) {
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 
 	req := endpoints.PlayerGameLogsRequest{
@@ -246,7 +246,7 @@ func (h *StatsHandler) handlePlayerVsPlayer(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 
 	req := endpoints.PlayerVsPlayerRequest{
@@ -270,7 +270,7 @@ func (h *StatsHandler) handlePlayerVsPlayer(w http.ResponseWriter, r *http.Reque
 // Team endpoint handlers (expanded)
 
 func (h *StatsHandler) handlePlayerTrackingShotDashboard(w http.ResponseWriter, r *http.Request) {
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 	perMode := parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))
 
@@ -291,7 +291,7 @@ func (h *StatsHandler) handlePlayerTrackingShotDashboard(w http.ResponseWriter, 
 }
 
 func (h *StatsHandler) handlePlayerTrackingPasses(w http.ResponseWriter, r *http.Request) {
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 	perMode := parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))
 
@@ -312,7 +312,7 @@ func (h *StatsHandler) handlePlayerTrackingPasses(w http.ResponseWriter, r *http
 }
 
 func (h *StatsHandler) handlePlayerTrackingDefense(w http.ResponseWriter, r *http.Request) {
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 	perMode := parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))
 
@@ -333,7 +333,7 @@ func (h *StatsHandler) handlePlayerTrackingDefense(w http.ResponseWriter, r *htt
 }
 
 func (h *StatsHandler) handlePlayerTrackingRebounding(w http.ResponseWriter, r *http.Request) {
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 	perMode := parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))
 
@@ -354,7 +354,7 @@ func (h *StatsHandler) handlePlayerTrackingRebounding(w http.ResponseWriter, r *
 }
 
 func (h *StatsHandler) handlePlayerTrackingSpeedDistance(w http.ResponseWriter, r *http.Request) {
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 	perMode := parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))
 
@@ -375,7 +375,7 @@ func (h *StatsHandler) handlePlayerTrackingSpeedDistance(w http.ResponseWriter, 
 }
 
 func (h *StatsHandler) handlePlayerTrackingCatchShoot(w http.ResponseWriter, r *http.Request) {
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 	perMode := parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))
 
@@ -396,7 +396,7 @@ func (h *StatsHandler) handlePlayerTrackingCatchShoot(w http.ResponseWriter, r *
 }
 
 func (h *StatsHandler) handlePlayerTrackingDrives(w http.ResponseWriter, r *http.Request) {
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 	perMode := parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))
 
@@ -417,7 +417,7 @@ func (h *StatsHandler) handlePlayerTrackingDrives(w http.ResponseWriter, r *http
 }
 
 func (h *StatsHandler) handlePlayerEstimatedMetrics(w http.ResponseWriter, r *http.Request) {
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 
 	req := endpoints.PlayerEstimatedMetricsRequest{
@@ -462,7 +462,7 @@ func (h *StatsHandler) handlePlayerDashPtShots(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 
 	req := endpoints.PlayerDashPtShotsRequest{
@@ -488,7 +488,7 @@ func (h *StatsHandler) handlePlayerDashboardByLastNGames(w http.ResponseWriter, 
 		return
 	}
 
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 	perMode := parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))
 
@@ -517,7 +517,7 @@ func (h *StatsHandler) handlePlayerDashboardByTeamPerformance(w http.ResponseWri
 		return
 	}
 
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 	perMode := parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))
 
@@ -546,7 +546,7 @@ func (h *StatsHandler) handlePlayerDashboardByGameSplits(w http.ResponseWriter, 
 		return
 	}
 
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 	perMode := parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))
 
@@ -577,7 +577,7 @@ func (h *StatsHandler) handlePlayerDashboardByYearOverYear(w http.ResponseWriter
 		return
 	}
 
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 	perMode := parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))
 
@@ -605,7 +605,7 @@ func (h *StatsHandler) handlePlayerCompare(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 
 	req := endpoints.PlayerCompareRequest{
@@ -648,7 +648,7 @@ func (h *StatsHandler) handlePlayerYearByYearStats(w http.ResponseWriter, r *htt
 // Common endpoints (iteration 4)
 
 func (h *StatsHandler) handlePlayerTrackingPostTouch(w http.ResponseWriter, r *http.Request) {
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 	perMode := parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))
 
@@ -669,7 +669,7 @@ func (h *StatsHandler) handlePlayerTrackingPostTouch(w http.ResponseWriter, r *h
 }
 
 func (h *StatsHandler) handlePlayerTrackingPaintTouch(w http.ResponseWriter, r *http.Request) {
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 	perMode := parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))
 
@@ -690,7 +690,7 @@ func (h *StatsHandler) handlePlayerTrackingPaintTouch(w http.ResponseWriter, r *
 }
 
 func (h *StatsHandler) handlePlayerTrackingElbowTouch(w http.ResponseWriter, r *http.Request) {
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 	perMode := parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))
 
@@ -711,7 +711,7 @@ func (h *StatsHandler) handlePlayerTrackingElbowTouch(w http.ResponseWriter, r *
 }
 
 func (h *StatsHandler) handlePlayerTrackingPullUpShot(w http.ResponseWriter, r *http.Request) {
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 	perMode := parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))
 
@@ -734,7 +734,7 @@ func (h *StatsHandler) handlePlayerTrackingPullUpShot(w http.ResponseWriter, r *
 // Team endpoints (iteration 6)
 
 func (h *StatsHandler) handlePlayerIndex(w http.ResponseWriter, r *http.Request) {
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 
 	req := endpoints.PlayerIndexRequest{
 		Season:   seasonPtr(season),
@@ -770,7 +770,7 @@ func (h *StatsHandler) handlePlayerCareerByCollege(w http.ResponseWriter, r *htt
 }
 
 func (h *StatsHandler) handlePlayerGameStreakFinder(w http.ResponseWriter, r *http.Request) {
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 
 	req := endpoints.PlayerGameStreakFinderRequest{
@@ -789,7 +789,7 @@ func (h *StatsHandler) handlePlayerGameStreakFinder(w http.ResponseWriter, r *ht
 }
 
 func (h *StatsHandler) handlePlayerEstimatedAdvancedStats(w http.ResponseWriter, r *http.Request) {
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 
 	req := endpoints.PlayerEstimatedAdvancedStatsRequest{
@@ -833,7 +833,7 @@ func (h *StatsHandler) handlePlayerNextNGames(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 	leagueID := parameters.LeagueIDNBA
 
@@ -854,7 +854,7 @@ func (h *StatsHandler) handlePlayerNextNGames(w http.ResponseWriter, r *http.Req
 }
 
 func (h *StatsHandler) handlePlayerTrackingShootingEfficiency(w http.ResponseWriter, r *http.Request) {
-	season := parameters.Season(getQueryOrDefault(r, "Season", "2023-24"))
+	season := parameters.Season(getSeasonOrDefault(r))
 	seasonType := parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))
 	perMode := parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))
 	leagueID := parameters.LeagueIDNBA
