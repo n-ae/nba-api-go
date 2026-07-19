@@ -1,10 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"go/parser"
 	"go/token"
 	"os"
 	"path/filepath"
+	"sort"
 	"testing"
 )
 
@@ -197,5 +199,120 @@ func TestInferGoType(t *testing.T) {
 				t.Errorf("inferGoType(%q) = %q, want %q (%s)", tt.field, got, tt.want, tt.note)
 			}
 		})
+	}
+}
+
+// TestFieldTypesOverridesKnownWrongInference verifies that fieldtypes.json
+// - the explicit, hand-reviewed dictionary fieldGoType consults before ever
+// falling back to inferGoType - actually corrects every knownWrong case
+// documented in TestInferGoType above (plus other confirmed instances of
+// the same bug classes found across the committed metadata: PCT_<STAT>
+// "share of team total" fields mistyped by the FGM/FGA suffix sub-rule,
+// FG_PCT_MID_RANGE mistyped by the _RANGE substring rule despite being a
+// percentage rather than a text bucket, and GENERALMANAGER mistyped int
+// because "generalmanager" contains the substring "age"). This is the test
+// that proves the override mechanism actually fixes the corruption bugs
+// inferGoType alone does not.
+func TestFieldTypesOverridesKnownWrongInference(t *testing.T) {
+	corrected := map[string]string{
+		"CLOSE_DEF_DIST_RANGE":     "string",
+		"DRIBBLE_RANGE":            "string",
+		"SHOT_CLOCK_RANGE":         "string",
+		"SHOT_DIST_RANGE":          "string",
+		"SHOT_ZONE_RANGE":          "string",
+		"TOUCH_TIME_RANGE":         "string",
+		"FG_PCT_MID_RANGE":         "float64",
+		"DISPLAY_FIRST_LAST":       "string",
+		"DISPLAY_FI_LAST":          "string",
+		"DISPLAY_LAST_COMMA_FIRST": "string",
+		"PLAYER_NAME_LAST_FIRST":   "string",
+		"FG_PCT_ABOVE_BREAK_3":     "float64",
+		"FG_PCT_BACKCOURT":         "float64",
+		"FG_PCT_IN_PAINT":          "float64",
+		"FG_PCT_LEFT_CORNER_3":     "float64",
+		"FG_PCT_RA":                "float64",
+		"FG_PCT_RIGHT_CORNER_3":    "float64",
+		"PCT":                      "float64",
+		"WinPCT":                   "float64",
+		"PCT_AST_2PM":              "float64",
+		"PCT_AST_3PM":              "float64",
+		"PCT_AST_FGM":              "float64",
+		"PCT_BLKA":                 "float64",
+		"PCT_FG3A":                 "float64",
+		"PCT_FG3M":                 "float64",
+		"PCT_FGA":                  "float64",
+		"PCT_FGM":                  "float64",
+		"PCT_FTA":                  "float64",
+		"PCT_FTM":                  "float64",
+		"PCT_UAST_2PM":             "float64",
+		"PCT_UAST_3PM":             "float64",
+		"PCT_UAST_FGM":             "float64",
+		"PERCENTILE":               "float64",
+		"GENERALMANAGER":           "string",
+	}
+
+	for field, want := range corrected {
+		t.Run(field, func(t *testing.T) {
+			if inferGoType(field) == want {
+				t.Fatalf("inferGoType(%q) already returns %q - this case is no longer knownWrong, remove it from the correction map instead of leaving a redundant assertion", field, want)
+			}
+			got := fieldGoType(field)
+			if got != want {
+				t.Errorf("fieldGoType(%q) = %q, want %q (fieldtypes.json entry missing or incorrect)", field, got, want)
+			}
+		})
+	}
+}
+
+// TestAllMetadataFieldsHaveExplicitTypes ensures every field name
+// referenced by a committed metadata/*.json file has an explicit entry in
+// fieldtypes.json, so generation never silently falls back to inferGoType
+// for a field nobody has reviewed. A new endpoint's metadata should add its
+// new field names to fieldtypes.json (verified against a live response) in
+// the same change, not rely on the fallback.
+func TestAllMetadataFieldsHaveExplicitTypes(t *testing.T) {
+	types, err := loadFieldTypes()
+	if err != nil {
+		t.Fatalf("loadFieldTypes() failed: %v", err)
+	}
+
+	metadataFiles, err := filepath.Glob("metadata/*.json")
+	if err != nil {
+		t.Fatalf("failed to glob metadata files: %v", err)
+	}
+	if len(metadataFiles) == 0 {
+		t.Fatal("no metadata files found under metadata/ - this test would trivially pass without exercising anything")
+	}
+
+	missing := map[string][]string{} // field -> metadata files referencing it
+	for _, mf := range metadataFiles {
+		data, err := os.ReadFile(mf)
+		if err != nil {
+			t.Fatalf("failed to read %s: %v", mf, err)
+		}
+		var endpoints []EndpointMetadata
+		if err := json.Unmarshal(data, &endpoints); err != nil {
+			t.Fatalf("failed to parse %s: %v", mf, err)
+		}
+		for _, ep := range endpoints {
+			for _, rs := range ep.ResultSets {
+				for _, field := range rs.Fields {
+					if _, ok := types[field]; !ok {
+						missing[field] = append(missing[field], mf)
+					}
+				}
+			}
+		}
+	}
+
+	if len(missing) > 0 {
+		fields := make([]string, 0, len(missing))
+		for f := range missing {
+			fields = append(fields, f)
+		}
+		sort.Strings(fields)
+		for _, f := range fields {
+			t.Errorf("field %q referenced by %v has no entry in fieldtypes.json", f, missing[f])
+		}
 	}
 }
