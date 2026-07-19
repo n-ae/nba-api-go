@@ -47,7 +47,13 @@ jobs:
         run: make test-examples
 
       - name: govulncheck
-        run: go run golang.org/x/vuln/cmd/govulncheck@latest ./...
+        # Pinned, not "@latest": an unpinned tool version can change what a
+        # build checks (and whether it passes) with no repository change at
+        # all - the same class of problem golangci-lint-action's version
+        # pin above exists to prevent. Bump deliberately (Dependabot will
+        # propose gomod bumps, but this is a `go run` tool version, not a
+        # go.mod dependency, so it must be bumped here by hand).
+        run: go run golang.org/x/vuln/cmd/govulncheck@v1.6.0 ./...
 
       - name: build generator tool
         working-directory: tools/generator

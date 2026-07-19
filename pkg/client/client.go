@@ -15,6 +15,12 @@ import (
 )
 
 const (
+	// DefaultUserAgent is not applied automatically. The core client is
+	// generic and NBA-agnostic; it's each facade's DefaultMiddlewares
+	// (see pkg/stats, pkg/live) that installs the User-Agent NBA.com
+	// expects, via middleware.WithUserAgent. DefaultUserAgent remains
+	// exported for callers who construct client.Client directly and want
+	// a reasonable fallback.
 	DefaultUserAgent = "nba-api-go/1.0"
 	DefaultTimeout   = 30 * time.Second
 
@@ -87,12 +93,13 @@ func NewClient(config Config) *Client {
 		}
 	}
 
-	if config.Headers == nil {
-		config.Headers = make(http.Header)
-	}
-
-	if config.Headers.Get("User-Agent") == "" {
-		config.Headers.Set("User-Agent", DefaultUserAgent)
+	// Clone rather than alias config.Headers: without this, constructing a
+	// Client would mutate the caller's map, later caller-side mutations
+	// would silently reach into the client, and concurrent access to
+	// either would race.
+	headers := config.Headers.Clone()
+	if headers == nil {
+		headers = make(http.Header)
 	}
 
 	baseTransport := &baseRoundTripper{client: config.HTTPClient}
@@ -106,7 +113,7 @@ func NewClient(config Config) *Client {
 	return &Client{
 		baseURL:          config.BaseURL,
 		httpClient:       config.HTTPClient,
-		headers:          config.Headers,
+		headers:          headers,
 		timeout:          config.Timeout,
 		transport:        transport,
 		maxResponseBytes: config.MaxResponseBytes,
