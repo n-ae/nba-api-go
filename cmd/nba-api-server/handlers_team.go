@@ -25,7 +25,7 @@ func (h *StatsHandler) handleTeamGameLog(w http.ResponseWriter, r *http.Request)
 
 	resp, err := endpoints.GetTeamGameLog(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -49,7 +49,7 @@ func (h *StatsHandler) handleTeamInfoCommon(w http.ResponseWriter, r *http.Reque
 
 	resp, err := endpoints.GetTeamInfoCommon(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -77,7 +77,7 @@ func (h *StatsHandler) handleTeamDashboardByGeneralSplits(w http.ResponseWriter,
 
 	resp, err := endpoints.GetTeamDashboardByGeneralSplits(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -105,7 +105,7 @@ func (h *StatsHandler) handleTeamDashboardByShootingSplits(w http.ResponseWriter
 
 	resp, err := endpoints.GetTeamDashboardByShootingSplits(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -133,7 +133,7 @@ func (h *StatsHandler) handleTeamDashboardByOpponent(w http.ResponseWriter, r *h
 
 	resp, err := endpoints.GetTeamDashboardByOpponent(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -153,7 +153,7 @@ func (h *StatsHandler) handleTeamDetails(w http.ResponseWriter, r *http.Request)
 
 	resp, err := endpoints.GetTeamDetails(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -181,7 +181,7 @@ func (h *StatsHandler) handleTeamPlayerDashboard(w http.ResponseWriter, r *http.
 
 	resp, err := endpoints.GetTeamPlayerDashboard(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -210,7 +210,7 @@ func (h *StatsHandler) handleTeamLineups(w http.ResponseWriter, r *http.Request)
 
 	resp, err := endpoints.GetTeamLineups(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -235,7 +235,7 @@ func (h *StatsHandler) handleTeamGameLogs(w http.ResponseWriter, r *http.Request
 
 	resp, err := endpoints.GetTeamGameLogs(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -261,7 +261,7 @@ func (h *StatsHandler) handleTeamYearByYearStats(w http.ResponseWriter, r *http.
 
 	resp, err := endpoints.GetTeamYearByYearStats(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -289,7 +289,7 @@ func (h *StatsHandler) handleTeamVsTeam(w http.ResponseWriter, r *http.Request) 
 
 	resp, err := endpoints.GetTeamVsTeam(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -310,7 +310,7 @@ func (h *StatsHandler) handleTeamHistoricalLeaders(w http.ResponseWriter, r *htt
 
 	resp, err := endpoints.GetTeamHistoricalLeaders(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -329,7 +329,7 @@ func (h *StatsHandler) handleTeamEstimatedMetrics(w http.ResponseWriter, r *http
 
 	resp, err := endpoints.GetTeamEstimatedMetrics(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -355,7 +355,7 @@ func (h *StatsHandler) handleTeamDashPtShots(w http.ResponseWriter, r *http.Requ
 
 	resp, err := endpoints.GetTeamDashPtShots(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -385,7 +385,7 @@ func (h *StatsHandler) handleTeamDashboardByClutch(w http.ResponseWriter, r *htt
 
 	resp, err := endpoints.GetTeamDashboardByClutch(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -413,7 +413,7 @@ func (h *StatsHandler) handleTeamDashboardByLastNGames(w http.ResponseWriter, r 
 
 	resp, err := endpoints.GetTeamDashboardByLastNGames(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -441,7 +441,7 @@ func (h *StatsHandler) handleTeamDashboardByYearOverYear(w http.ResponseWriter, 
 
 	resp, err := endpoints.GetTeamDashboardByYearOverYear(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -469,7 +469,7 @@ func (h *StatsHandler) handleTeamVsPlayer(w http.ResponseWriter, r *http.Request
 
 	resp, err := endpoints.GetTeamVsPlayer(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -499,7 +499,7 @@ func (h *StatsHandler) handleTeamDashboardByGameSplits(w http.ResponseWriter, r 
 
 	resp, err := endpoints.GetTeamDashboardByGameSplits(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -527,7 +527,7 @@ func (h *StatsHandler) handleTeamDashboardByTeamPerformance(w http.ResponseWrite
 
 	resp, err := endpoints.GetTeamDashboardByTeamPerformance(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -555,7 +555,7 @@ func (h *StatsHandler) handleTeamPlayerOnOffSummary(w http.ResponseWriter, r *ht
 
 	resp, err := endpoints.GetTeamPlayerOnOffSummary(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -576,7 +576,7 @@ func (h *StatsHandler) handleTeamGameStreakFinder(w http.ResponseWriter, r *http
 
 	resp, err := endpoints.GetTeamGameStreakFinder(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -599,7 +599,7 @@ func (h *StatsHandler) handleTeamPlayerOnOffDetails(w http.ResponseWriter, r *ht
 
 	resp, err := endpoints.GetTeamPlayerOnOffDetails(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -630,7 +630,7 @@ func (h *StatsHandler) handleTeamAndPlayersVsPlayers(w http.ResponseWriter, r *h
 
 	resp, err := endpoints.GetTeamAndPlayersVsPlayers(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -657,7 +657,7 @@ func (h *StatsHandler) handleTeamInfoCommonV2(w http.ResponseWriter, r *http.Req
 
 	resp, err := endpoints.GetTeamInfoCommonV2(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -684,7 +684,7 @@ func (h *StatsHandler) handleTeamNextNGames(w http.ResponseWriter, r *http.Reque
 
 	resp, err := endpoints.GetTeamNextNGames(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -713,7 +713,7 @@ func (h *StatsHandler) handleTeamYearOverYearSplits(w http.ResponseWriter, r *ht
 
 	resp, err := endpoints.GetTeamYearOverYearSplits(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 

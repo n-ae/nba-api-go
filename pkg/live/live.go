@@ -17,14 +17,31 @@ type Client struct {
 }
 
 // Config configures a live Client. BaseURL overrides LiveBaseURL, mainly
-// for pointing the client at a test server. Headers is a plain map for
-// ergonomics; values are copied into an http.Header before being
-// forwarded. Timeout is in seconds; zero means the client default (30s).
+// for pointing the client at a test server. Headers, Timeout, and
+// MaxResponseBytes forward directly to the underlying client.Config; a
+// zero Timeout means the client default (30s), and a zero
+// MaxResponseBytes means client.DefaultMaxResponseBytes. A
+// caller-supplied Middlewares replaces the default chain entirely rather
+// than extending it - use append(live.DefaultMiddlewares(),
+// yourMiddleware...) if you want the defaults plus your own additions
+// instead of replacing them outright.
 type Config struct {
-	BaseURL     string
-	Headers     map[string]string
-	Timeout     int
-	Middlewares []middleware.Middleware
+	BaseURL          string
+	Headers          http.Header
+	Timeout          time.Duration
+	MaxResponseBytes int64
+	Middlewares      []client.Middleware
+}
+
+// DefaultMiddlewares returns the middleware chain NewClient uses when
+// Config.Middlewares is empty: a User-Agent header and a per-host rate
+// limit. It's exported so a custom chain can extend these defaults - see
+// Config's doc comment - instead of silently replacing them.
+func DefaultMiddlewares() []client.Middleware {
+	return []client.Middleware{
+		middleware.WithUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"),
+		middleware.WithPerHostRateLimit(5, 10),
+	}
 }
 
 func NewClient(config Config) *Client {
@@ -34,28 +51,16 @@ func NewClient(config Config) *Client {
 	}
 
 	clientConfig := client.Config{
-		BaseURL: baseURL,
-	}
-
-	if len(config.Headers) > 0 {
-		headers := make(http.Header, len(config.Headers))
-		for key, value := range config.Headers {
-			headers.Set(key, value)
-		}
-		clientConfig.Headers = headers
-	}
-
-	if config.Timeout > 0 {
-		clientConfig.Timeout = time.Duration(config.Timeout) * time.Second
+		BaseURL:          baseURL,
+		Headers:          config.Headers,
+		Timeout:          config.Timeout,
+		MaxResponseBytes: config.MaxResponseBytes,
 	}
 
 	if len(config.Middlewares) > 0 {
 		clientConfig.Middlewares = config.Middlewares
 	} else {
-		clientConfig.Middlewares = []middleware.Middleware{
-			middleware.WithUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"),
-			middleware.WithPerHostRateLimit(5, 10),
-		}
+		clientConfig.Middlewares = DefaultMiddlewares()
 	}
 
 	return &Client{

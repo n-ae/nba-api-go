@@ -22,7 +22,7 @@ func (h *StatsHandler) handlePlayByPlayV2(w http.ResponseWriter, r *http.Request
 
 	resp, err := endpoints.GetPlayByPlayV2(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -46,7 +46,7 @@ func (h *StatsHandler) handleShotChartDetail(w http.ResponseWriter, r *http.Requ
 
 	resp, err := endpoints.GetShotChartDetail(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -67,7 +67,7 @@ func (h *StatsHandler) handleGameRotation(w http.ResponseWriter, r *http.Request
 
 	resp, err := endpoints.GetGameRotation(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -89,7 +89,7 @@ func (h *StatsHandler) handleWinProbabilityPBP(w http.ResponseWriter, r *http.Re
 
 	resp, err := endpoints.GetWinProbabilityPBP(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -111,7 +111,7 @@ func (h *StatsHandler) handleVideoEvents(w http.ResponseWriter, r *http.Request)
 
 	resp, err := endpoints.GetVideoEvents(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -141,7 +141,7 @@ func (h *StatsHandler) handlePlayByPlayV3(w http.ResponseWriter, r *http.Request
 
 	resp, err := endpoints.GetPlayByPlayV3(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -174,7 +174,7 @@ func (h *StatsHandler) handleShotChartLineupDetail(w http.ResponseWriter, r *htt
 
 	resp, err := endpoints.GetShotChartLineupDetail(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 

@@ -20,7 +20,7 @@ func (h *StatsHandler) handleLeagueStandings(w http.ResponseWriter, r *http.Requ
 
 	resp, err := endpoints.GetLeagueStandings(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -41,7 +41,7 @@ func (h *StatsHandler) handleLeagueLeaders(w http.ResponseWriter, r *http.Reques
 
 	resp, err := endpoints.LeagueLeaders(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -63,7 +63,7 @@ func (h *StatsHandler) handleLeagueDashTeamStats(w http.ResponseWriter, r *http.
 
 	resp, err := endpoints.GetLeagueDashTeamStats(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -85,7 +85,7 @@ func (h *StatsHandler) handleLeagueDashPlayerStats(w http.ResponseWriter, r *htt
 
 	resp, err := endpoints.GetLeagueDashPlayerStats(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -107,7 +107,7 @@ func (h *StatsHandler) handleLeagueGameLog(w http.ResponseWriter, r *http.Reques
 
 	resp, err := endpoints.GetLeagueGameLog(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -130,7 +130,7 @@ func (h *StatsHandler) handleLeagueDashLineups(w http.ResponseWriter, r *http.Re
 
 	resp, err := endpoints.GetLeagueDashLineups(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -153,7 +153,7 @@ func (h *StatsHandler) handleLeagueDashPlayerClutch(w http.ResponseWriter, r *ht
 
 	resp, err := endpoints.GetLeagueDashPlayerClutch(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -174,7 +174,7 @@ func (h *StatsHandler) handleLeagueDashTeamClutch(w http.ResponseWriter, r *http
 
 	resp, err := endpoints.GetLeagueDashTeamClutch(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -193,7 +193,7 @@ func (h *StatsHandler) handleLeagueDashPlayerBioStats(w http.ResponseWriter, r *
 
 	resp, err := endpoints.GetLeagueDashPlayerBioStats(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -212,7 +212,7 @@ func (h *StatsHandler) handleLeagueDashTeamBioStats(w http.ResponseWriter, r *ht
 
 	resp, err := endpoints.GetLeagueDashTeamBioStats(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -233,7 +233,7 @@ func (h *StatsHandler) handleLeagueDashPtStats(w http.ResponseWriter, r *http.Re
 
 	resp, err := endpoints.GetLeagueDashPtStats(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -254,7 +254,7 @@ func (h *StatsHandler) handleLeagueHustleStatsPlayer(w http.ResponseWriter, r *h
 
 	resp, err := endpoints.GetLeagueHustleStatsPlayer(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -275,7 +275,7 @@ func (h *StatsHandler) handleLeagueHustleStatsTeam(w http.ResponseWriter, r *htt
 
 	resp, err := endpoints.GetLeagueHustleStatsTeam(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -296,7 +296,7 @@ func (h *StatsHandler) handleLeagueDashPtDefend(w http.ResponseWriter, r *http.R
 
 	resp, err := endpoints.GetLeagueDashPtDefend(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -315,7 +315,7 @@ func (h *StatsHandler) handleLeagueGameFinder(w http.ResponseWriter, r *http.Req
 
 	resp, err := endpoints.GetLeagueGameFinder(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -332,7 +332,7 @@ func (h *StatsHandler) handleLeagueStandingsV3(w http.ResponseWriter, r *http.Re
 
 	resp, err := endpoints.GetLeagueStandingsV3(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -355,7 +355,7 @@ func (h *StatsHandler) handleLeagueDashPlayerShotLocations(w http.ResponseWriter
 
 	resp, err := endpoints.GetLeagueDashPlayerShotLocations(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -376,7 +376,7 @@ func (h *StatsHandler) handleLeagueDashTeamShotLocations(w http.ResponseWriter, 
 
 	resp, err := endpoints.GetLeagueDashTeamShotLocations(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -395,7 +395,7 @@ func (h *StatsHandler) handleLeagueSeasonMatchups(w http.ResponseWriter, r *http
 
 	resp, err := endpoints.GetLeagueSeasonMatchups(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -416,7 +416,7 @@ func (h *StatsHandler) handleLeagueDashPtTeamDefend(w http.ResponseWriter, r *ht
 
 	resp, err := endpoints.GetLeagueDashPtTeamDefend(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -439,7 +439,7 @@ func (h *StatsHandler) handleLeagueDashPlayerPtShot(w http.ResponseWriter, r *ht
 
 	resp, err := endpoints.GetLeagueDashPlayerPtShot(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -460,7 +460,7 @@ func (h *StatsHandler) handleLeagueDashTeamPtShot(w http.ResponseWriter, r *http
 
 	resp, err := endpoints.GetLeagueDashTeamPtShot(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -483,7 +483,7 @@ func (h *StatsHandler) handleLeagueDashOppPtShot(w http.ResponseWriter, r *http.
 
 	resp, err := endpoints.GetLeagueDashOppPtShot(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -506,7 +506,7 @@ func (h *StatsHandler) handleLeagueLeadersV2(w http.ResponseWriter, r *http.Requ
 
 	resp, err := endpoints.GetLeagueLeadersV2(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -527,7 +527,7 @@ func (h *StatsHandler) handleLeaguePlayerOnDetails(w http.ResponseWriter, r *htt
 
 	resp, err := endpoints.GetLeaguePlayerOnDetails(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -548,7 +548,7 @@ func (h *StatsHandler) handleLeagueHustleStatsTeamLeaders(w http.ResponseWriter,
 
 	resp, err := endpoints.GetLeagueHustleStatsTeamLeaders(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -572,7 +572,7 @@ func (h *StatsHandler) handleLeagueDashPlayerClutchV2(w http.ResponseWriter, r *
 
 	resp, err := endpoints.GetLeagueDashPlayerClutchV2(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -594,7 +594,7 @@ func (h *StatsHandler) handleLeagueDashPlayerShotLocationV2(w http.ResponseWrite
 
 	resp, err := endpoints.GetLeagueDashPlayerShotLocationV2(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -616,7 +616,7 @@ func (h *StatsHandler) handleLeagueDashTeamClutchV2(w http.ResponseWriter, r *ht
 
 	resp, err := endpoints.GetLeagueDashTeamClutchV2(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -653,7 +653,7 @@ func (h *StatsHandler) handleInternationalBroadcasterSchedule(w http.ResponseWri
 
 	resp, err := endpoints.GetInternationalBroadcasterSchedule(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 

@@ -2,9 +2,11 @@ package middleware
 
 import (
 	"context"
+	"errors"
 	"math"
 	"math/rand"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -37,20 +39,34 @@ func WithRetry(config RetryConfig) Middleware {
 		return RoundTripperFunc(func(ctx context.Context, req *http.Request) (*http.Response, error) {
 			var resp *http.Response
 			var err error
+			// retryAfter carries a server-specified delay from the previous
+			// attempt's response into the next attempt's wait, taking
+			// priority over the calculated exponential backoff.
+			var retryAfter time.Duration
 
 			for attempt := 0; attempt <= config.MaxRetries; attempt++ {
 				if attempt > 0 {
-					backoff := calculateBackoff(attempt, config)
+					backoff := retryAfter
+					if backoff <= 0 {
+						backoff = calculateBackoff(attempt, config)
+					}
 					select {
 					case <-time.After(backoff):
 					case <-ctx.Done():
 						return nil, ctx.Err()
 					}
 				}
+				retryAfter = 0
 
 				resp, err = next.RoundTrip(ctx, req)
 
 				if err != nil {
+					// A canceled or expired context means every further
+					// attempt will fail the same way immediately - retrying
+					// just burns through MaxRetries for nothing.
+					if isPermanentTransportError(err) {
+						return nil, err
+					}
 					if attempt < config.MaxRetries {
 						continue
 					}
@@ -60,6 +76,8 @@ func WithRetry(config RetryConfig) Middleware {
 				if !isRetryableStatus(resp.StatusCode, config.RetryableStatus) {
 					return resp, nil
 				}
+
+				retryAfter = parseRetryAfter(resp.Header.Get("Retry-After"), config.MaxBackoff)
 
 				if attempt < config.MaxRetries {
 					//nolint:errcheck
@@ -73,6 +91,46 @@ func WithRetry(config RetryConfig) Middleware {
 			return resp, err
 		})
 	}
+}
+
+func isPermanentTransportError(err error) bool {
+	return errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded)
+}
+
+// parseRetryAfter parses an HTTP Retry-After header value, which per RFC
+// 9110 §10.2.3 is either a non-negative integer number of seconds or an
+// HTTP-date. It returns 0 (meaning "no preference, use the calculated
+// backoff") when header is empty, unparseable, or in the past, and caps
+// the result at maxBackoff so a misbehaving upstream can't stall a caller
+// indefinitely.
+func parseRetryAfter(header string, maxBackoff time.Duration) time.Duration {
+	if header == "" {
+		return 0
+	}
+
+	if seconds, err := strconv.Atoi(header); err == nil {
+		if seconds <= 0 {
+			return 0
+		}
+		delay := time.Duration(seconds) * time.Second
+		if delay > maxBackoff {
+			return maxBackoff
+		}
+		return delay
+	}
+
+	if when, err := http.ParseTime(header); err == nil {
+		delay := time.Until(when)
+		if delay <= 0 {
+			return 0
+		}
+		if delay > maxBackoff {
+			return maxBackoff
+		}
+		return delay
+	}
+
+	return 0
 }
 
 func calculateBackoff(attempt int, config RetryConfig) time.Duration {

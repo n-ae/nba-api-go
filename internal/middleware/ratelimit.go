@@ -8,9 +8,13 @@ import (
 	"golang.org/x/time/rate"
 )
 
+// RateLimiter wraps rate.Limiter, which is already safe for concurrent use
+// on its own - Wait/Allow deliberately do not add a mutex around it. An
+// earlier version serialized every caller through a mutex held across
+// Wait's blocking delay, which head-of-line-blocked unrelated goroutines
+// behind whichever one was currently sleeping.
 type RateLimiter struct {
 	limiter *rate.Limiter
-	mu      sync.Mutex
 }
 
 func NewRateLimiter(requestsPerSecond float64, burst int) *RateLimiter {
@@ -33,14 +37,10 @@ func WithRateLimit(requestsPerSecond float64, burst int) Middleware {
 }
 
 func (rl *RateLimiter) Wait(ctx context.Context) error {
-	rl.mu.Lock()
-	defer rl.mu.Unlock()
 	return rl.limiter.Wait(ctx)
 }
 
 func (rl *RateLimiter) Allow() bool {
-	rl.mu.Lock()
-	defer rl.mu.Unlock()
 	return rl.limiter.Allow()
 }
 

@@ -31,7 +31,7 @@ func TestNewClient_ForwardsHeaders(t *testing.T) {
 
 	c := NewClient(Config{
 		BaseURL: srv.URL,
-		Headers: map[string]string{"X-Test-Header": "hello"},
+		Headers: http.Header{"X-Test-Header": {"hello"}},
 	})
 
 	if _, err := c.client.Get(context.Background(), "test", url.Values{}); err != nil {
@@ -59,7 +59,7 @@ func TestNewClient_ForwardsTimeout(t *testing.T) {
 
 	c := NewClient(Config{
 		BaseURL:     srv.URL,
-		Timeout:     1, // seconds
+		Timeout:     time.Second,
 		Middlewares: []middleware.Middleware{noRetry()},
 	})
 
@@ -72,5 +72,22 @@ func TestNewClient_ForwardsTimeout(t *testing.T) {
 	}
 	if elapsed >= 1500*time.Millisecond {
 		t.Errorf("expected request to abort around the 1s Timeout, took %v (server needed 1.5s)", elapsed)
+	}
+}
+
+func TestNewClient_ForwardsMaxResponseBytes(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(make([]byte, 100))
+	}))
+	defer srv.Close()
+
+	c := NewClient(Config{
+		BaseURL:          srv.URL,
+		MaxResponseBytes: 10,
+	})
+
+	if _, err := c.client.Get(context.Background(), "test", url.Values{}); err == nil {
+		t.Fatal("expected an error for a 100-byte body against a forwarded 10-byte MaxResponseBytes, got nil")
 	}
 }

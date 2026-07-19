@@ -19,7 +19,7 @@ func (h *StatsHandler) handleBoxScoreSummaryV2(w http.ResponseWriter, r *http.Re
 
 	resp, err := endpoints.GetBoxScoreSummaryV2(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -41,7 +41,7 @@ func (h *StatsHandler) handleBoxScoreTraditionalV2(w http.ResponseWriter, r *htt
 
 	resp, err := endpoints.GetBoxScoreTraditionalV2(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -63,7 +63,7 @@ func (h *StatsHandler) handleBoxScoreAdvancedV2(w http.ResponseWriter, r *http.R
 
 	resp, err := endpoints.GetBoxScoreAdvancedV2(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -85,7 +85,7 @@ func (h *StatsHandler) handleBoxScoreScoringV2(w http.ResponseWriter, r *http.Re
 
 	resp, err := endpoints.GetBoxScoreScoringV2(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -107,7 +107,7 @@ func (h *StatsHandler) handleBoxScoreMiscV2(w http.ResponseWriter, r *http.Reque
 
 	resp, err := endpoints.GetBoxScoreMiscV2(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -129,7 +129,7 @@ func (h *StatsHandler) handleBoxScoreUsageV2(w http.ResponseWriter, r *http.Requ
 
 	resp, err := endpoints.GetBoxScoreUsageV2(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -151,7 +151,7 @@ func (h *StatsHandler) handleBoxScoreFourFactorsV2(w http.ResponseWriter, r *htt
 
 	resp, err := endpoints.GetBoxScoreFourFactorsV2(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -171,7 +171,7 @@ func (h *StatsHandler) handleBoxScorePlayerTrackV2(w http.ResponseWriter, r *htt
 
 	resp, err := endpoints.GetBoxScorePlayerTrackV2(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -195,7 +195,7 @@ func (h *StatsHandler) handleBoxScoreDefensiveV2(w http.ResponseWriter, r *http.
 
 	resp, err := endpoints.GetBoxScoreDefensiveV2(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -215,7 +215,7 @@ func (h *StatsHandler) handleBoxScoreHustleV2(w http.ResponseWriter, r *http.Req
 
 	resp, err := endpoints.GetBoxScoreHustleV2(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 
@@ -247,7 +247,7 @@ func (h *StatsHandler) handleBoxScoreMatchupsV3(w http.ResponseWriter, r *http.R
 
 	resp, err := endpoints.GetBoxScoreMatchupsV3(r.Context(), h.client, req)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "api_error", err.Error())
+		writeEndpointError(w, err)
 		return
 	}
 

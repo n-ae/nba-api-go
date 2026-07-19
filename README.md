@@ -270,33 +270,44 @@ The library is organized into the following packages:
 
 ### Middleware
 
-The client supports composable middleware for cross-cutting concerns.
-
-> **Note:** `internal/middleware` is a Go `internal` package, so the example
-> below only compiles for code living inside this module (e.g. its own
-> `examples/`) — it is **not importable from an external `go get` consumer**.
-> Publishing this seam under an importable path (e.g. `pkg/client`) is
-> planned for v1.2.0; see `docs/MAINTAINABILITY_ASSESSMENT_2026-07-19.md`.
+The client supports composable middleware for cross-cutting concerns. The
+seam itself — `client.Middleware`, `client.RoundTripper`,
+`client.RoundTripperFunc`, and `client.Chain` — lives in the importable
+`pkg/client` package, so you can write your own middleware without
+depending on anything internal to this module:
 
 ```go
 import (
-    "github.com/n-ae/nba-api-go/internal/middleware"
+    "context"
+    "net/http"
+
     "github.com/n-ae/nba-api-go/pkg/client"
+    "github.com/n-ae/nba-api-go/pkg/stats"
 )
 
-config := client.Config{
-    BaseURL: "https://stats.nba.com/stats",
-    Middlewares: []middleware.Middleware{
-        middleware.WithUserAgent("MyApp/1.0"),
-        middleware.WithReferer("https://www.nba.com/"),
-        middleware.WithPerHostRateLimit(3, 5),
-        middleware.WithRetry(middleware.DefaultRetryConfig()),
-        middleware.WithLogging(nil), // uses default logger
-    },
+// A custom middleware - written entirely with exported types.
+func withRequestID(id string) client.Middleware {
+    return func(next client.RoundTripper) client.RoundTripper {
+        return client.RoundTripperFunc(func(ctx context.Context, req *http.Request) (*http.Response, error) {
+            req.Header.Set("X-Request-ID", id)
+            return next.RoundTrip(ctx, req)
+        })
+    }
 }
 
-client := client.NewClient(config)
+// stats.Config.Middlewares REPLACES the default chain (retry, the headers
+// NBA.com's API expects, and a per-host rate limit) rather than extending
+// it, so use stats.DefaultMiddlewares() as a base if you want those plus
+// your own additions.
+statsClient := stats.NewClient(stats.Config{
+    Middlewares: append(stats.DefaultMiddlewares(), withRequestID("abc123")),
+})
 ```
+
+`pkg/live` has the equivalent `live.DefaultMiddlewares()`. The concrete
+built-in middlewares (retry, per-host rate limiting, the default NBA
+headers) stay internal — write your own via `client.Middleware` for
+anything the defaults don't cover.
 
 ## Static Data
 

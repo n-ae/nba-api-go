@@ -350,6 +350,7 @@ Likely NBA.com made breaking changes:
 
 - **ADR 001**: Go Replication Strategy (why Go, not Python port)
 - **ADR 002**: HTTP API Server Architecture (stdlib-only design)
+- **ADR 003**: HTTP Transport Policy (why the default transport clones `http.DefaultTransport` with keep-alives enabled)
 
 ### When to Create New ADR
 

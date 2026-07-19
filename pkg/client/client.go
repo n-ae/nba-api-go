@@ -11,13 +11,18 @@ import (
 	"sort"
 	"time"
 
-	"github.com/n-ae/nba-api-go/internal/middleware"
 	"github.com/n-ae/nba-api-go/pkg/models"
 )
 
 const (
 	DefaultUserAgent = "nba-api-go/1.0"
 	DefaultTimeout   = 30 * time.Second
+
+	// DefaultMaxResponseBytes bounds how much of a response body Get reads
+	// into memory. NBA.com responses are ordinarily well under this, but
+	// an upstream failure, proxy error page, or an unexpectedly large
+	// endpoint could otherwise consume unbounded memory.
+	DefaultMaxResponseBytes int64 = 50 * 1024 * 1024 // 50 MiB
 )
 
 type HTTPClient interface {
@@ -25,11 +30,12 @@ type HTTPClient interface {
 }
 
 type Client struct {
-	baseURL    string
-	httpClient HTTPClient
-	headers    http.Header
-	timeout    time.Duration
-	transport  middleware.RoundTripper
+	baseURL          string
+	httpClient       HTTPClient
+	headers          http.Header
+	timeout          time.Duration
+	transport        RoundTripper
+	maxResponseBytes int64
 }
 
 type Config struct {
@@ -37,7 +43,10 @@ type Config struct {
 	HTTPClient  HTTPClient
 	Headers     http.Header
 	Timeout     time.Duration
-	Middlewares []middleware.Middleware
+	Middlewares []Middleware
+	// MaxResponseBytes bounds how much of a response body Get reads into
+	// memory; a value <= 0 means DefaultMaxResponseBytes.
+	MaxResponseBytes int64
 }
 
 func NewClient(config Config) *Client {
@@ -45,14 +54,32 @@ func NewClient(config Config) *Client {
 		config.Timeout = DefaultTimeout
 	}
 
+	if config.MaxResponseBytes <= 0 {
+		config.MaxResponseBytes = DefaultMaxResponseBytes
+	}
+
 	if config.HTTPClient == nil {
-		transport := &http.Transport{
-			DisableKeepAlives:     true,
-			MaxIdleConns:          1,
-			IdleConnTimeout:       30 * time.Second,
-			TLSHandshakeTimeout:   30 * time.Second,
-			ResponseHeaderTimeout: 60 * time.Second,
+		// Clone http.DefaultTransport rather than building one from a
+		// mostly zero-valued struct, so proxy support
+		// (Proxy: ProxyFromEnvironment), HTTP/2 negotiation, and sane
+		// connect timeouts aren't silently lost. This also re-enables
+		// keep-alives, which a previous version of this transport
+		// unconditionally disabled with no recorded rationale - see
+		// ADR 003 for the full analysis and the conditions under which
+		// that decision should be revisited.
+		defaultTransport, ok := http.DefaultTransport.(*http.Transport)
+		if !ok {
+			// Practically unreachable: http.DefaultTransport is always
+			// *http.Transport unless something replaced the package-level
+			// var. Fail loudly rather than risk Clone on a nil transport.
+			panic("client: http.DefaultTransport is not *http.Transport")
 		}
+		transport := defaultTransport.Clone()
+		// NBA.com/Akamai's handshake and response times run slower than
+		// most sites; give both more headroom than the stdlib defaults
+		// (10s and unset, respectively).
+		transport.TLSHandshakeTimeout = 30 * time.Second
+		transport.ResponseHeaderTimeout = 60 * time.Second
 
 		config.HTTPClient = &http.Client{
 			Timeout:   config.Timeout,
@@ -70,18 +97,19 @@ func NewClient(config Config) *Client {
 
 	baseTransport := &baseRoundTripper{client: config.HTTPClient}
 
-	var transport middleware.RoundTripper = baseTransport
+	var transport RoundTripper = baseTransport
 	if len(config.Middlewares) > 0 {
-		chained := middleware.Chain(config.Middlewares...)
+		chained := Chain(config.Middlewares...)
 		transport = chained(baseTransport)
 	}
 
 	return &Client{
-		baseURL:    config.BaseURL,
-		httpClient: config.HTTPClient,
-		headers:    config.Headers,
-		timeout:    config.Timeout,
-		transport:  transport,
+		baseURL:          config.BaseURL,
+		httpClient:       config.HTTPClient,
+		headers:          config.Headers,
+		timeout:          config.Timeout,
+		transport:        transport,
+		maxResponseBytes: config.MaxResponseBytes,
 	}
 }
 
@@ -118,13 +146,20 @@ func (c *Client) Get(ctx context.Context, endpoint string, params url.Values) (*
 	//nolint:errcheck
 	defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
+	// Read one byte past the limit so a body that's exactly at the limit
+	// (allowed) can be told apart from one that's larger (rejected)
+	// without needing a second read.
+	limited := io.LimitReader(resp.Body, c.maxResponseBytes+1)
+	body, err := io.ReadAll(limited)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read response body: %w", err)
 	}
+	if int64(len(body)) > c.maxResponseBytes {
+		return nil, fmt.Errorf("%w: %d bytes", models.ErrResponseTooLarge, c.maxResponseBytes)
+	}
 
 	if resp.StatusCode >= 400 {
-		if apiErr := models.HTTPStatusToError(resp.StatusCode, reqURL); apiErr != nil {
+		if apiErr := models.HTTPStatusToError(resp.StatusCode, reqURL, body); apiErr != nil {
 			return nil, apiErr
 		}
 	}
@@ -184,6 +219,14 @@ func (c *Client) AddHeader(key, value string) {
 	c.headers.Add(key, value)
 }
 
+// SetHeaders replaces the client's headers with a copy of headers. It
+// clones rather than aliasing the caller's map so that later mutations to
+// the map the caller passed in (or to c.headers via SetHeader/AddHeader)
+// can't reach into each other unexpectedly.
 func (c *Client) SetHeaders(headers http.Header) {
-	c.headers = headers
+	cloned := make(http.Header, len(headers))
+	for key, values := range headers {
+		cloned[key] = append([]string(nil), values...)
+	}
+	c.headers = cloned
 }

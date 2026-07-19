@@ -2,10 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"strings"
 
+	"github.com/n-ae/nba-api-go/pkg/models"
 	"github.com/n-ae/nba-api-go/pkg/stats"
 	"github.com/n-ae/nba-api-go/pkg/stats/parameters"
 )
@@ -378,6 +380,22 @@ func seasonPtr(s parameters.Season) *parameters.Season {
 
 func seasonTypePtr(st parameters.SeasonType) *parameters.SeasonType {
 	return &st
+}
+
+// writeEndpointError writes an error response for a failed SDK/endpoint
+// call. If err is (or wraps) a *models.APIError - meaning NBA.com actually
+// responded, just with a non-2xx status - the response reuses that same
+// status code, so e.g. an upstream 404 reads as 404 here instead of a
+// misleading blanket 500. Anything else (network failures, decode errors,
+// a canceled context, ...) falls back to 500, since those represent
+// something going wrong on our side rather than a clean upstream response.
+func writeEndpointError(w http.ResponseWriter, err error) {
+	var apiErr *models.APIError
+	if errors.As(err, &apiErr) && apiErr.StatusCode > 0 {
+		writeError(w, apiErr.StatusCode, "api_error", err.Error())
+		return
+	}
+	writeError(w, http.StatusInternalServerError, "api_error", err.Error())
 }
 
 func writeSuccess(w http.ResponseWriter, data interface{}) {

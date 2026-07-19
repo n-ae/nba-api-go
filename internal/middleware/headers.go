@@ -5,12 +5,23 @@ import (
 	"net/http"
 )
 
+// WithHeaders applies headers to every request. The first value for each
+// key replaces whatever is already on the request (via Header.Set);
+// remaining values for that same key, if headers itself specifies more
+// than one, are appended with Header.Add. Using Set for the first value
+// matters because retry middleware reuses the same *http.Request across
+// attempts - if every value were applied with Add, each retry would pile
+// another copy of these headers onto the ones the previous attempt added.
 func WithHeaders(headers http.Header) Middleware {
 	return func(next RoundTripper) RoundTripper {
 		return RoundTripperFunc(func(ctx context.Context, req *http.Request) (*http.Response, error) {
 			for key, values := range headers {
-				for _, value := range values {
-					req.Header.Add(key, value)
+				for i, value := range values {
+					if i == 0 {
+						req.Header.Set(key, value)
+					} else {
+						req.Header.Add(key, value)
+					}
 				}
 			}
 			return next.RoundTrip(ctx, req)
