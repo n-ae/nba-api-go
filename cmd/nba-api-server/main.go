@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/n-ae/nba-api-go/pkg/stats"
-	"github.com/n-ae/nba-api-go/pkg/stats/endpoints"
 )
 
 const version = "1.1.7"
@@ -31,6 +30,9 @@ func main() {
 	logger.Printf("Log level: %s", logLevel)
 
 	server := NewServer(logger)
+
+	healthCtx, cancelHealthCheck := context.WithCancel(context.Background())
+	server.healthChecker.Start(healthCtx, time.Minute)
 
 	srv := &http.Server{
 		Addr:         ":" + port,
@@ -52,6 +54,7 @@ func main() {
 	<-quit
 
 	logger.Println("Shutting down server...")
+	cancelHealthCheck()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -71,21 +74,25 @@ func getEnv(key, defaultValue string) string {
 }
 
 type Server struct {
-	logger       *log.Logger
-	statsHandler *StatsHandler
-	metrics      *Metrics
-	rateLimiter  *RateLimiter
+	logger        *log.Logger
+	statsHandler  *StatsHandler
+	metrics       *Metrics
+	rateLimiter   *RateLimiter
+	healthChecker *HealthChecker
 }
 
 func NewServer(logger *log.Logger) *Server {
 	rateLimiter := NewRateLimiter(100, 200)
 	rateLimiter.CleanupOldLimiters(5 * time.Minute)
 
+	statsClient := stats.NewDefaultClient()
+
 	return &Server{
-		logger:       logger,
-		statsHandler: NewStatsHandler(),
-		metrics:      NewMetrics(),
-		rateLimiter:  rateLimiter,
+		logger:        logger,
+		statsHandler:  NewStatsHandler(statsClient),
+		metrics:       NewMetrics(),
+		rateLimiter:   rateLimiter,
+		healthChecker: NewHealthChecker(statsClient),
 	}
 }
 
@@ -93,6 +100,7 @@ func (s *Server) Routes() http.Handler {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/health", s.handleHealth())
+	mux.HandleFunc("/readyz", s.handleReadyz())
 	mux.HandleFunc("/metrics", s.handleMetrics())
 	mux.Handle("/api/v1/stats/", s.statsHandler)
 
@@ -156,7 +164,12 @@ func (s *Server) handleHealth() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		nbaAPIStatus := s.checkNBAAPI()
+		// /health is a local liveness check: it reports whether this
+		// process is up and always answers 200, reading the upstream
+		// status from the HealthChecker's cache rather than making a
+		// live NBA.com request per probe. Use /readyz if you need a
+		// probe that fails when the upstream dependency is degraded.
+		nbaAPIStatus := s.healthChecker.Status()
 
 		resp := healthResponse{
 			Status:  "healthy",
@@ -166,9 +179,17 @@ func (s *Server) handleHealth() http.HandlerFunc {
 				"build_time": buildTime,
 				"git_commit": gitCommit,
 			},
+			// sdk_total: distinct endpoint functions in pkg/stats/endpoints
+			// (143 files minus the 2 shared helpers, dates.go and types.go).
+			// http_exposed: distinct case labels in the StatsHandler switch
+			// below; one of them ("playertrackingshotdashboard") is a legacy
+			// alias that reaches the same SDK endpoint as
+			// "playertrackingshootingefficiency", so http_exposed is one
+			// higher than sdk_total rather than equal to it. Verified
+			// 2026-07-19 - see docs/MAINTAINABILITY_ASSESSMENT_2026-07-19.md.
 			EndpointsCount: map[string]int{
-				"sdk_total":    140,
-				"http_exposed": 149,
+				"sdk_total":    141,
+				"http_exposed": 142,
 			},
 			Dependencies: map[string]string{
 				"nba_api": "stats.nba.com",
@@ -197,22 +218,37 @@ func (s *Server) handleMetrics() http.HandlerFunc {
 	}
 }
 
-func (s *Server) checkNBAAPI() string {
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-
-	client := stats.NewDefaultClient()
-
-	req := endpoints.CommonAllPlayersRequest{
-		Season: "2023-24",
+// handleReadyz reports whether this instance can currently serve NBA data.
+// Unlike /health it can return a non-200 status: 503 when the cached
+// upstream status is degraded, so a load balancer or orchestrator can stop
+// routing traffic here without restarting the process. A status of
+// nbaAPIStatusUnknown (no background probe has completed yet) counts as
+// ready, so readiness doesn't fail during the brief window after startup.
+func (s *Server) handleReadyz() http.HandlerFunc {
+	type readyzResponse struct {
+		Ready        bool   `json:"ready"`
+		NBAAPIStatus string `json:"nba_api_status"`
 	}
 
-	_, err := endpoints.GetCommonAllPlayers(ctx, client, req)
-	if err != nil {
-		return "degraded"
-	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		nbaAPIStatus := s.healthChecker.Status()
+		ready := nbaAPIStatus != nbaAPIStatusDegraded
 
-	return "operational"
+		resp := readyzResponse{
+			Ready:        ready,
+			NBAAPIStatus: nbaAPIStatus,
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		if ready {
+			w.WriteHeader(http.StatusOK)
+		} else {
+			w.WriteHeader(http.StatusServiceUnavailable)
+		}
+		if err := json.NewEncoder(w).Encode(resp); err != nil {
+			log.Printf("Error encoding readyz response: %v", err)
+		}
+	}
 }
 
 func writeError(w http.ResponseWriter, status int, code, message string) {

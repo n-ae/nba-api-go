@@ -34,12 +34,18 @@ curl http://localhost:8080/api/v1/stats/playergamelog?PlayerID=2544&Season=2023-
 ### Option A: Docker/Podman (Recommended)
 
 ```bash
-# Using podman
-podman build -t nba-api-go -f Containerfile .
+# Using podman (pass the git commit/build time so /health reports them)
+podman build \
+  --build-arg GIT_COMMIT=$(git rev-parse --short HEAD) \
+  --build-arg BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) \
+  -t nba-api-go -f Containerfile .
 podman run -p 8080:8080 nba-api-go
 
 # Using docker
-docker build -t nba-api-go -f Containerfile .
+docker build \
+  --build-arg GIT_COMMIT=$(git rev-parse --short HEAD) \
+  --build-arg BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) \
+  -t nba-api-go -f Containerfile .
 docker run -p 8080:8080 nba-api-go
 
 # Using docker-compose/podman-compose
@@ -65,6 +71,8 @@ PORT=3000 ./nba-api-server
 
 ### Health Check
 
+`/health` is a **liveness** check: it always returns `200` with `status: "healthy"` as long as the process is up. It never makes a live call to NBA.com — `nba_api_status` reflects the result of the last background probe (run roughly once a minute) rather than checking upstream on every request.
+
 ```bash
 GET /health
 ```
@@ -73,8 +81,45 @@ GET /health
 ```json
 {
   "status": "healthy",
-  "version": "0.1.0",
-  "endpoints_count": 79
+  "version": "1.1.7",
+  "build_info": {
+    "go_version": "go1.26.5",
+    "build_time": "2026-07-19T00:05:57Z",
+    "git_commit": "92fd36f"
+  },
+  "endpoints_count": {
+    "sdk_total": 141,
+    "http_exposed": 142
+  },
+  "dependencies": {
+    "nba_api": "stats.nba.com"
+  },
+  "nba_api_status": "operational",
+  "timestamp": 1784505600
+}
+```
+
+### Readiness Check
+
+`/readyz` is a **readiness** check: unlike `/health`, it returns `503` when the cached upstream status is `degraded`, so a load balancer or orchestrator can stop routing traffic here without restarting the process. Point your orchestrator's readiness probe at this endpoint, not `/health`.
+
+```bash
+GET /readyz
+```
+
+**Response (ready):**
+```json
+{
+  "ready": true,
+  "nba_api_status": "operational"
+}
+```
+
+**Response (not ready — HTTP 503):**
+```json
+{
+  "ready": false,
+  "nba_api_status": "degraded"
 }
 ```
 
@@ -544,7 +589,10 @@ PORT=3000 ./nba-api-server
 pwd  # Should show .../nba-api-go
 
 # Use podman instead of docker (if on Linux)
-podman build -t nba-api-go -f Containerfile .
+podman build \
+  --build-arg GIT_COMMIT=$(git rev-parse --short HEAD) \
+  --build-arg BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) \
+  -t nba-api-go -f Containerfile .
 ```
 
 ### API returns 500 errors

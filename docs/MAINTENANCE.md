@@ -327,8 +327,8 @@ ls -lh pkg/stats/static/data/
    - Alert if p95 >2 seconds
 
 3. **Health Check**
-   - `/health` should always return 200
-   - Alert if down for >1 minute
+   - `/health` is liveness: it always returns 200 while the process is up (it never calls NBA.com per request). Alert only if it stops responding at all — that means the process/container is down, not that NBA.com is degraded.
+   - `/readyz` is readiness: it returns 503 when the cached upstream status (`nba_api_status`, refreshed roughly once a minute) is `degraded`. Point your orchestrator's readiness probe and "is NBA.com reachable" alerting at `/readyz`, not `/health`.
 
 4. **Dependency Vulnerabilities**
    - Enable GitHub Dependabot
@@ -353,15 +353,16 @@ ls -lh pkg/stats/static/data/
 **Response Time**: <15 minutes
 
 ```bash
-# 1. Check health endpoint
-curl https://your-domain.com/health
+# 1. Check liveness (process up?) and readiness (NBA.com reachable?) separately
+curl https://your-domain.com/health   # always 200 if the process is up
+curl https://your-domain.com/readyz   # 503 if nba_api_status is degraded
 
 # 2. Check logs
 kubectl logs deployment/nba-api  # or
 journalctl -u nba-api -n 100
 
 # 3. Common causes:
-#    - NBA.com is down (check status.nba.com)
+#    - NBA.com is down (check status.nba.com) - /readyz will show 503/degraded
 #    - Rate limited (wait 5 minutes)
 #    - Out of memory (check pod/container limits)
 #    - Certificate expired (renew SSL cert)

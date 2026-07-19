@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide helps you migrate from the Python [nba_api](https://github.com/swar/nba_api) library to the Go `nba-api-go` library. The Go library provides **100% feature parity** with all 139 endpoints available.
+This guide helps you migrate from the Python [nba_api](https://github.com/swar/nba_api) library to the Go `nba-api-go` library. The Go library provides **100% feature parity** with all 141 endpoints available.
 
 ## Why Migrate?
 
@@ -15,7 +15,7 @@ This guide helps you migrate from the Python [nba_api](https://github.com/swar/n
 
 ### HTTP API Benefits
 - **Language Agnostic**: Use from Python, JavaScript, Ruby, etc.
-- **100% Coverage**: All 139 endpoints available via REST
+- **100% Coverage**: All 141 endpoints available via REST
 - **Easy Integration**: Simple HTTP requests, no Go required
 - **Containerized**: Docker/Podman ready
 
@@ -868,12 +868,12 @@ func fetchMultiplePlayers(playerIDs []string) []Result {
 
 | Feature | Python nba_api | Go nba-api-go |
 |---------|---------------|---------------|
-| Endpoint Coverage | 139 endpoints | ✅ 139 endpoints (100%) |
+| Endpoint Coverage | 139 endpoints | ✅ 141 endpoints (100%) |
 | Type Safety | ❌ Runtime | ✅ Compile-time |
 | Performance | Baseline | 10-100x faster |
 | Memory Usage | Baseline | 3-5x lower |
 | Concurrency | Threading | Native goroutines |
-| HTTP API | ❌ No | ✅ Yes (all 139 endpoints) |
+| HTTP API | ❌ No | ✅ Yes (all 141 endpoints) |
 | Docker Ready | ❌ No | ✅ Yes |
 | Static Data | ✅ Yes | ✅ Yes |
 | Documentation | ✅ Excellent | ✅ Complete |
@@ -884,4 +884,4 @@ func fetchMultiplePlayers(playerIDs []string) []Result {
 
 **Last Updated:** November 2, 2025  
 **Go Library Version:** 1.0.0  
-**Coverage:** 100% (139/139 endpoints)
+**Coverage:** 100% (141/141 endpoints)

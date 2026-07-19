@@ -14,9 +14,13 @@ type StatsHandler struct {
 	client *stats.Client
 }
 
-func NewStatsHandler() *StatsHandler {
+// NewStatsHandler wraps an existing stats.Client. Callers share one client
+// across the handler and any other consumer (e.g. the health checker) so
+// they share its connection pool and per-host rate limiter instead of each
+// constructing their own.
+func NewStatsHandler(client *stats.Client) *StatsHandler {
 	return &StatsHandler{
-		client: stats.NewDefaultClient(),
+		client: client,
 	}
 }
 

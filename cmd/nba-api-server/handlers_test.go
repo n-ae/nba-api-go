@@ -7,8 +7,16 @@ import (
 	"net/http/httptest"
 	"os"
 	"testing"
+
+	"github.com/n-ae/nba-api-go/pkg/stats"
 )
 
+// TestHealthEndpoint is fully offline: NewServer constructs a
+// HealthChecker but never calls Start on it, so handleHealth reads the
+// checker's initial cached value instead of making a live NBA.com
+// request. That's deliberate - constructing a Server must never touch the
+// network, or every test in this package that builds one would depend on
+// NBA.com being reachable.
 func TestHealthEndpoint(t *testing.T) {
 	logger := log.New(os.Stdout, "[test] ", log.LstdFlags)
 	server := NewServer(logger)
@@ -45,12 +53,69 @@ func TestHealthEndpoint(t *testing.T) {
 
 	if nbaAPIStatus, ok := response["nba_api_status"].(string); !ok {
 		t.Error("expected nba_api_status to be present")
-	} else if nbaAPIStatus != "operational" && nbaAPIStatus != "degraded" {
-		t.Errorf("expected nba_api_status to be 'operational' or 'degraded', got %s", nbaAPIStatus)
+	} else if nbaAPIStatus != nbaAPIStatusUnknown && nbaAPIStatus != nbaAPIStatusOperational && nbaAPIStatus != nbaAPIStatusDegraded {
+		t.Errorf("expected nba_api_status to be one of unknown/operational/degraded, got %s", nbaAPIStatus)
+	}
+
+	// /health must always answer 200 with status=healthy even when the
+	// cached upstream status is degraded - that's the whole point of
+	// separating liveness from readiness.
+	server.healthChecker.status.Store(nbaAPIStatusDegraded)
+	w2 := httptest.NewRecorder()
+	server.handleHealth()(w2, httptest.NewRequest(http.MethodGet, "/health", nil))
+	if w2.Code != http.StatusOK {
+		t.Errorf("expected /health to stay 200 while degraded, got %d", w2.Code)
 	}
 
 	if timestamp, ok := response["timestamp"].(float64); !ok || timestamp == 0 {
 		t.Error("expected timestamp to be set")
+	}
+}
+
+// TestReadyzEndpoint drives the cached status directly rather than
+// depending on a live NBA.com call, so it is deterministic and offline.
+func TestReadyzEndpoint(t *testing.T) {
+	logger := log.New(os.Stdout, "[test] ", log.LstdFlags)
+	server := NewServer(logger)
+
+	cases := []struct {
+		name      string
+		status    string
+		wantCode  int
+		wantReady bool
+	}{
+		{"unknown counts as ready", nbaAPIStatusUnknown, http.StatusOK, true},
+		{"operational is ready", nbaAPIStatusOperational, http.StatusOK, true},
+		{"degraded is not ready", nbaAPIStatusDegraded, http.StatusServiceUnavailable, false},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			server.healthChecker.status.Store(tc.status)
+
+			req := httptest.NewRequest(http.MethodGet, "/readyz", nil)
+			w := httptest.NewRecorder()
+			server.handleReadyz()(w, req)
+
+			if w.Code != tc.wantCode {
+				t.Errorf("expected status %d, got %d", tc.wantCode, w.Code)
+			}
+
+			var response struct {
+				Ready        bool   `json:"ready"`
+				NBAAPIStatus string `json:"nba_api_status"`
+			}
+			if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+				t.Fatalf("failed to decode response: %v", err)
+			}
+
+			if response.Ready != tc.wantReady {
+				t.Errorf("expected ready=%v, got %v", tc.wantReady, response.Ready)
+			}
+			if response.NBAAPIStatus != tc.status {
+				t.Errorf("expected nba_api_status=%s, got %s", tc.status, response.NBAAPIStatus)
+			}
+		})
 	}
 }
 
@@ -110,6 +175,12 @@ func TestServerRoutes(t *testing.T) {
 			method:         http.MethodGet,
 			path:           "/health",
 			expectedStatus: http.StatusOK,
+		},
+		{
+			name:           "readyz endpoint",
+			method:         http.MethodGet,
+			path:           "/readyz",
+			expectedStatus: http.StatusOK, // no probe has run yet: nbaAPIStatusUnknown counts as ready
 		},
 		{
 			name:           "unknown endpoint",
@@ -186,7 +257,7 @@ func TestLoggingMiddleware(t *testing.T) {
 }
 
 func TestStatsHandlerMethodNotAllowed(t *testing.T) {
-	handler := NewStatsHandler()
+	handler := NewStatsHandler(stats.NewDefaultClient())
 
 	req := httptest.NewRequest(http.MethodPost, "/api/v1/stats/playergamelog", nil)
 	w := httptest.NewRecorder()
@@ -208,7 +279,7 @@ func TestStatsHandlerMethodNotAllowed(t *testing.T) {
 }
 
 func TestStatsHandlerInvalidEndpoint(t *testing.T) {
-	handler := NewStatsHandler()
+	handler := NewStatsHandler(stats.NewDefaultClient())
 
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/stats/nonexistent", nil)
 	w := httptest.NewRecorder()
@@ -309,7 +380,7 @@ func TestMetricsTracking(t *testing.T) {
 }
 
 func TestInternationalBroadcasterScheduleEndpoint_MissingSeason(t *testing.T) {
-	handler := NewStatsHandler()
+	handler := NewStatsHandler(stats.NewDefaultClient())
 
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/stats/internationalbroadcasterschedule", nil)
 	w := httptest.NewRecorder()
@@ -345,7 +416,7 @@ func TestInternationalBroadcasterScheduleEndpoint_ValidRequest(t *testing.T) {
 		t.Skip("Skipping integration test (set INTEGRATION_TESTS=1 to run)")
 	}
 
-	handler := NewStatsHandler()
+	handler := NewStatsHandler(stats.NewDefaultClient())
 
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/stats/internationalbroadcasterschedule?LeagueID=00&Season=2025", nil)
 	w := httptest.NewRecorder()
@@ -373,7 +444,7 @@ func TestInternationalBroadcasterScheduleEndpoint_WithOptionalParams(t *testing.
 		t.Skip("Skipping integration test (set INTEGRATION_TESTS=1 to run)")
 	}
 
-	handler := NewStatsHandler()
+	handler := NewStatsHandler(stats.NewDefaultClient())
 
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/stats/internationalbroadcasterschedule?LeagueID=00&Season=2025&RegionID=1", nil)
 	w := httptest.NewRecorder()

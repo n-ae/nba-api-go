@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Deliberately boring: one job, one Go version (whatever go.mod declares),
+# no matrix. Live/integration tests are opt-in via INTEGRATION_TESTS=1 and
+# are not run here - they hit stats.nba.com and belong in a separate,
+# scheduled workflow, not on every push/PR.
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: go test
+        run: go test ./...
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+
+      - name: test-examples
+        run: make test-examples
+
+      - name: govulncheck
+        run: go run golang.org/x/vuln/cmd/govulncheck@latest ./...
+
+      - name: build generator tool
+        working-directory: tools/generator
+        run: go build ./...

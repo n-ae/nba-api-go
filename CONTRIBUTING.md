@@ -28,7 +28,7 @@ Be respectful, collaborative, and constructive in all interactions.
 
 ### Prerequisites
 
-- Go 1.21 or later
+- Go 1.26.5 or later (matches the `go` directive in `go.mod`)
 - Make (optional, for convenience commands)
 - golangci-lint (for linting)
 

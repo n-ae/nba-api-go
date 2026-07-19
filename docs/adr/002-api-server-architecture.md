@@ -12,6 +12,16 @@ Accepted - Fully Implemented (November 2024)
 - Multi-stage container build complete
 - Deployed and tested
 
+> **Update (2026-07-19):** The SDK and route count above reflect this ADR's
+> original November 2024 status and are left as-is for the historical
+> record. The current count (verified against source, not prior
+> documentation) is 141 distinct SDK endpoints and 142 HTTP routes — one
+> route (`playertrackingshotdashboard`) is a legacy alias reaching the same
+> SDK endpoint as `playertrackingshootingefficiency`. See
+> `docs/MAINTAINABILITY_ASSESSMENT_2026-07-19.md` for the verification
+> method and `cmd/nba-api-server/main.go`'s `EndpointsCount` for the
+> currently authoritative numbers.
+
 ## Context
 
 The nba-api-go project currently provides a **Go SDK** for accessing NBA statistics. To enable non-Go applications (Python, JavaScript, etc.) to use this library, we need to provide an **HTTP API wrapper**.

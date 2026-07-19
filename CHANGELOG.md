@@ -17,14 +17,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Documentation
 - README: added a "Get Player Info (with Date of Birth)" example demonstrating the `DateOfBirth()` accessor methods added in 1.1.6.
 
+### Compatibility note (added 2026-07-19, retroactive)
+- The `go` directive bump above (1.25.3 → 1.26.5) is a **minimum-Go-version increase in a patch release**. That's a real compatibility break for anyone on a pinned or hermetic Go 1.25.x toolchain, and it conflicts with this project's own "Backward Compatibility: Minor and patch versions guarantee backward compatibility" promise (see the Versioning section below). `GOTOOLCHAIN=auto` (the Go default) papers over it for most consumers by fetching 1.26.5 automatically, but that's not true for everyone. Future minimum-Go-version increases will ship in a minor release and be called out explicitly in the release title, not folded into a patch alongside dependency bumps.
+
 ## [1.1.6] - 2026-07-11
 
 ### Added
 - `DateOfBirth()` accessor methods on `PlayerInfo` (`CommonPlayerInfo`), `CommonPlayerInfoV2CommonPlayerInfo`, `CommonTeamRosterCommonTeamRoster`, and `CommonTeamRosterV2CommonTeamRoster`. These parse the raw `BIRTHDATE`/`BIRTH_DATE` string (format differs by endpoint) into a `time.Time`. The existing raw string fields are unchanged.
 
 ### Fixed
-- `gamerotation_test.go` failed to compile after `PT_DIFF` was changed to `float64` in 1.1.3 — the test's expected struct literals still used string values (`"-3"`, `"5"`) and its mock JSON response body quoted `PT_DIFF` as a string, which `toFloat` silently parses as `0`. Both now use numeric literals, matching the documented real API shape.
+- `gamerotation_test.go` failed to compile after `PT_DIFF` was changed to `float64` in 1.1.5 — the test's expected struct literals still used string values (`"-3"`, `"5"`) and its mock JSON response body quoted `PT_DIFF` as a string, which `toFloat` silently parses as `0`. Both now use numeric literals, matching the documented real API shape.
 - `cmd/nba-api-server`'s `version` constant was still `"1.1.3"` despite tags through `v1.1.5`; bumped to match this release.
+
+## [1.1.5] - 2026-07-09 (backfilled 2026-07-19)
+
+This entry was reconstructed from git history on 2026-07-19; the release itself predates this changelog entry.
+
+### Fixed
+- **`GameRotation` endpoint**: `PT_DIFF` on `GameRotationAwayTeam`/`GameRotationHomeTeam` was typed `string` even though the live API returns it as a number (e.g. `-6`); corrected to `float64`.
+
+### Documentation
+- Added a doc comment on `GameRotationAwayTeam` recording the verified live-response column layout (`GAME_ID, TEAM_ID, TEAM_CITY, TEAM_NAME, PERSON_ID, PLAYER_FIRST, PLAYER_LAST, IN_TIME_REAL, OUT_TIME_REAL, PLAYER_PTS, PT_DIFF, USG_PCT` — 12 columns) and confirming `IN_TIME_REAL`/`OUT_TIME_REAL` are tenths-of-a-second elapsed since game start, continuous across periods rather than reset per quarter.
+
+## [1.1.4] - 2026-07-09 (backfilled 2026-07-19)
+
+This entry was reconstructed from git history on 2026-07-19; the release itself predates this changelog entry.
+
+### Fixed
+- Resolved the `golangci-lint` v2 issues surfaced by the 1.1.3 config migration (see `docs/LINT_CLEANUP_PLAN.md`): added targeted `//nolint:errcheck` on deliberately ignored close/write errors, removed unused helper code in `tests/contract/helpers.go` and `tests/integration/helpers.go`, and cleaned up smaller `govet`/`staticcheck` findings across the generated endpoints and the generator template.
 
 ## [1.1.3] - 2026-07-09
 
@@ -38,6 +58,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Migrated `.golangci.yml` to the golangci-lint v2 config schema (the v1 config was silently failing to load under the installed v2 toolchain, so `make lint` had not been running). Disabled `govet`'s `fieldalignment` check, which reorders generated struct fields for memory-layout efficiency at the cost of the generator's intentional NBA API column ordering — see `docs/LINT_CLEANUP_PLAN.md` for the full rationale and the plan for the remaining pre-existing lint debt this migration exposed.
+
+## [1.1.1] - 2025-11-15 (backfilled 2026-07-19)
+
+This entry was reconstructed from git history on 2026-07-19; the release itself predates this changelog entry.
+
+### Added
+- `middleware.WithRetry(middleware.DefaultRetryConfig())` in the stats client's default middleware chain — retries were implemented but not actually applied to any client until this release.
+
+### Fixed
+- `cmd/nba-api-server`'s `version` constant was still `"0.1.0"`; bumped to match this release.
+- Suppressed `errcheck` findings on `json.NewEncoder(...).Encode(...)` in the health and metrics handlers (the encode error is logged, not silently dropped; this satisfies the linter without changing behavior).
 
 ## [1.1.0] - 2025-11-07
 
@@ -291,8 +322,13 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to suggest changes or report issues.
 
-[Unreleased]: https://github.com/n-ae/nba-api-go/compare/v1.1.3...HEAD
+[Unreleased]: https://github.com/n-ae/nba-api-go/compare/v1.1.7...HEAD
+[1.1.7]: https://github.com/n-ae/nba-api-go/compare/v1.1.6...v1.1.7
+[1.1.6]: https://github.com/n-ae/nba-api-go/compare/v1.1.5...v1.1.6
+[1.1.5]: https://github.com/n-ae/nba-api-go/compare/v1.1.4...v1.1.5
+[1.1.4]: https://github.com/n-ae/nba-api-go/compare/v1.1.3...v1.1.4
 [1.1.3]: https://github.com/n-ae/nba-api-go/compare/v1.1.1...v1.1.3
+[1.1.1]: https://github.com/n-ae/nba-api-go/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/n-ae/nba-api-go/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/n-ae/nba-api-go/compare/v0.9.0...v1.0.0
 [0.9.0]: https://github.com/n-ae/nba-api-go/compare/v0.3.0...v0.9.0

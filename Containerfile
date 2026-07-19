@@ -2,6 +2,13 @@
 # Build stage
 FROM golang:1.26-alpine AS builder
 
+# Pass the git short hash and build time in from the host (via
+# --build-arg) rather than computing them from a .git directory inside the
+# image - keeps the build context free of repo history and works the same
+# whether or not .git happens to be present in the context.
+ARG GIT_COMMIT=unknown
+ARG BUILD_TIME=unknown
+
 WORKDIR /build
 
 # Copy go mod files
@@ -12,7 +19,9 @@ RUN go mod download
 COPY . .
 
 # Build the binary
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags="-w -s" -o nba-api-server ./cmd/nba-api-server
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo \
+    -ldflags="-w -s -X main.gitCommit=${GIT_COMMIT} -X main.buildTime=${BUILD_TIME}" \
+    -o nba-api-server ./cmd/nba-api-server
 
 # Runtime stage
 FROM alpine:latest

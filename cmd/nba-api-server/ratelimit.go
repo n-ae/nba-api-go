@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net"
 	"net/http"
 	"sync"
 	"time"
@@ -38,7 +39,7 @@ func (rl *RateLimiter) getLimiter(ip string) *rate.Limiter {
 
 func (rl *RateLimiter) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ip := r.RemoteAddr
+		ip := clientIP(r)
 		limiter := rl.getLimiter(ip)
 
 		if !limiter.Allow() {
@@ -48,6 +49,23 @@ func (rl *RateLimiter) Middleware(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+// clientIP extracts the connecting IP from r.RemoteAddr, stripping the
+// ephemeral source port so that a client reconnecting on a new port keys
+// into the same limiter bucket. Proxy headers (X-Forwarded-For,
+// X-Real-IP) are deliberately not trusted here: honoring them from an
+// arbitrary client would let any request forge its own rate-limit key.
+// If this server is deployed behind a trusted reverse proxy, that proxy
+// must be the one to enforce (or safely relay) per-client identity.
+func clientIP(r *http.Request) string {
+	host, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		// RemoteAddr had no port (e.g. a unix socket or a test request
+		// built without one) - fall back to the raw value.
+		return r.RemoteAddr
+	}
+	return host
 }
 
 func (rl *RateLimiter) CleanupOldLimiters(interval time.Duration) {

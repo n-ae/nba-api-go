@@ -1,4 +1,8 @@
-.PHONY: help test test-coverage test-examples build clean lint fmt vet examples
+.PHONY: help test test-coverage test-examples build build-server clean lint fmt vet examples
+
+GIT_COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null || echo unknown)
+BUILD_TIME := $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
+SERVER_LDFLAGS := -X main.gitCommit=$(GIT_COMMIT) -X main.buildTime=$(BUILD_TIME)
 
 help:
 	@echo "Available targets:"
@@ -6,6 +10,7 @@ help:
 	@echo "  test-coverage - Run tests with coverage report"
 	@echo "  test-examples - Build all example programs to verify they compile"
 	@echo "  build         - Build all examples"
+	@echo "  build-server  - Build nba-api-server with git commit/build time embedded"
 	@echo "  clean         - Remove build artifacts"
 	@echo "  lint          - Run golangci-lint"
 	@echo "  fmt           - Format code with gofmt"
@@ -48,6 +53,11 @@ build:
 	go build -o bin/scoreboard ./examples/scoreboard
 	go build -o bin/player_search ./examples/player_search
 	@echo "Binaries built in bin/"
+
+build-server:
+	@echo "Building nba-api-server ($(GIT_COMMIT))..."
+	go build -ldflags "$(SERVER_LDFLAGS)" -o bin/nba-api-server ./cmd/nba-api-server
+	@echo "Binary built: bin/nba-api-server"
 
 clean:
 	rm -rf bin/

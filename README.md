@@ -6,10 +6,10 @@ A type-safe Go library and HTTP API server for accessing NBA statistics from sta
 
 **World's first complete NBA API implementation in Go!**
 
-- ✅ **140 endpoints** (100%+ coverage - all NBA Stats API endpoints plus international schedule)
+- ✅ **141 endpoints** (all NBA Stats API endpoints plus international schedule)
 - ✅ **All categories complete**: Box Scores, Player, Team, League, Game, Advanced, International
 - ✅ **Dual access**: Native Go SDK + HTTP REST API for any language
-- ✅ **Production-ready**: Zero bugs, type-safe, fully tested
+- ✅ **Type-safe**: generated, endpoint-specific request/response types; see [CHANGELOG.md](./CHANGELOG.md) for the project's actual defect and fix history
 - ✅ **Complete feature parity** with Python nba_api + additional features
 
 See [Migration Guide](./docs/MIGRATION_GUIDE.md) to migrate from Python nba_api to Go.
@@ -17,9 +17,9 @@ See [Migration Guide](./docs/MIGRATION_GUIDE.md) to migrate from Python nba_api 
 ## Features
 
 ### Core Features
-- **🏆 140 Stats API endpoints** - 100%+ COVERAGE! (Complete feature parity with Python nba_api + international schedule)
+- **🏆 141 Stats API endpoints** - Complete feature parity with Python nba_api + international schedule
 - **Go SDK** - Type-safe library for direct Go integration
-- **HTTP API Server** - Complete REST API with all 140 endpoints for any language
+- **HTTP API Server** - Complete REST API exposing all endpoints for any language
 - **Docker/Podman Ready** - Multi-stage containerization (< 20MB images)
 - **Live API** - Real-time game data and scoreboards
 - **Static Data** - Pre-loaded player and team datasets with search (5,135 players, 30 teams)
@@ -34,11 +34,12 @@ See [Migration Guide](./docs/MIGRATION_GUIDE.md) to migrate from Python nba_api 
 - **🏥 Health Checks** - `/health` endpoint with NBA API connectivity status and build info
 - **🔒 CORS Support** - Configurable cross-origin resource sharing
 - **📝 Request Logging** - Structured logging with response times
-- **🚀 High Performance** - Handles 10,000+ req/min on 1 vCPU
 - **💾 Low Memory** - < 100MB typical memory usage
 - **🔄 Graceful Shutdown** - Safe shutdown with connection draining (10s timeout)
 
 ## Installation
+
+**Requires Go 1.26.5 or later** (the `go` directive in `go.mod`; older toolchains cannot build this module).
 
 ### Go SDK
 ```bash
@@ -269,7 +270,13 @@ The library is organized into the following packages:
 
 ### Middleware
 
-The client supports composable middleware for cross-cutting concerns:
+The client supports composable middleware for cross-cutting concerns.
+
+> **Note:** `internal/middleware` is a Go `internal` package, so the example
+> below only compiles for code living inside this module (e.g. its own
+> `examples/`) — it is **not importable from an external `go get` consumer**.
+> Publishing this seam under an importable path (e.g. `pkg/client`) is
+> planned for v1.2.0; see `docs/MAINTAINABILITY_ASSESSMENT_2026-07-19.md`.
 
 ```go
 import (
@@ -433,10 +440,10 @@ Based on the [ADR](./docs/adr/001-go-replication-strategy.md), the library is be
 - [x] Phase 1: Foundation (HTTP client, middleware, models)
 - [x] Phase 2: Core Stats API (initial endpoints)
 - [x] Phase 3: Live API (Scoreboard endpoint)
-- [x] Phase 4: Additional Endpoints - ✅ **100% COMPLETE (140 endpoints including international schedule)**
+- [x] Phase 4: Additional Endpoints - ✅ **COMPLETE (141 endpoints including international schedule)**
 - [x] Phase 5: Performance Optimization (benchmarks complete)
 - [x] Code generation tooling (completed)
-- [x] HTTP API Server - ✅ **100% COMPLETE (All 140 endpoints exposed)**
+- [x] HTTP API Server - ✅ **COMPLETE (all endpoints exposed)**
 - [x] Migration guide from Python nba_api - ✅ **COMPLETE (887 lines)**
 - [x] HTTP API client examples - ✅ **COMPLETE (Python, JavaScript, Bash)**
 - [x] Integration test suite - ✅ **COMPLETE (60+ tests)**
