@@ -6,7 +6,7 @@ This file provides guidance to Claude Code when working with the nba-api-go repo
 
 **nba-api-go** is a production-ready Go SDK and HTTP API server providing type-safe access to 141 NBA Stats API endpoints (all standard endpoints plus international broadcast schedule). The project emphasizes maintainability, minimal dependencies, and solo engineer viability.
 
-**Current Status**: `main` is ahead of the latest tagged release (`v1.2.0`); see `CHANGELOG.md`'s `[Unreleased]` section for what's changed since.
+**Current Status**: `main` is at the latest tagged release, `v1.3.0`.
 **Grade**: See `docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md` for the current assessment of record - do not hardcode a grade here, it goes stale the moment a new assessment lands and nobody remembers to update this file (see that file's own docs-consolidation section for the fix: archive the superseded assessment in the same commit as the new one).
 **Maintenance Burden**: ~1.6 hours/week for the hand-written core; the generated-endpoint surface currently needs more than that until the verification backlog in the current assessment is cleared - see that document's "Is this too complex for one person?" section.
 
@@ -242,7 +242,7 @@ See `DEPLOYMENT.md` for:
 
 ### API Stability
 
-**Latest tagged release: v1.2.0.** Note that v1.2.0 itself shipped a source-breaking change in a minor release (`stats.Config`/`live.Config` field types, `models.NewAPIError`/`HTTPStatusToError` signatures) - see `CHANGELOG.md`'s retroactive compatibility note under `[1.2.0]`. Treat the "strict semver" promise below as the target, not an unconditional guarantee of the historical record.
+**Latest tagged release: v1.3.0** (no breaking changes since v1.2.0). Note that v1.2.0 itself shipped a source-breaking change in a minor release (`stats.Config`/`live.Config` field types, `models.NewAPIError`/`HTTPStatusToError` signatures) - see `CHANGELOG.md`'s retroactive compatibility note under `[1.2.0]`. Treat the "strict semver" promise below as the target, not an unconditional guarantee of the historical record.
 
 **Breaking changes** require:
 - Major version bump
@@ -500,14 +500,14 @@ if err != nil {
 
 ## Version Information
 
-**Latest tagged release**: v1.2.0 (`main` has unreleased changes ahead of it - see `CHANGELOG.md`'s `[Unreleased]` section)
+**Latest tagged release**: v1.3.0 (`main` is at this tag; see `CHANGELOG.md`'s `[Unreleased]` section for what's changed since)
 **Go Version**: 1.26.5+ (the `go` directive in `go.mod`; older toolchains cannot build this module)
-**Stability**: See the Versioning/API Stability section above - v1.2.0 itself contained a source-breaking change in a minor release, documented with a retroactive compatibility note in `CHANGELOG.md`
+**Stability**: See the Versioning/API Stability section above - v1.2.0 itself contained a source-breaking change in a minor release, documented with a retroactive compatibility note in `CHANGELOG.md`; v1.3.0 shipped no breaking changes
 
 See `CHANGELOG.md` for full version history.
 
 ---
 
-**This file last updated**: 2026-07-20 (docs consolidation pass; see `docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md` section 7)
+**This file last updated**: 2026-07-20 (v1.3.0 release)
 **Maintainability grade**: tracked in the current assessment (see the header of this file), not duplicated here
 **Next assessment**: due whenever the verification-infrastructure backlog in the current assessment's v1.3.0/v2.0.0 plan meaningfully changes, or quarterly, whichever comes first
