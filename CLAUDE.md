@@ -6,7 +6,7 @@ This file provides guidance to Claude Code when working with the nba-api-go repo
 
 **nba-api-go** is a production-ready Go SDK and HTTP API server providing type-safe access to 141 NBA Stats API endpoints (all standard endpoints plus international broadcast schedule). The project emphasizes maintainability, minimal dependencies, and solo engineer viability.
 
-**Current Status**: v1.1.0 - Stable with new international schedule endpoint
+**Current Status**: v1.2.0
 **Grade**: A (93/100) - Production-ready with excellent maintainability
 **Maintenance Burden**: ~1.6 hours/week
 
@@ -213,7 +213,7 @@ See `docs/DEPLOYMENT.md` for:
 
 ### API Stability
 
-**Current: v1.1.0** - Stable with strict semver guarantees
+**Current: v1.2.0** - Stable with strict semver guarantees
 
 **Breaking changes** require:
 - Major version bump

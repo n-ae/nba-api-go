@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-07-19
+
 ### Added
 - `pkg/client.Middleware`, `RoundTripper`, `RoundTripperFunc`, and `Chain` - the middleware seam is now defined in the importable `pkg/client` package instead of only `internal/middleware`, so external consumers can write their own middleware. `internal/middleware`'s identically-named types are now aliases of these for source compatibility.
 - `stats.DefaultMiddlewares()` / `live.DefaultMiddlewares()` return each client's default middleware chain, so a custom `Config.Middlewares` can extend the defaults (`append(stats.DefaultMiddlewares(), yourMiddleware...)`) instead of having to silently replace them (this replace-not-extend behavior itself is unchanged - only extension is now possible).
@@ -24,8 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - README's middleware example now imports `pkg/client` (and, via the `stats`/`live` facades, `DefaultMiddlewares()`) instead of `internal/middleware`, so it's actually compilable from an external `go get` consumer - verified against a real external module during this change, not just read.
-- **Breaking (unreleased):** `stats.Config`/`live.Config`'s `Timeout` is now `time.Duration` (was `int`, meaning seconds) and `Headers` is now `http.Header` (was `map[string]string`). These fields started actually forwarding to the underlying client only very recently (previous `[Unreleased]` cycle) and have never appeared in a tagged release in their old shape, so this retype breaks no released contract - but it is a source-breaking change for any code written against `main` in that window. `Headers: map[string]string{"K": "V"}` becomes `Headers: http.Header{"K": {"V"}}`; `Timeout: 10` (meaning 10s) becomes `Timeout: 10 * time.Second`. A bare `Timeout: 10` still compiles under the new type (it means 10 *nanoseconds*) - if you set this field, update the literal, don't just leave the number.
-- **Breaking (unreleased):** `models.NewAPIError` and `models.HTTPStatusToError` both gained a `body []byte` parameter (to populate the new `APIError.Body` field). Neither has appeared in a tagged release with the old signature.
+- **Breaking:** `stats.Config`/`live.Config`'s `Timeout` is now `time.Duration` (was `int`, meaning seconds) and `Headers` is now `http.Header` (was `map[string]string`). These fields started actually forwarding to the underlying client only in v1.1.7-and-later `main` commits and have never appeared in a tagged release in their old shape, so this retype breaks no released contract - but it is a source-breaking change for any code written against those commits. `Headers: map[string]string{"K": "V"}` becomes `Headers: http.Header{"K": {"V"}}`; `Timeout: 10` (meaning 10s) becomes `Timeout: 10 * time.Second`. A bare `Timeout: 10` still compiles under the new type (it means 10 *nanoseconds*) - if you set this field, update the literal, don't just leave the number.
+- **Breaking:** `models.NewAPIError` and `models.HTTPStatusToError` both gained a `body []byte` parameter (to populate the new `APIError.Body` field). Neither has appeared in a tagged release with the old signature.
 - `internal/middleware` went from 0% test coverage to ~60%: added tests for retry (retryable-status retries, backoff cap, context-cancellation exit, permanent-vs-transient transport errors, `Retry-After` parsing and capping), per-host rate limiting (hosts are independent, concurrent `Wait` is race-clean), and header idempotency (`WithHeaders` doesn't duplicate across repeated applications to the same request, `WithUserAgent`/`WithReferer`/`WithAccept` don't override an existing value).
 - `client`'s default transport now clones `http.DefaultTransport` (restoring `Proxy: ProxyFromEnvironment`, `ForceAttemptHTTP2`, and stdlib connect timeouts) with keep-alives left enabled, instead of a mostly zero-valued `http.Transport{DisableKeepAlives: true, MaxIdleConns: 1, ...}` with no recorded rationale for either choice. `TLSHandshakeTimeout` (30s) and `ResponseHeaderTimeout` (60s) are still explicitly set, generous versus NBA.com/Akamai's occasionally slow responses. See **ADR 003: HTTP Transport Policy** (`docs/adr/003-http-transport-policy.md`) for the full analysis, including why this could not be empirically benchmarked against live NBA.com and the conditions under which it should be revisited.
 
@@ -272,6 +274,31 @@ First public release of the NBA API Go SDK. Provides type-safe access to NBA sta
 
 ## Upgrade Guide
 
+### From 1.1.7 to 1.2.0
+
+**Two source-breaking changes, both narrowly scoped and neither ever shipped working in a tagged release before now:**
+
+1. `stats.Config`/`live.Config`'s `Timeout` field is `time.Duration` (was `int` seconds) and `Headers` is `http.Header` (was `map[string]string`). If you set either field:
+   - `Headers: map[string]string{"K": "V"}` → `Headers: http.Header{"K": {"V"}}`
+   - `Timeout: 10` (meaning 10s) → `Timeout: 10 * time.Second` (a bare `Timeout: 10` still compiles but now means 10 *nanoseconds*)
+2. If you call `models.NewAPIError` or `models.HTTPStatusToError` directly (most users don't - they're used internally by `pkg/client`), both now take an additional `body []byte` parameter.
+
+If you never set `stats.Config.Timeout`/`Headers` or called the `models` functions above directly, **there is nothing to change** - upgrade with `go get github.com/n-ae/nba-api-go@v1.2.0`.
+
+**What's New:**
+- The middleware seam (`Middleware`, `RoundTripper`, `RoundTripperFunc`, `Chain`) is now importable from `pkg/client`, plus `stats.DefaultMiddlewares()`/`live.DefaultMiddlewares()` - see the README's "Middleware" section for a compilable example of writing your own.
+- `client.Config.MaxResponseBytes` bounds response body reads (default 50 MiB) instead of the previous unbounded read.
+- `models.APIError.Body` carries a truncated copy of the failing response for diagnostics.
+- The HTTP server now returns the real upstream status code for endpoint failures (404, 429, etc.) instead of a blanket 500.
+- `Retry-After` response headers are now honored by the retry middleware.
+
+**Migration Steps:**
+1. Update dependency: `go get github.com/n-ae/nba-api-go@v1.2.0`
+2. If you set `stats.Config.Timeout`/`Headers` or `live.Config.Timeout`/`Headers`, update those literals per above.
+3. If you call `models.NewAPIError`/`HTTPStatusToError` directly, add the `body` argument (pass `nil` if you don't have one).
+
+See the `[1.2.0]` section above for the full list of changes.
+
 ### From 1.0.0 to 1.1.0
 
 **No breaking changes!** This is a minor release adding a new endpoint.
@@ -344,7 +371,8 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to suggest changes or report issues.
 
-[Unreleased]: https://github.com/n-ae/nba-api-go/compare/v1.1.7...HEAD
+[Unreleased]: https://github.com/n-ae/nba-api-go/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/n-ae/nba-api-go/compare/v1.1.7...v1.2.0
 [1.1.7]: https://github.com/n-ae/nba-api-go/compare/v1.1.6...v1.1.7
 [1.1.6]: https://github.com/n-ae/nba-api-go/compare/v1.1.5...v1.1.6
 [1.1.5]: https://github.com/n-ae/nba-api-go/compare/v1.1.4...v1.1.5
