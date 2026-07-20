@@ -84,13 +84,57 @@ func (g *Generator) GenerateFromMetadata(metadataFile string, dryRun bool) error
 	return nil
 }
 
-func (g *Generator) GenerateSingleEndpoint(name string, dryRun bool) error {
-	metadata := EndpointMetadata{
-		Name:     name,
-		Endpoint: strings.ToLower(name),
+// GenerateSingleEndpoint generates the endpoint named name by searching
+// metadataDir's *.json files for a matching entry - the documented
+// `-endpoint NAME` workflow. Previously this rendered a bare
+// EndpointMetadata{Name, Endpoint} with zero parameters and zero result
+// sets - no metadata lookup happened at all - silently producing an empty
+// stub struct and reporting success, which -dry-run did not reveal
+// either. That silent-stub failure mode is worse than the crash it
+// replaced (a crash stops you immediately; this cost nothing until you
+// checked the diff, or didn't, and shipped it) - fixed by actually
+// searching for the metadata and failing loudly when it isn't found,
+// via findEndpointMetadata.
+func (g *Generator) GenerateSingleEndpoint(name, metadataDir string, dryRun bool) error {
+	metadata, err := findEndpointMetadata(metadataDir, name)
+	if err != nil {
+		return err
+	}
+	metadata = g.processMetadata(metadata)
+	return g.generateEndpoint(metadata, dryRun)
+}
+
+// findEndpointMetadata searches every metadata/*.json file under
+// metadataDir for an entry whose Name matches name exactly, returning an
+// error - not a zero-value EndpointMetadata - if no file has a matching
+// entry. GenerateSingleEndpoint relies on this erroring rather than
+// silently continuing with empty metadata.
+func findEndpointMetadata(metadataDir, name string) (EndpointMetadata, error) {
+	files, err := filepath.Glob(filepath.Join(metadataDir, "*.json"))
+	if err != nil {
+		return EndpointMetadata{}, fmt.Errorf("failed to glob metadata directory %s: %w", metadataDir, err)
+	}
+	if len(files) == 0 {
+		return EndpointMetadata{}, fmt.Errorf("no metadata/*.json files found under %s", metadataDir)
 	}
 
-	return g.generateEndpoint(metadata, dryRun)
+	for _, f := range files {
+		data, err := os.ReadFile(f)
+		if err != nil {
+			return EndpointMetadata{}, fmt.Errorf("failed to read metadata file %s: %w", f, err)
+		}
+		var endpoints []EndpointMetadata
+		if err := json.Unmarshal(data, &endpoints); err != nil {
+			return EndpointMetadata{}, fmt.Errorf("failed to parse metadata file %s: %w", f, err)
+		}
+		for _, ep := range endpoints {
+			if ep.Name == name {
+				return ep, nil
+			}
+		}
+	}
+
+	return EndpointMetadata{}, fmt.Errorf("no metadata found for endpoint %q in any *.json file under %s - write a metadata entry for it first (see tools/generator/README.md), or use -metadata to point at a specific file directly", name, metadataDir)
 }
 
 func (g *Generator) generateEndpoint(metadata EndpointMetadata, dryRun bool) (err error) {
