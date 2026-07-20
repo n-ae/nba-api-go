@@ -50,7 +50,7 @@ type ScoreboardV3Response struct {
 func GetScoreboardV3(ctx context.Context, client *stats.Client, req ScoreboardV3Request) (*models.Response[*ScoreboardV3Response], error) {
 	params := url.Values{}
 	if req.GameDate == "" {
-		return nil, fmt.Errorf("gameDate is required")
+		return nil, fmt.Errorf("%s is required", "GameDate")
 	}
 	params.Set("GameDate", req.GameDate)
 	if req.LeagueID != nil {

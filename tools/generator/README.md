@@ -135,6 +135,29 @@ responses) that the same field name genuinely needs different types in
 different places - not as a shortcut for a `fieldtypes.json` correction
 that should apply everywhere.
 
+## Field Names (camelCase metadata)
+
+Most metadata field names are `SCREAMING_SNAKE_CASE` (the classic Stats
+API convention, e.g. `"GAME_ID"`) and already valid, exported Go
+identifiers - the template uses them as-is. NBA Live-Data-style endpoints
+(`PlayByPlayV3`, `ScoreboardV3`, `LeagueStandings`, ...) instead use
+camelCase field names starting with a lowercase letter (e.g.
+`"gameId"`). Using that directly as a Go struct field name would produce
+an **unexported** field - invisible to `encoding/json`, inaccessible to
+any external caller. `goFieldName` in `generator.go` fixes this: it
+capitalizes each camelCase word and fully uppercases recognized
+initialisms (`ID`, `URL`, `UUID`, etc.), so `"gameId"` becomes `GameID`,
+matching Go convention. The original field name is untouched as the
+JSON tag - only the Go identifier changes.
+
+This is deliberately conservative: it does not try to guess at
+non-standard abbreviations. `VideoEvents`' `vl`/`vt`/`gc`/`surl`/`durl`/
+`vurl`/`purl` fields are hand-committed as fully-uppercase
+(`VL`/`VT`/.../`PURL`) despite not being recognized initialisms by any
+standard convention - regenerating that file today would produce
+`Vl`/`Vt`/etc. instead, so it stays excluded from regeneration rather
+than force a guess into the initialisms list that wouldn't generalize.
+
 ## Creating Metadata
 
 ### From Python nba_api

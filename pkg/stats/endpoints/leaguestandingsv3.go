@@ -29,7 +29,7 @@ type LeagueStandingsV3Standings struct {
 	DivisionRank            int     `json:"DivisionRank"`
 	WINS                    string  `json:"WINS"`
 	LOSSES                  string  `json:"LOSSES"`
-	WinPCT                  string  `json:"WinPCT"`
+	WinPCT                  float64 `json:"WinPCT"`
 	LeagueRank              int     `json:"LeagueRank"`
 	Record                  string  `json:"Record"`
 	HOME                    string  `json:"HOME"`
@@ -135,7 +135,7 @@ func GetLeagueStandingsV3(ctx context.Context, client *stats.Client, req LeagueS
 					DivisionRank:            toInt(row[8]),
 					WINS:                    toString(row[9]),
 					LOSSES:                  toString(row[10]),
-					WinPCT:                  toString(row[11]),
+					WinPCT:                  toFloat(row[11]),
 					LeagueRank:              toInt(row[12]),
 					Record:                  toString(row[13]),
 					HOME:                    toString(row[14]),
