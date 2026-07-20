@@ -1,4 +1,9 @@
 {
+  "ShotChartDetail": {
+    "Shot_Chart_Detail": {
+      "SECONDS_REMAINING": "int"
+    }
+  },
   "BoxScoreTraditionalV2": {
     "PlayerStats": {
       "OREB": "int",

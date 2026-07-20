@@ -371,6 +371,63 @@ func TestFieldTypesMatchCommittedConsensus(t *testing.T) {
 	}
 }
 
+// TestShotChartFieldsMatchShotChartDetailPrecedent documents 7 more
+// fieldtypes.json corrections found neither by TestInferGoType's knownWrong
+// cases nor by unanimous committed consensus (these fields disagreed across
+// the only two committed occurrences, ShotChartDetail and
+// ShotChartLineupDetail), but by strong semantic evidence: shot chart
+// coordinates/distances/flags/event-IDs are unambiguously numeric (a court
+// X coordinate, a shot distance in feet, an attempted/made 0-or-1 flag, an
+// event sequence number), and ShotChartDetail's own committed code already
+// had the correct type for every one of them - only ShotChartLineupDetail
+// (regenerated in the same change as this test, from a plain fieldtypes.json
+// default of "string"/"float64" inherited from inferGoType) had it wrong.
+// SHOT_DISTANCE and LOC_X/LOC_Y are the same corruption class as the
+// already-documented FG_PCT_RA bug: toString formats a float64 with "%.0f",
+// so a shot chart X coordinate of 23.5 silently became "24" in
+// ShotChartLineupDetail before this correction - a real, shipped bug caught
+// only while investigating ShotChartDetail's regeneration, not by any
+// dedicated fixture or contract test.
+func TestShotChartFieldsMatchShotChartDetailPrecedent(t *testing.T) {
+	corrected := map[string]string{
+		"GAME_EVENT_ID":       "int",
+		"MINUTES_REMAINING":   "int",
+		"SHOT_DISTANCE":       "float64",
+		"LOC_X":               "float64",
+		"LOC_Y":               "float64",
+		"SHOT_ATTEMPTED_FLAG": "int",
+		"SHOT_MADE_FLAG":      "int",
+	}
+
+	for field, want := range corrected {
+		t.Run(field, func(t *testing.T) {
+			if inferGoType(field) == want {
+				t.Fatalf("inferGoType(%q) already returns %q - this correction is redundant, remove it", field, want)
+			}
+			got := resolveFieldGoType("", "", field)
+			if got != want {
+				t.Errorf("resolveFieldGoType(%q) = %q, want %q (fieldtypes.json entry missing or incorrect)", field, got, want)
+			}
+		})
+	}
+
+	// SECONDS_REMAINING is deliberately NOT corrected globally: its two
+	// committed occurrences disagree (ShotChartDetail: int, but
+	// ShotChartLineupDetail and WinProbabilityPBP: string) without the
+	// same unambiguous semantic evidence the fields above have (compare
+	// WinProbabilityPBP's neighboring HOME_SCORE/VISITOR_SCORE, also
+	// string - possibly a real, different, not-yet-investigated
+	// pre-existing type gap in that endpoint, not proof SECONDS_REMAINING
+	// itself is safe to correct everywhere). ShotChartDetail gets a
+	// narrow override instead, matching only its own committed value.
+	if got := resolveFieldGoType("ShotChartDetail", "Shot_Chart_Detail", "SECONDS_REMAINING"); got != "int" {
+		t.Errorf(`resolveFieldGoType("ShotChartDetail", "Shot_Chart_Detail", "SECONDS_REMAINING") = %q, want "int" (fieldtype_overrides.json entry)`, got)
+	}
+	if got := resolveFieldGoType("", "", "SECONDS_REMAINING"); got != "string" {
+		t.Errorf(`resolveFieldGoType("", "", "SECONDS_REMAINING") = %q, want "string" (the override must not leak into the global default)`, got)
+	}
+}
+
 // TestAllMetadataFieldsHaveExplicitTypes ensures every field name
 // referenced by a committed metadata/*.json file has an explicit entry in
 // fieldtypes.json, so generation never silently falls back to inferGoType

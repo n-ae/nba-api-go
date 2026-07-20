@@ -23,13 +23,13 @@ type ShotChartLineupDetailRequest struct {
 type ShotChartLineupDetailShot_Chart_Detail struct {
 	GRID_TYPE           string  `json:"GRID_TYPE"`
 	GAME_ID             string  `json:"GAME_ID"`
-	GAME_EVENT_ID       string  `json:"GAME_EVENT_ID"`
+	GAME_EVENT_ID       int     `json:"GAME_EVENT_ID"`
 	PLAYER_ID           int     `json:"PLAYER_ID"`
 	PLAYER_NAME         string  `json:"PLAYER_NAME"`
 	TEAM_ID             int     `json:"TEAM_ID"`
 	TEAM_NAME           string  `json:"TEAM_NAME"`
 	PERIOD              int     `json:"PERIOD"`
-	MINUTES_REMAINING   float64 `json:"MINUTES_REMAINING"`
+	MINUTES_REMAINING   int     `json:"MINUTES_REMAINING"`
 	SECONDS_REMAINING   string  `json:"SECONDS_REMAINING"`
 	EVENT_TYPE          string  `json:"EVENT_TYPE"`
 	ACTION_TYPE         string  `json:"ACTION_TYPE"`
@@ -37,11 +37,11 @@ type ShotChartLineupDetailShot_Chart_Detail struct {
 	SHOT_ZONE_BASIC     string  `json:"SHOT_ZONE_BASIC"`
 	SHOT_ZONE_AREA      string  `json:"SHOT_ZONE_AREA"`
 	SHOT_ZONE_RANGE     string  `json:"SHOT_ZONE_RANGE"`
-	SHOT_DISTANCE       string  `json:"SHOT_DISTANCE"`
-	LOC_X               string  `json:"LOC_X"`
-	LOC_Y               string  `json:"LOC_Y"`
-	SHOT_ATTEMPTED_FLAG string  `json:"SHOT_ATTEMPTED_FLAG"`
-	SHOT_MADE_FLAG      string  `json:"SHOT_MADE_FLAG"`
+	SHOT_DISTANCE       float64 `json:"SHOT_DISTANCE"`
+	LOC_X               float64 `json:"LOC_X"`
+	LOC_Y               float64 `json:"LOC_Y"`
+	SHOT_ATTEMPTED_FLAG int     `json:"SHOT_ATTEMPTED_FLAG"`
+	SHOT_MADE_FLAG      int     `json:"SHOT_MADE_FLAG"`
 	GAME_DATE           string  `json:"GAME_DATE"`
 	HTM                 string  `json:"HTM"`
 	VTM                 string  `json:"VTM"`
@@ -99,13 +99,13 @@ func GetShotChartLineupDetail(ctx context.Context, client *stats.Client, req Sho
 				item := ShotChartLineupDetailShot_Chart_Detail{
 					GRID_TYPE:           toString(row[0]),
 					GAME_ID:             toString(row[1]),
-					GAME_EVENT_ID:       toString(row[2]),
+					GAME_EVENT_ID:       toInt(row[2]),
 					PLAYER_ID:           toInt(row[3]),
 					PLAYER_NAME:         toString(row[4]),
 					TEAM_ID:             toInt(row[5]),
 					TEAM_NAME:           toString(row[6]),
 					PERIOD:              toInt(row[7]),
-					MINUTES_REMAINING:   toFloat(row[8]),
+					MINUTES_REMAINING:   toInt(row[8]),
 					SECONDS_REMAINING:   toString(row[9]),
 					EVENT_TYPE:          toString(row[10]),
 					ACTION_TYPE:         toString(row[11]),
@@ -113,11 +113,11 @@ func GetShotChartLineupDetail(ctx context.Context, client *stats.Client, req Sho
 					SHOT_ZONE_BASIC:     toString(row[13]),
 					SHOT_ZONE_AREA:      toString(row[14]),
 					SHOT_ZONE_RANGE:     toString(row[15]),
-					SHOT_DISTANCE:       toString(row[16]),
-					LOC_X:               toString(row[17]),
-					LOC_Y:               toString(row[18]),
-					SHOT_ATTEMPTED_FLAG: toString(row[19]),
-					SHOT_MADE_FLAG:      toString(row[20]),
+					SHOT_DISTANCE:       toFloat(row[16]),
+					LOC_X:               toFloat(row[17]),
+					LOC_Y:               toFloat(row[18]),
+					SHOT_ATTEMPTED_FLAG: toInt(row[19]),
+					SHOT_MADE_FLAG:      toInt(row[20]),
 					GAME_DATE:           toString(row[21]),
 					HTM:                 toString(row[22]),
 					VTM:                 toString(row[23]),
