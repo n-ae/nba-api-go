@@ -264,6 +264,50 @@ func TestFieldTypesOverridesKnownWrongInference(t *testing.T) {
 	}
 }
 
+// TestFieldTypesMatchCommittedConsensus documents 14 fieldtypes.json
+// corrections found by a different method than TestFieldTypesOverridesKnownWrongInference
+// above: cross-referencing every field name against the Go type actually
+// used for it across all 143 committed pkg/stats/endpoints/*.go files, and
+// adopting the unanimous committed type where fieldtypes.json (inheriting
+// inferGoType's unreviewed default) disagreed with it. Each of these fields
+// has exactly one Go type across every occurrence in committed code -
+// distinct from fields like OREB/REB/AST/PTS, which are float64 in ~90
+// committed endpoints (per-game averages) but int in exactly 8 box-score
+// endpoints (single-game counts): that's a real per-endpoint semantic
+// difference a flat name->type dictionary cannot represent, not a case
+// where one side is simply wrong, and is intentionally left alone here
+// pending a per-endpoint override mechanism.
+func TestFieldTypesMatchCommittedConsensus(t *testing.T) {
+	corrected := map[string]string{
+		"CONF_COUNT":           "int",
+		"DIV_COUNT":            "int",
+		"EVENTMSGACTIONTYPE":   "int",
+		"EVENTMSGTYPE":         "int",
+		"EVENTNUM":             "int",
+		"PERSON1TYPE":          "int",
+		"PERSON2TYPE":          "int",
+		"PERSON3TYPE":          "int",
+		"PLAYER_LAST":          "string",
+		"PO_LOSSES":            "int",
+		"PO_WINS":              "int",
+		"PT_DIFF":              "float64",
+		"TO":                   "int",
+		"VIDEO_AVAILABLE_FLAG": "int",
+	}
+
+	for field, want := range corrected {
+		t.Run(field, func(t *testing.T) {
+			if inferGoType(field) == want {
+				t.Fatalf("inferGoType(%q) already returns %q - this correction is redundant, remove it", field, want)
+			}
+			got := fieldGoType(field)
+			if got != want {
+				t.Errorf("fieldGoType(%q) = %q, want %q (fieldtypes.json entry missing or incorrect)", field, got, want)
+			}
+		})
+	}
+}
+
 // TestAllMetadataFieldsHaveExplicitTypes ensures every field name
 // referenced by a committed metadata/*.json file has an explicit entry in
 // fieldtypes.json, so generation never silently falls back to inferGoType
