@@ -1,3 +1,10 @@
+> **Superseded.** This assessed revision `8549390` (grade B-). The current assessment of record is
+> [`docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-20_384e5de.md`](../MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-20_384e5de.md),
+> covering revision `384e5de` and later (tag `v2.1.0`, grade B). Retained here for history; see that document's
+> section 4 ("What the prior assessment's plan got right, and where reality diverged") for what
+> carried forward vs. what changed, and its verification ledger for the item-by-item status of every
+> finding below.
+
 # Maintainable-Architect-v4 Assessment: nba-api-go
 
 **Date:** 2026-07-20
