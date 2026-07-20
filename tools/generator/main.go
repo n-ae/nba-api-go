@@ -28,6 +28,20 @@ func defaultOutputDir() string {
 	return filepath.Join(repoRoot, "pkg", "stats", "endpoints")
 }
 
+// defaultMetadataDir resolves to tools/generator/metadata regardless of
+// the process's working directory, for the same reason and via the same
+// runtime.Caller(0) approach as defaultOutputDir: `-endpoint NAME` (see
+// GenerateSingleEndpoint) needs to reliably find the metadata directory
+// to search, not assume the working directory happens to be
+// tools/generator.
+func defaultMetadataDir() string {
+	_, thisFile, _, ok := runtime.Caller(0)
+	if !ok {
+		return "metadata"
+	}
+	return filepath.Join(filepath.Dir(thisFile), "metadata")
+}
+
 func main() {
 	var (
 		endpoint     = flag.String("endpoint", "", "Endpoint name to generate (e.g., PlayerGameLog)")
@@ -58,7 +72,7 @@ func main() {
 			log.Fatalf("Failed to generate from metadata: %v", err)
 		}
 	} else if *endpoint != "" {
-		if err := generator.GenerateSingleEndpoint(*endpoint, *dryRun); err != nil {
+		if err := generator.GenerateSingleEndpoint(*endpoint, defaultMetadataDir(), *dryRun); err != nil {
 			log.Fatalf("Failed to generate endpoint: %v", err)
 		}
 	}

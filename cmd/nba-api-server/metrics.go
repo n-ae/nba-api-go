@@ -6,6 +6,12 @@ import (
 	"time"
 )
 
+const (
+	defaultMaxPaths          = 1000
+	defaultMaxResponseTimes  = 1000
+	overflowMetricsPathLabel = "__other__"
+)
+
 type Metrics struct {
 	mu               sync.RWMutex
 	startTime        time.Time
@@ -14,16 +20,23 @@ type Metrics struct {
 	requestsByStatus map[int]*atomic.Int64
 	requestsByPath   map[string]*atomic.Int64
 	responseTimes    []time.Duration
+	responseTimeNext int
 	maxResponseTimes int
+	maxPaths         int
 }
 
 func NewMetrics() *Metrics {
+	return newMetrics(defaultMaxPaths, defaultMaxResponseTimes)
+}
+
+func newMetrics(maxPaths, maxResponseTimes int) *Metrics {
 	m := &Metrics{
 		startTime:        time.Now(),
 		requestsByStatus: make(map[int]*atomic.Int64),
 		requestsByPath:   make(map[string]*atomic.Int64),
-		responseTimes:    make([]time.Duration, 0, 1000),
-		maxResponseTimes: 1000,
+		responseTimes:    make([]time.Duration, 0, maxResponseTimes),
+		maxResponseTimes: maxResponseTimes,
+		maxPaths:         maxPaths,
 	}
 	return m
 }
@@ -43,6 +56,9 @@ func (m *Metrics) RecordRequest(path string, status int, duration time.Duration)
 	}
 	m.requestsByStatus[status].Add(1)
 
+	if _, exists := m.requestsByPath[path]; !exists && len(m.requestsByPath) >= m.maxPaths {
+		path = overflowMetricsPathLabel
+	}
 	if _, exists := m.requestsByPath[path]; !exists {
 		m.requestsByPath[path] = &atomic.Int64{}
 	}
@@ -50,7 +66,10 @@ func (m *Metrics) RecordRequest(path string, status int, duration time.Duration)
 
 	if len(m.responseTimes) < m.maxResponseTimes {
 		m.responseTimes = append(m.responseTimes, duration)
+		return
 	}
+	m.responseTimes[m.responseTimeNext] = duration
+	m.responseTimeNext = (m.responseTimeNext + 1) % m.maxResponseTimes
 }
 
 func (m *Metrics) GetSnapshot() MetricsSnapshot {

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -69,5 +70,27 @@ func TestClient_Get_DefaultMaxResponseBytes(t *testing.T) {
 	c := NewClient(Config{BaseURL: "http://example.com"})
 	if c.maxResponseBytes != DefaultMaxResponseBytes {
 		t.Errorf("expected maxResponseBytes to default to %d, got %d", DefaultMaxResponseBytes, c.maxResponseBytes)
+	}
+}
+
+func TestClientGetOversizedErrorResponsePreservesStatusError(t *testing.T) {
+	client := NewClient(Config{
+		BaseURL:          "https://api.example.com",
+		MaxResponseBytes: 10,
+		HTTPClient: httpClientFunc(func(*http.Request) (*http.Response, error) {
+			return &http.Response{
+				StatusCode: http.StatusNotFound,
+				Header:     make(http.Header),
+				Body:       io.NopCloser(bytes.NewReader(bytes.Repeat([]byte("x"), 11))),
+			}, nil
+		}),
+	})
+
+	_, err := client.Get(context.Background(), "missing", nil)
+	if !errors.Is(err, models.ErrNotFound) {
+		t.Fatalf("expected the upstream 404 to remain visible, got %v", err)
+	}
+	if errors.Is(err, models.ErrResponseTooLarge) {
+		t.Errorf("expected the upstream status error, not ErrResponseTooLarge")
 	}
 }

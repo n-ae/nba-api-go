@@ -241,6 +241,8 @@ variables only, read in `cmd/nba-api-server/main.go`:
 
 - `PORT` (default `8080`) - listens on `:$PORT`, all interfaces (there is no separate host/bind-address setting - `-host`/`-port`/`-rate-limit`/`-rate-burst` flags don't exist, despite examples that may circulate suggesting otherwise)
 - `LOG_LEVEL` (default `info`) - currently read and logged at startup but does not filter or change log output
+- `NBA_API_TIMEOUT` (default `30s`) - positive Go duration limiting upstream NBA API requests
+- `CORS_ALLOW_ORIGIN` (default `*`) - value returned in `Access-Control-Allow-Origin`
 - Per-IP rate limiting is hardcoded (100 req/s, burst 200; see `cmd/nba-api-server/main.go`'s `NewRateLimiter` call) - not configurable without a code change
 
 ```bash

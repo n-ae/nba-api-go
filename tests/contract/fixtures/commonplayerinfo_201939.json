@@ -1,0 +1,226 @@
+{
+  "Data": {
+    "CommonPlayerInfo": [
+      {
+        "PERSON_ID": 201939,
+        "FIRST_NAME": "Stephen",
+        "LAST_NAME": "Curry",
+        "DISPLAY_FIRST_LAST": "Stephen Curry",
+        "DISPLAY_LAST_COMMA_FIRST": "Curry, Stephen",
+        "DISPLAY_FI_LAST": "S. Curry",
+        "PLAYER_SLUG": "stephen-curry",
+        "BIRTHDATE": "1988-03-14T00:00:00",
+        "SCHOOL": "Davidson",
+        "COUNTRY": "USA",
+        "LAST_AFFILIATION": "Davidson/USA",
+        "HEIGHT": "6-2",
+        "WEIGHT": "185",
+        "SEASON_EXP": 16,
+        "JERSEY": "30",
+        "POSITION": "Guard",
+        "ROSTERSTATUS": "Active",
+        "TEAM_ID": 0,
+        "TEAM_NAME": "1610612744",
+        "TEAM_ABBREVIATION": "Warriors",
+        "TEAM_CODE": "GSW",
+        "TEAM_CITY": "warriors",
+        "PLAYERCODE": "Golden State",
+        "FROM_YEAR": "stephen_curry",
+        "TO_YEAR": "2009",
+        "DLEAGUE_FLAG": "2025",
+        "NBA_FLAG": "N",
+        "GAMES_PLAYED_FLAG": "Y",
+        "DRAFT_YEAR": "Y",
+        "DRAFT_ROUND": "2009",
+        "DRAFT_NUMBER": "1"
+      }
+    ],
+    "PlayerHeadlineStats": [
+      {
+        "PLAYER_ID": 201939,
+        "PLAYER_NAME": "Stephen Curry",
+        "TimeFrame": "2025-26",
+        "PTS": 26.8,
+        "AST": 4.3,
+        "REB": 3.6,
+        "PIE": 0
+      }
+    ],
+    "AvailableSeasons": [
+      {
+        "SEASON_ID": "12009"
+      },
+      {
+        "SEASON_ID": "22009"
+      },
+      {
+        "SEASON_ID": "12010"
+      },
+      {
+        "SEASON_ID": "22010"
+      },
+      {
+        "SEASON_ID": "12011"
+      },
+      {
+        "SEASON_ID": "22011"
+      },
+      {
+        "SEASON_ID": "12012"
+      },
+      {
+        "SEASON_ID": "22012"
+      },
+      {
+        "SEASON_ID": "42012"
+      },
+      {
+        "SEASON_ID": "12013"
+      },
+      {
+        "SEASON_ID": "22013"
+      },
+      {
+        "SEASON_ID": "32013"
+      },
+      {
+        "SEASON_ID": "42013"
+      },
+      {
+        "SEASON_ID": "12014"
+      },
+      {
+        "SEASON_ID": "22014"
+      },
+      {
+        "SEASON_ID": "32014"
+      },
+      {
+        "SEASON_ID": "42014"
+      },
+      {
+        "SEASON_ID": "12015"
+      },
+      {
+        "SEASON_ID": "22015"
+      },
+      {
+        "SEASON_ID": "32015"
+      },
+      {
+        "SEASON_ID": "42015"
+      },
+      {
+        "SEASON_ID": "12016"
+      },
+      {
+        "SEASON_ID": "22016"
+      },
+      {
+        "SEASON_ID": "32016"
+      },
+      {
+        "SEASON_ID": "42016"
+      },
+      {
+        "SEASON_ID": "12017"
+      },
+      {
+        "SEASON_ID": "22017"
+      },
+      {
+        "SEASON_ID": "32017"
+      },
+      {
+        "SEASON_ID": "42017"
+      },
+      {
+        "SEASON_ID": "12018"
+      },
+      {
+        "SEASON_ID": "22018"
+      },
+      {
+        "SEASON_ID": "32018"
+      },
+      {
+        "SEASON_ID": "42018"
+      },
+      {
+        "SEASON_ID": "12019"
+      },
+      {
+        "SEASON_ID": "22019"
+      },
+      {
+        "SEASON_ID": "12020"
+      },
+      {
+        "SEASON_ID": "22020"
+      },
+      {
+        "SEASON_ID": "32020"
+      },
+      {
+        "SEASON_ID": "52020"
+      },
+      {
+        "SEASON_ID": "12021"
+      },
+      {
+        "SEASON_ID": "22021"
+      },
+      {
+        "SEASON_ID": "32021"
+      },
+      {
+        "SEASON_ID": "42021"
+      },
+      {
+        "SEASON_ID": "12022"
+      },
+      {
+        "SEASON_ID": "22022"
+      },
+      {
+        "SEASON_ID": "42022"
+      },
+      {
+        "SEASON_ID": "12023"
+      },
+      {
+        "SEASON_ID": "22023"
+      },
+      {
+        "SEASON_ID": "32023"
+      },
+      {
+        "SEASON_ID": "52023"
+      },
+      {
+        "SEASON_ID": "12024"
+      },
+      {
+        "SEASON_ID": "22024"
+      },
+      {
+        "SEASON_ID": "32024"
+      },
+      {
+        "SEASON_ID": "42024"
+      },
+      {
+        "SEASON_ID": "52024"
+      },
+      {
+        "SEASON_ID": "12025"
+      },
+      {
+        "SEASON_ID": "22025"
+      }
+    ]
+  },
+  "StatusCode": 200,
+  "URL": "",
+  "Headers": null
+}

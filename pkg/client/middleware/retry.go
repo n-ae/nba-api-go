@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+// RetryConfig controls retry behavior. MaxRetries values below zero are
+// treated as zero, so a request is always attempted at least once.
 type RetryConfig struct {
 	MaxRetries      int
 	InitialBackoff  time.Duration
@@ -35,6 +37,10 @@ func DefaultRetryConfig() RetryConfig {
 }
 
 func WithRetry(config RetryConfig) Middleware {
+	if config.MaxRetries < 0 {
+		config.MaxRetries = 0
+	}
+
 	return func(next RoundTripper) RoundTripper {
 		return RoundTripperFunc(func(ctx context.Context, req *http.Request) (*http.Response, error) {
 			var resp *http.Response

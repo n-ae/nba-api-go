@@ -2,11 +2,19 @@ package client
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"sync"
 	"testing"
 )
+
+type httpClientFunc func(*http.Request) (*http.Response, error)
+
+func (f httpClientFunc) Do(req *http.Request) (*http.Response, error) {
+	return f(req)
+}
 
 func TestClient_Get(t *testing.T) {
 	tests := []struct {
@@ -130,5 +138,51 @@ func TestClient_buildURL(t *testing.T) {
 				t.Errorf("Client.buildURL() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestClientBuildURLRejectsInvalidBaseURL(t *testing.T) {
+	client := NewClient(Config{BaseURL: "://invalid"})
+	if _, err := client.buildURL("health", nil); err == nil {
+		t.Fatal("buildURL() succeeded with an invalid base URL")
+	}
+}
+
+func TestClientHeaderMutationsAreSafeDuringRequests(t *testing.T) {
+	client := NewClient(Config{
+		BaseURL: "https://api.example.com",
+		HTTPClient: httpClientFunc(func(*http.Request) (*http.Response, error) {
+			return &http.Response{
+				StatusCode: http.StatusOK,
+				Header:     make(http.Header),
+				Body:       io.NopCloser(http.NoBody),
+			}, nil
+		}),
+	})
+
+	const iterations = 200
+	errs := make(chan error, iterations)
+	var wg sync.WaitGroup
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		for i := 0; i < iterations; i++ {
+			client.SetHeader("X-Request-ID", "set")
+			client.AddHeader("X-Request-ID", "add")
+			client.SetHeaders(http.Header{"X-Request-ID": {"replace"}})
+		}
+	}()
+	go func() {
+		defer wg.Done()
+		for i := 0; i < iterations; i++ {
+			if _, err := client.Get(context.Background(), "health", nil); err != nil {
+				errs <- err
+			}
+		}
+	}()
+	wg.Wait()
+	close(errs)
+	for err := range errs {
+		t.Errorf("Get() returned error: %v", err)
 	}
 }

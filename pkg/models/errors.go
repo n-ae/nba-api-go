@@ -33,7 +33,13 @@ type APIError struct {
 
 func (e *APIError) Error() string {
 	if e.Err != nil {
+		if e.Body != "" {
+			return fmt.Sprintf("API error (status %d, url %s): %s: %v (body: %q)", e.StatusCode, e.URL, e.Message, e.Err, e.Body)
+		}
 		return fmt.Sprintf("API error (status %d, url %s): %s: %v", e.StatusCode, e.URL, e.Message, e.Err)
+	}
+	if e.Body != "" {
+		return fmt.Sprintf("API error (status %d, url %s): %s (body: %q)", e.StatusCode, e.URL, e.Message, e.Body)
 	}
 	return fmt.Sprintf("API error (status %d, url %s): %s", e.StatusCode, e.URL, e.Message)
 }

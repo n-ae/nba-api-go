@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"path"
 	"sort"
+	"sync"
 	"time"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -36,8 +37,10 @@ type HTTPClient interface {
 }
 
 type Client struct {
-	baseURL          string
+	baseURL          *url.URL
+	baseURLErr       error
 	httpClient       HTTPClient
+	headersMu        sync.RWMutex
 	headers          http.Header
 	timeout          time.Duration
 	transport        RoundTripper
@@ -63,6 +66,8 @@ func NewClient(config Config) *Client {
 	if config.MaxResponseBytes <= 0 {
 		config.MaxResponseBytes = DefaultMaxResponseBytes
 	}
+
+	baseURL, baseURLErr := url.Parse(config.BaseURL)
 
 	if config.HTTPClient == nil {
 		// Clone http.DefaultTransport rather than building one from a
@@ -111,7 +116,8 @@ func NewClient(config Config) *Client {
 	}
 
 	return &Client{
-		baseURL:          config.BaseURL,
+		baseURL:          baseURL,
+		baseURLErr:       baseURLErr,
 		httpClient:       config.HTTPClient,
 		headers:          headers,
 		timeout:          config.Timeout,
@@ -140,7 +146,10 @@ func (c *Client) Get(ctx context.Context, endpoint string, params url.Values) (*
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 
-	for key, values := range c.headers {
+	c.headersMu.RLock()
+	headers := c.headers.Clone()
+	c.headersMu.RUnlock()
+	for key, values := range headers {
 		for _, value := range values {
 			req.Header.Add(key, value)
 		}
@@ -161,14 +170,13 @@ func (c *Client) Get(ctx context.Context, endpoint string, params url.Values) (*
 	if err != nil {
 		return nil, fmt.Errorf("failed to read response body: %w", err)
 	}
-	if int64(len(body)) > c.maxResponseBytes {
-		return nil, fmt.Errorf("%w: %d bytes", models.ErrResponseTooLarge, c.maxResponseBytes)
-	}
-
 	if resp.StatusCode >= 400 {
 		if apiErr := models.HTTPStatusToError(resp.StatusCode, reqURL, body); apiErr != nil {
 			return nil, apiErr
 		}
+	}
+	if int64(len(body)) > c.maxResponseBytes {
+		return nil, fmt.Errorf("%w: %d bytes", models.ErrResponseTooLarge, c.maxResponseBytes)
 	}
 
 	return models.NewRawResponse(body, resp.StatusCode, reqURL, resp.Header), nil
@@ -188,10 +196,10 @@ func (c *Client) GetJSON(ctx context.Context, endpoint string, params url.Values
 }
 
 func (c *Client) buildURL(endpoint string, params url.Values) (string, error) {
-	baseURL, err := url.Parse(c.baseURL)
-	if err != nil {
-		return "", fmt.Errorf("invalid base URL: %w", err)
+	if c.baseURLErr != nil {
+		return "", fmt.Errorf("invalid base URL: %w", c.baseURLErr)
 	}
+	baseURL := *c.baseURL
 
 	baseURL.Path = path.Join(baseURL.Path, endpoint)
 
@@ -219,10 +227,14 @@ func (c *Client) sortParams(params url.Values) url.Values {
 }
 
 func (c *Client) SetHeader(key, value string) {
+	c.headersMu.Lock()
+	defer c.headersMu.Unlock()
 	c.headers.Set(key, value)
 }
 
 func (c *Client) AddHeader(key, value string) {
+	c.headersMu.Lock()
+	defer c.headersMu.Unlock()
 	c.headers.Add(key, value)
 }
 
@@ -231,9 +243,10 @@ func (c *Client) AddHeader(key, value string) {
 // the map the caller passed in (or to c.headers via SetHeader/AddHeader)
 // can't reach into each other unexpectedly.
 func (c *Client) SetHeaders(headers http.Header) {
-	cloned := make(http.Header, len(headers))
-	for key, values := range headers {
-		cloned[key] = append([]string(nil), values...)
+	c.headersMu.Lock()
+	defer c.headersMu.Unlock()
+	c.headers = headers.Clone()
+	if c.headers == nil {
+		c.headers = make(http.Header)
 	}
-	c.headers = cloned
 }

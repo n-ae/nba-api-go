@@ -10,11 +10,8 @@ services:
     environment:
       - PORT=8080
       - LOG_LEVEL=info
-      # NBA_API_TIMEOUT is not currently read by cmd/nba-api-server; this
-      # line documents the intended knob but has no effect. See
-      # docs/adr/002-api-server-architecture.md and the current
-      # maintainability assessment.
       - NBA_API_TIMEOUT=30s
+      - CORS_ALLOW_ORIGIN=*
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]

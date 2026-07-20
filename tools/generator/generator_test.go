@@ -62,6 +62,62 @@ func TestGenerateFromMetadata_ProducesValidGo(t *testing.T) {
 	}
 }
 
+// TestGenerateSingleEndpointLoadsMetadata prevents -endpoint from falling
+// back to the old empty EndpointMetadata stub. A successful single-endpoint
+// generation must include the parameters and result sets supplied by the
+// matching metadata entry.
+func TestGenerateSingleEndpointLoadsMetadata(t *testing.T) {
+	const endpointName = "LeagueGameFinder"
+
+	metadata, err := findEndpointMetadata(defaultMetadataDir(), endpointName)
+	if err != nil {
+		t.Fatalf("findEndpointMetadata(%q, %q): %v", defaultMetadataDir(), endpointName, err)
+	}
+	if len(metadata.Parameters) == 0 || len(metadata.ResultSets) == 0 {
+		t.Fatalf("test metadata for %s is incomplete: got %d parameters and %d result sets", endpointName, len(metadata.Parameters), len(metadata.ResultSets))
+	}
+
+	outDir := t.TempDir()
+	g := NewGenerator(outDir)
+	if err := g.GenerateSingleEndpoint(endpointName, defaultMetadataDir(), false); err != nil {
+		t.Fatalf("GenerateSingleEndpoint(%q): %v", endpointName, err)
+	}
+
+	generatedFile := filepath.Join(outDir, strings.ToLower(endpointName)+".go")
+	generated, err := os.ReadFile(generatedFile)
+	if err != nil {
+		t.Fatalf("failed to read generated endpoint: %v", err)
+	}
+	for _, parameter := range metadata.Parameters {
+		if !strings.Contains(string(generated), "\t"+parameter.Name+" ") {
+			t.Errorf("generated endpoint is missing parameter %q", parameter.Name)
+		}
+	}
+	for _, resultSet := range metadata.ResultSets {
+		if !strings.Contains(string(generated), "\t"+resultSet.Name+" []") {
+			t.Errorf("generated endpoint is missing result set %q", resultSet.Name)
+		}
+	}
+}
+
+// TestGenerateSingleEndpointRejectsUnknownMetadata ensures a typo or a
+// metadata gap fails rather than writing a compilable-but-empty endpoint.
+func TestGenerateSingleEndpointRejectsUnknownMetadata(t *testing.T) {
+	outDir := t.TempDir()
+	g := NewGenerator(outDir)
+	if err := g.GenerateSingleEndpoint("NotARealEndpoint", defaultMetadataDir(), false); err == nil {
+		t.Fatal("GenerateSingleEndpoint() succeeded for an endpoint without metadata")
+	}
+
+	entries, err := os.ReadDir(outDir)
+	if err != nil {
+		t.Fatalf("failed to read output directory: %v", err)
+	}
+	if len(entries) != 0 {
+		t.Fatalf("GenerateSingleEndpoint() wrote files for an endpoint without metadata: %v", entries)
+	}
+}
+
 // TestGoFieldName documents goFieldName's camelCase-to-exported-Go-identifier
 // conversion using real field names from committed metadata. Most metadata
 // field names are already valid, exported Go identifiers
