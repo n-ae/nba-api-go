@@ -1,0 +1,247 @@
+{
+  "Data": {
+    "TeamBackground": [
+      {
+        "TEAM_ID": 1610612743,
+        "ABBREVIATION": "DEN",
+        "NICKNAME": "Nuggets",
+        "YEARFOUNDED": "1976",
+        "CITY": "Denver",
+        "ARENA": "Ball Arena",
+        "ARENACAPACITY": "",
+        "OWNER": "Stan Kroenke",
+        "GENERALMANAGER": 0,
+        "HEADCOACH": "David Adelman",
+        "DLEAGUEAFFILIATION": "Grand Rapids Gold"
+      }
+    ],
+    "TeamHistory": [
+      {
+        "TEAM_ID": 1610612743,
+        "CITY": "Denver",
+        "NICKNAME": "Nuggets",
+        "YEARFOUNDED": "1976",
+        "YEARACTIVETILL": "2023"
+      }
+    ],
+    "TeamSocialSites": [
+      {
+        "ACCOUNTTYPE": "Facebook",
+        "WEBSITE_LINK": "https://www.facebook.com/DenverNuggets"
+      },
+      {
+        "ACCOUNTTYPE": "Instagram",
+        "WEBSITE_LINK": "https://instagram.com/nuggets"
+      },
+      {
+        "ACCOUNTTYPE": "Twitter",
+        "WEBSITE_LINK": "https://twitter.com/nuggets"
+      }
+    ],
+    "TeamAwardsChampionships": [
+      {
+        "YEARAWARDED": "2023",
+        "OPPOSITETEAM": "Miami Heat"
+      }
+    ],
+    "TeamAwardsConf": [
+      {
+        "YEARAWARDED": "2023",
+        "OPPOSITETEAM": ""
+      }
+    ],
+    "TeamAwardsDiv": [
+      {
+        "YEARAWARDED": "1977",
+        "OPPOSITETEAM": ""
+      },
+      {
+        "YEARAWARDED": "1978",
+        "OPPOSITETEAM": ""
+      },
+      {
+        "YEARAWARDED": "1985",
+        "OPPOSITETEAM": ""
+      },
+      {
+        "YEARAWARDED": "1988",
+        "OPPOSITETEAM": ""
+      },
+      {
+        "YEARAWARDED": "2006",
+        "OPPOSITETEAM": ""
+      },
+      {
+        "YEARAWARDED": "2009",
+        "OPPOSITETEAM": ""
+      },
+      {
+        "YEARAWARDED": "2010",
+        "OPPOSITETEAM": ""
+      },
+      {
+        "YEARAWARDED": "2019",
+        "OPPOSITETEAM": ""
+      },
+      {
+        "YEARAWARDED": "2020",
+        "OPPOSITETEAM": ""
+      },
+      {
+        "YEARAWARDED": "2023",
+        "OPPOSITETEAM": ""
+      }
+    ],
+    "TeamHof": [
+      {
+        "PLAYERID": "896",
+        "PLAYER": "Tim Hardaway",
+        "POSITION": "G",
+        "JERSEY": "",
+        "SEASONSWITHTEAM": "2002",
+        "YEAR": "2022"
+      },
+      {
+        "PLAYERID": "77193",
+        "PLAYER": "Bobby Jones",
+        "POSITION": "F",
+        "JERSEY": "",
+        "SEASONSWITHTEAM": "1975-1978",
+        "YEAR": "2019"
+      },
+      {
+        "PLAYERID": "78097",
+        "PLAYER": "Charlie Scott",
+        "POSITION": "G",
+        "JERSEY": "",
+        "SEASONSWITHTEAM": "1979-1980",
+        "YEAR": "2018"
+      },
+      {
+        "PLAYERID": "77532",
+        "PLAYER": "George McGinnis",
+        "POSITION": "F",
+        "JERSEY": "",
+        "SEASONSWITHTEAM": "1978-1980",
+        "YEAR": "2017"
+      },
+      {
+        "PLAYERID": "947",
+        "PLAYER": "Allen Iverson",
+        "POSITION": "G",
+        "JERSEY": "",
+        "SEASONSWITHTEAM": "2007-2009",
+        "YEAR": "2016"
+      },
+      {
+        "PLAYERID": "87",
+        "PLAYER": "Dikembe Mutombo",
+        "POSITION": "C",
+        "JERSEY": "",
+        "SEASONSWITHTEAM": "1992-1996",
+        "YEAR": "2015"
+      },
+      {
+        "PLAYERID": "76981",
+        "PLAYER": "Spencer Haywood",
+        "POSITION": "F",
+        "JERSEY": "",
+        "SEASONSWITHTEAM": "1970",
+        "YEAR": "2015"
+      },
+      {
+        "PLAYERID": "36",
+        "PLAYER": "Sarunas Marciulionis",
+        "POSITION": "G",
+        "JERSEY": "",
+        "SEASONSWITHTEAM": "1997",
+        "YEAR": "2014"
+      },
+      {
+        "PLAYERID": "76673",
+        "PLAYER": "Alex English",
+        "POSITION": "F",
+        "JERSEY": "",
+        "SEASONSWITHTEAM": "1980-1990",
+        "YEAR": "1997"
+      },
+      {
+        "PLAYERID": "78326",
+        "PLAYER": "David Thompson",
+        "POSITION": "G",
+        "JERSEY": "",
+        "SEASONSWITHTEAM": "1976-1982",
+        "YEAR": "1996"
+      },
+      {
+        "PLAYERID": "77097",
+        "PLAYER": "Dan Issel",
+        "POSITION": "C",
+        "JERSEY": "",
+        "SEASONSWITHTEAM": "1976-1985",
+        "YEAR": "1993"
+      }
+    ],
+    "TeamRetired": [
+      {
+        "PLAYERID": "77376",
+        "PLAYER": "Fat Lever",
+        "POSITION": "G",
+        "JERSEY": "12",
+        "SEASONSWITHTEAM": "1984-1990",
+        "YEAR": "2017"
+      },
+      {
+        "PLAYERID": "87",
+        "PLAYER": "Dikembe Mutombo",
+        "POSITION": "C",
+        "JERSEY": "55",
+        "SEASONSWITHTEAM": "1992-1996",
+        "YEAR": "2016"
+      },
+      {
+        "PLAYERID": "",
+        "PLAYER": "Doug Moe",
+        "POSITION": "Coach",
+        "JERSEY": "432",
+        "SEASONSWITHTEAM": "1981-1990",
+        "YEAR": "2002"
+      },
+      {
+        "PLAYERID": "76673",
+        "PLAYER": "Alex English",
+        "POSITION": "F",
+        "JERSEY": "2",
+        "SEASONSWITHTEAM": "1980-1990",
+        "YEAR": "1993"
+      },
+      {
+        "PLAYERID": "78326",
+        "PLAYER": "David Thompson",
+        "POSITION": "G",
+        "JERSEY": "33",
+        "SEASONSWITHTEAM": "1976-1982",
+        "YEAR": "1992"
+      },
+      {
+        "PLAYERID": "77097",
+        "PLAYER": "Dan Issel",
+        "POSITION": "C",
+        "JERSEY": "44",
+        "SEASONSWITHTEAM": "1976-1985",
+        "YEAR": "1985"
+      },
+      {
+        "PLAYERID": "76134",
+        "PLAYER": "Byron Beck",
+        "POSITION": "F/C",
+        "JERSEY": "40",
+        "SEASONSWITHTEAM": "1968-1977",
+        "YEAR": "1977"
+      }
+    ]
+  },
+  "StatusCode": 200,
+  "URL": "",
+  "Headers": null
+}

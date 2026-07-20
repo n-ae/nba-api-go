@@ -1,0 +1,254 @@
+{
+  "Data": {
+    "GameSummary": [
+      {
+        "GAME_DATE_EST": "2023-11-03T00:00:00",
+        "GAME_SEQUENCE": 1,
+        "GAME_ID": "0022300001",
+        "GAME_STATUS_ID": 3,
+        "GAME_STATUS_TEXT": "Final",
+        "GAMECODE": "20231103/CLEIND",
+        "HOME_TEAM_ID": 1610612754,
+        "VISITOR_TEAM_ID": 1610612739,
+        "SEASON": "2023",
+        "LIVE_PERIOD": 4,
+        "LIVE_PC_TIME": "     ",
+        "NATL_TV_BROADCASTER_ABBREVIATION": null,
+        "LIVE_PERIOD_TIME_BCAST": null,
+        "WH_STATUS": 1
+      }
+    ],
+    "OtherStats": [
+      {
+        "LEAGUE_ID": "00",
+        "TEAM_ID": 1610612739,
+        "TEAM_ABBREVIATION": "CLE",
+        "TEAM_CITY": "Cleveland",
+        "PTS_PAINT": 62,
+        "PTS_2ND_CHANCE": 6,
+        "PTS_FB": 24,
+        "LARGEST_LEAD": 4,
+        "LEAD_CHANGES": 10,
+        "TIMES_TIED": 4,
+        "TEAM_TURNOVERS": 0,
+        "TOTAL_TURNOVERS": 13,
+        "TEAM_REBOUNDS": 3,
+        "PTS_OFF_TO": 26
+      },
+      {
+        "LEAGUE_ID": "00",
+        "TEAM_ID": 1610612754,
+        "TEAM_ABBREVIATION": "IND",
+        "TEAM_CITY": "Indiana",
+        "PTS_PAINT": 52,
+        "PTS_2ND_CHANCE": 20,
+        "PTS_FB": 17,
+        "LARGEST_LEAD": 18,
+        "LEAD_CHANGES": 10,
+        "TIMES_TIED": 4,
+        "TEAM_TURNOVERS": 1,
+        "TOTAL_TURNOVERS": 19,
+        "TEAM_REBOUNDS": 16,
+        "PTS_OFF_TO": 15
+      }
+    ],
+    "Officials": [
+      {
+        "OFFICIAL_ID": 101283,
+        "FIRST_NAME": "Brian",
+        "LAST_NAME": "Forte",
+        "JERSEY_NUM": "45  "
+      },
+      {
+        "OFFICIAL_ID": 201638,
+        "FIRST_NAME": "Brent",
+        "LAST_NAME": "Barnaky",
+        "JERSEY_NUM": "36  "
+      },
+      {
+        "OFFICIAL_ID": 1627529,
+        "FIRST_NAME": "Suyash",
+        "LAST_NAME": "Mehta",
+        "JERSEY_NUM": "82  "
+      }
+    ],
+    "InactivePlayers": [
+      {
+        "PLAYER_ID": 201937,
+        "FIRST_NAME": "Ricky",
+        "LAST_NAME": "Rubio",
+        "JERSEY_NUM": "13  ",
+        "TEAM_ID": 1610612739,
+        "TEAM_CITY": "Cleveland",
+        "TEAM_NAME": "Cavaliers",
+        "TEAM_ABBREVIATION": "CLE"
+      },
+      {
+        "PLAYER_ID": 1629660,
+        "FIRST_NAME": "Ty",
+        "LAST_NAME": "Jerome",
+        "JERSEY_NUM": "2   ",
+        "TEAM_ID": 1610612739,
+        "TEAM_CITY": "Cleveland",
+        "TEAM_NAME": "Cavaliers",
+        "TEAM_ABBREVIATION": "CLE"
+      },
+      {
+        "PLAYER_ID": 1630600,
+        "FIRST_NAME": "Isaiah",
+        "LAST_NAME": "Mobley",
+        "JERSEY_NUM": "15  ",
+        "TEAM_ID": 1610612739,
+        "TEAM_CITY": "Cleveland",
+        "TEAM_NAME": "Cavaliers",
+        "TEAM_ABBREVIATION": "CLE"
+      },
+      {
+        "PLAYER_ID": 1641734,
+        "FIRST_NAME": "Emoni",
+        "LAST_NAME": "Bates",
+        "JERSEY_NUM": "21  ",
+        "TEAM_ID": 1610612739,
+        "TEAM_CITY": "Cleveland",
+        "TEAM_NAME": "Cavaliers",
+        "TEAM_ABBREVIATION": "CLE"
+      },
+      {
+        "PLAYER_ID": 1631112,
+        "FIRST_NAME": "Kendall",
+        "LAST_NAME": "Brown",
+        "JERSEY_NUM": "10  ",
+        "TEAM_ID": 1610612754,
+        "TEAM_CITY": "Indiana",
+        "TEAM_NAME": "Pacers",
+        "TEAM_ABBREVIATION": "IND"
+      },
+      {
+        "PLAYER_ID": 1631131,
+        "FIRST_NAME": "Oscar",
+        "LAST_NAME": "Tshiebwe",
+        "JERSEY_NUM": "44  ",
+        "TEAM_ID": 1610612754,
+        "TEAM_CITY": "Indiana",
+        "TEAM_NAME": "Pacers",
+        "TEAM_ABBREVIATION": "IND"
+      },
+      {
+        "PLAYER_ID": 1631209,
+        "FIRST_NAME": "Isaiah",
+        "LAST_NAME": "Wong",
+        "JERSEY_NUM": "21  ",
+        "TEAM_ID": 1610612754,
+        "TEAM_CITY": "Indiana",
+        "TEAM_NAME": "Pacers",
+        "TEAM_ABBREVIATION": "IND"
+      }
+    ],
+    "GameInfo": [
+      {
+        "GAME_DATE": "Friday, November 03, 2023",
+        "ATTENDANCE": 16744,
+        "GAME_TIME": "2:20"
+      }
+    ],
+    "LineScore": [
+      {
+        "GAME_DATE_EST": null,
+        "GAME_SEQUENCE": null,
+        "GAME_ID": null,
+        "TEAM_ID": null,
+        "TEAM_ABBREVIATION": null,
+        "TEAM_CITY_NAME": null,
+        "TEAM_WINS_LOSSES": null,
+        "PTS_QTR1": null,
+        "PTS_QTR2": null,
+        "PTS_QTR3": null,
+        "PTS_QTR4": null,
+        "PTS_OT1": null,
+        "PTS_OT2": null,
+        "PTS_OT3": null,
+        "PTS_OT4": null,
+        "PTS_OT5": null,
+        "PTS_OT6": null,
+        "PTS_OT7": null,
+        "PTS_OT8": null,
+        "PTS_OT9": null,
+        "PTS_OT10": null,
+        "PTS": null,
+        "FG_PCT": null,
+        "FT_PCT": null,
+        "FG3_PCT": null,
+        "AST": null,
+        "REB": null,
+        "TOV": null
+      },
+      {
+        "GAME_DATE_EST": null,
+        "GAME_SEQUENCE": null,
+        "GAME_ID": null,
+        "TEAM_ID": null,
+        "TEAM_ABBREVIATION": null,
+        "TEAM_CITY_NAME": null,
+        "TEAM_WINS_LOSSES": null,
+        "PTS_QTR1": null,
+        "PTS_QTR2": null,
+        "PTS_QTR3": null,
+        "PTS_QTR4": null,
+        "PTS_OT1": null,
+        "PTS_OT2": null,
+        "PTS_OT3": null,
+        "PTS_OT4": null,
+        "PTS_OT5": null,
+        "PTS_OT6": null,
+        "PTS_OT7": null,
+        "PTS_OT8": null,
+        "PTS_OT9": null,
+        "PTS_OT10": null,
+        "PTS": null,
+        "FG_PCT": null,
+        "FT_PCT": null,
+        "FG3_PCT": null,
+        "AST": null,
+        "REB": null,
+        "TOV": null
+      }
+    ],
+    "LastMeeting": [
+      {
+        "GAME_ID": "0022300001",
+        "GAME_DATE_EST": "0022300091",
+        "GAME_DATE_TIME_EST": "2023-10-28T00:00:00",
+        "HOME_TEAM_ID": 1610612754,
+        "HOME_TEAM_CITY": "Indiana",
+        "HOME_TEAM_NAME": "Pacers",
+        "HOME_TEAM_ABBREVIATION": "IND",
+        "HOME_TEAM_POINTS": 125,
+        "VISITOR_TEAM_ID": 1610612739,
+        "VISITOR_TEAM_CITY": "Cleveland",
+        "VISITOR_TEAM_NAME": "Cavaliers",
+        "VISITOR_TEAM_ABBREVIATION": "CLE",
+        "VISITOR_TEAM_POINTS": 113
+      }
+    ],
+    "SeasonSeries": [
+      {
+        "GAME_ID": "0022300001",
+        "HOME_TEAM_ID": 1610612754,
+        "VISITOR_TEAM_ID": 1610612739,
+        "GAME_DATE_EST": "2023-11-03T00:00:00",
+        "HOME_TEAM_WINS": 2,
+        "HOME_TEAM_LOSSES": 2,
+        "SERIES_LEADER": "Tied"
+      }
+    ],
+    "AvailableVideo": [
+      {
+        "GAME_ID": "0022300001",
+        "VIDEO_AVAILABLE_FLAG": 1
+      }
+    ]
+  },
+  "StatusCode": 200,
+  "URL": "",
+  "Headers": null
+}

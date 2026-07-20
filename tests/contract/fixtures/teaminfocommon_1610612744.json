@@ -1,0 +1,38 @@
+{
+  "Data": {
+    "TeamInfoCommon": [
+      {
+        "TEAM_ID": 1610612744,
+        "SEASON_YEAR": "2025-26",
+        "TEAM_CITY": "Golden State",
+        "TEAM_NAME": "Warriors",
+        "TEAM_ABBREVIATION": "GSW",
+        "TEAM_CONFERENCE": "West",
+        "TEAM_DIVISION": "Pacific",
+        "W": 0,
+        "L": 0,
+        "PCT": 5,
+        "MIN_YEAR": "3",
+        "MAX_YEAR": "1"
+      }
+    ],
+    "TeamSeasonRanks": [
+      {
+        "LEAGUE_ID": "00",
+        "SEASON_ID": "22025",
+        "TEAM_ID": 1610612744,
+        "PTS_RANK": 13,
+        "PTS_PG": 117.6,
+        "REB_RANK": 22,
+        "REB_PG": 41.5,
+        "AST_RANK": 5,
+        "AST_PG": 28.4,
+        "OPP_PTS_RANK": 9,
+        "OPP_PTS_PG": 114.6
+      }
+    ]
+  },
+  "StatusCode": 200,
+  "URL": "",
+  "Headers": null
+}
