@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/n-ae/nba-api-go/pkg/models"
+	"github.com/n-ae/nba-api-go/v2/pkg/models"
 )
 
 func TestWriteEndpointError_UsesAPIErrorStatusCode(t *testing.T) {

@@ -110,8 +110,8 @@ import (
     "context"
     "net/url"
 
-    "github.com/n-ae/nba-api-go/pkg/models"
-    "github.com/n-ae/nba-api-go/pkg/stats"
+    "github.com/n-ae/nba-api-go/v2/pkg/models"
+    "github.com/n-ae/nba-api-go/v2/pkg/stats"
 )
 
 type YourEndpointRequest struct {
@@ -262,8 +262,8 @@ import (
 
     "golang.org/x/text/transform"
 
-    "github.com/n-ae/nba-api-go/pkg/models"
-    "github.com/n-ae/nba-api-go/pkg/stats"
+    "github.com/n-ae/nba-api-go/v2/pkg/models"
+    "github.com/n-ae/nba-api-go/v2/pkg/stats"
 )
 ```
 

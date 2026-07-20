@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/n-ae/nba-api-go/pkg/stats"
-	"github.com/n-ae/nba-api-go/pkg/stats/parameters"
+	"github.com/n-ae/nba-api-go/v2/pkg/stats"
+	"github.com/n-ae/nba-api-go/v2/pkg/stats/parameters"
 )
 
 func TestPlayerCareerStatsIntegration(t *testing.T) {

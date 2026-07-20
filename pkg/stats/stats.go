@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/n-ae/nba-api-go/pkg/client"
-	"github.com/n-ae/nba-api-go/pkg/client/middleware"
+	"github.com/n-ae/nba-api-go/v2/pkg/client"
+	"github.com/n-ae/nba-api-go/v2/pkg/client/middleware"
 )
 
 const (

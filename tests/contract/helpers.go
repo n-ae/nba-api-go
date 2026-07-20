@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/n-ae/nba-api-go/pkg/stats/parameters"
+	"github.com/n-ae/nba-api-go/v2/pkg/stats/parameters"
 )
 
 const fixturesDir = "fixtures"

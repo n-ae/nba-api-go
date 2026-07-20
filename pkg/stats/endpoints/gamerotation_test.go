@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/n-ae/nba-api-go/pkg/stats"
+	"github.com/n-ae/nba-api-go/v2/pkg/stats"
 )
 
 // TestGetGameRotation_ColumnOffsets regression-tests the 12-column

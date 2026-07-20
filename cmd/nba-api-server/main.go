@@ -12,8 +12,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/n-ae/nba-api-go/pkg/client"
-	"github.com/n-ae/nba-api-go/pkg/stats"
+	"github.com/n-ae/nba-api-go/v2/pkg/client"
+	"github.com/n-ae/nba-api-go/v2/pkg/stats"
 )
 
 const version = "2.1.0"

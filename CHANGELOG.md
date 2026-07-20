@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.1] - 2026-07-20
+
 ### Fixed
+- **`v2.0.0`/`v2.1.0` were unfetchable via `go get` for any new or upgrading consumer.** Go modules requires a module's path to end in `/vN` once its major version reaches 2 or higher (`go.mod`'s own `module` line, and every import of it) - `v2.0.0` shipped this repo's first major-version bump without that suffix. The result: `go get github.com/n-ae/nba-api-go@v2.1.0` (or any v2.x tag) fails immediately with `invalid version: module contains a go.mod file, so module path must match major version ("github.com/n-ae/nba-api-go/v2")`, before any code is even fetched. Confirmed by reproducing it directly against a scratch module. Existing users who pinned a `v1.x` `go.mod` `require` line before this was noticed are unaffected; this blocked anyone trying to adopt or upgrade to `v2.0.0`/`v2.1.0` from the moment `v2.0.0` was tagged. Fixed: `go.mod`'s `module` line is now `github.com/n-ae/nba-api-go/v2`, and every internal import across the repo (185 files) is updated to match. **Import path change for all consumers**: `import "github.com/n-ae/nba-api-go/pkg/..."` becomes `import "github.com/n-ae/nba-api-go/v2/pkg/..."`. Anyone who somehow got a working `v2.0.0`/`v2.1.0` build via a `replace` directive or vendoring workaround will need to update their import paths to `/v2`; anyone on `v1.x`, or anyone who hit the `go get` failure above and is upgrading for the first time now, is unaffected beyond using the corrected path. `docs/RELEASE_CHECKLIST.md`'s Major Release section now calls this requirement out by name so it isn't missed again at `v3.0.0`.
+
 - **`playercareerstats.go` now validates result-set headers**, matching the pattern `commonplayerinfo`/`playergamelog`/`teamgamelog` gained in `[2.1.0]`. Found by the `v2.1.0` maintainability assessment: `CLAUDE.md` claimed this endpoint already validated headers, but it only did name-based result-set dispatch and parsed rows by fixed position with a length guard - the exact silent-corruption gap `validateHeaders` exists to close. All 8 of its result sets (`SeasonTotals*`/`CareerTotals*` x Regular/Post/AllStar/College) now call `findResultSet`/`validateHeaders` against `jsonTags(SeasonStat{})`/`jsonTags(CareerTotalStat{})`.
 - **`parseSeasonStats`' row-length guard was off by one** (`len(row) < 28`, found while adding the header-validation test above): `SeasonStat` has 27 fields (indices 0-26), so the guard required one more column than the parser ever reads - a live 27-column NBA.com response would have every row silently dropped. Corrected to `len(row) < 27`. (`CareerTotalStat`'s equivalent guard was already correct.)
 - Added `handwritten_headers_test.go`'s first coverage for `playercareerstats.go` (previously 0%).
@@ -503,7 +507,9 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to suggest changes or report issues.
 
-[Unreleased]: https://github.com/n-ae/nba-api-go/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/n-ae/nba-api-go/compare/v2.1.1...HEAD
+[2.1.1]: https://github.com/n-ae/nba-api-go/compare/v2.1.0...v2.1.1
+[2.1.0]: https://github.com/n-ae/nba-api-go/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/n-ae/nba-api-go/compare/v1.3.0...v2.0.0
 [1.3.0]: https://github.com/n-ae/nba-api-go/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/n-ae/nba-api-go/compare/v1.1.7...v1.2.0

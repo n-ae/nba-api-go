@@ -82,7 +82,7 @@ The nba-api-go project currently provides a **Go SDK** for accessing NBA statist
 **Usage:** Import directly in Go applications
 
 ```go
-import "github.com/n-ae/nba-api-go/pkg/stats"
+import "github.com/n-ae/nba-api-go/v2/pkg/stats"
 
 client := stats.NewDefaultClient()
 resp, err := endpoints.PlayerGameLog(ctx, client, req)
@@ -239,7 +239,7 @@ nba-api-go/
 #### Pattern 1: Direct Go Import (Recommended for Go apps)
 
 ```go
-import "github.com/n-ae/nba-api-go/pkg/stats"
+import "github.com/n-ae/nba-api-go/v2/pkg/stats"
 // Use SDK directly
 ```
 

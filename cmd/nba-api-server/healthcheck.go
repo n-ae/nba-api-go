@@ -5,9 +5,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/n-ae/nba-api-go/pkg/stats"
-	"github.com/n-ae/nba-api-go/pkg/stats/endpoints"
-	"github.com/n-ae/nba-api-go/pkg/stats/parameters"
+	"github.com/n-ae/nba-api-go/v2/pkg/stats"
+	"github.com/n-ae/nba-api-go/v2/pkg/stats/endpoints"
+	"github.com/n-ae/nba-api-go/v2/pkg/stats/parameters"
 )
 
 const (

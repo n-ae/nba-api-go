@@ -496,12 +496,12 @@ nba-api-go/                       # root Go module
 ### Import Paths
 ```go
 import (
-    "github.com/n-ae/nba-api-go/pkg/client"
-    "github.com/n-ae/nba-api-go/pkg/client/middleware"
-    "github.com/n-ae/nba-api-go/pkg/stats"
-    "github.com/n-ae/nba-api-go/pkg/stats/endpoints"
-    "github.com/n-ae/nba-api-go/pkg/stats/parameters"
-    "github.com/n-ae/nba-api-go/pkg/stats/static"
+    "github.com/n-ae/nba-api-go/v2/pkg/client"
+    "github.com/n-ae/nba-api-go/v2/pkg/client/middleware"
+    "github.com/n-ae/nba-api-go/v2/pkg/stats"
+    "github.com/n-ae/nba-api-go/v2/pkg/stats/endpoints"
+    "github.com/n-ae/nba-api-go/v2/pkg/stats/parameters"
+    "github.com/n-ae/nba-api-go/v2/pkg/stats/static"
 )
 ```
 
