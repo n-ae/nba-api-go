@@ -77,7 +77,7 @@ type BoxScoreMiscV2Response struct {
 func GetBoxScoreMiscV2(ctx context.Context, client *stats.Client, req BoxScoreMiscV2Request) (*models.Response[*BoxScoreMiscV2Response], error) {
 	params := url.Values{}
 	if req.GameID == "" {
-		return nil, fmt.Errorf("GameID is required")
+		return nil, fmt.Errorf("%s is required", "GameID")
 	}
 	params.Set("GameID", req.GameID)
 	if req.StartPeriod != nil {

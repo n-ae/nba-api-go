@@ -86,7 +86,7 @@ type PlayerProfileV2Response struct {
 func GetPlayerProfileV2(ctx context.Context, client *stats.Client, req PlayerProfileV2Request) (*models.Response[*PlayerProfileV2Response], error) {
 	params := url.Values{}
 	if req.PlayerID == "" {
-		return nil, fmt.Errorf("PlayerID is required")
+		return nil, fmt.Errorf("%s is required", "PlayerID")
 	}
 	params.Set("PlayerID", req.PlayerID)
 	if req.PerMode != nil {

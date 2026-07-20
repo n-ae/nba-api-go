@@ -167,7 +167,7 @@ type TeamDashboardByOpponentResponse struct {
 func GetTeamDashboardByOpponent(ctx context.Context, client *stats.Client, req TeamDashboardByOpponentRequest) (*models.Response[*TeamDashboardByOpponentResponse], error) {
 	params := url.Values{}
 	if req.TeamID == "" {
-		return nil, fmt.Errorf("TeamID is required")
+		return nil, fmt.Errorf("%s is required", "TeamID")
 	}
 	params.Set("TeamID", req.TeamID)
 	if req.MeasureType != nil {

@@ -98,7 +98,7 @@ type TeamDashboardByClutchResponse struct {
 func GetTeamDashboardByClutch(ctx context.Context, client *stats.Client, req TeamDashboardByClutchRequest) (*models.Response[*TeamDashboardByClutchResponse], error) {
 	params := url.Values{}
 	if req.TeamID == "" {
-		return nil, fmt.Errorf("TeamID is required")
+		return nil, fmt.Errorf("%s is required", "TeamID")
 	}
 	params.Set("TeamID", req.TeamID)
 	if req.MeasureType != nil {

@@ -40,7 +40,8 @@
       "STL": "int",
       "BLK": "int",
       "PF": "int",
-      "PTS": "int"
+      "PTS": "int",
+      "TOV": "int"
     }
   },
   "TeamGameLogs": {
@@ -52,7 +53,11 @@
       "STL": "int",
       "BLK": "int",
       "PF": "int",
-      "PTS": "int"
+      "PTS": "int",
+      "TOV": "int",
+      "PFD": "int",
+      "DD2": "int",
+      "TD3": "int"
     }
   },
   "TeamYearByYearStats": {
@@ -64,7 +69,13 @@
       "STL": "int",
       "BLK": "int",
       "PF": "int",
-      "PTS": "int"
+      "PTS": "int",
+      "WINS": "int",
+      "LOSSES": "int",
+      "TOV": "int",
+      "PTS_RANK": "int",
+      "CONF_RANK": "int",
+      "DIV_RANK": "int"
     }
   }
 }

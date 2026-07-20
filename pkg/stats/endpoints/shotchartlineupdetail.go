@@ -36,7 +36,7 @@ type ShotChartLineupDetailShot_Chart_Detail struct {
 	SHOT_TYPE           string  `json:"SHOT_TYPE"`
 	SHOT_ZONE_BASIC     string  `json:"SHOT_ZONE_BASIC"`
 	SHOT_ZONE_AREA      string  `json:"SHOT_ZONE_AREA"`
-	SHOT_ZONE_RANGE     int     `json:"SHOT_ZONE_RANGE"`
+	SHOT_ZONE_RANGE     string  `json:"SHOT_ZONE_RANGE"`
 	SHOT_DISTANCE       string  `json:"SHOT_DISTANCE"`
 	LOC_X               string  `json:"LOC_X"`
 	LOC_Y               string  `json:"LOC_Y"`
@@ -52,7 +52,7 @@ type ShotChartLineupDetailLeagueAverages struct {
 	GRID_TYPE       string  `json:"GRID_TYPE"`
 	SHOT_ZONE_BASIC string  `json:"SHOT_ZONE_BASIC"`
 	SHOT_ZONE_AREA  string  `json:"SHOT_ZONE_AREA"`
-	SHOT_ZONE_RANGE int     `json:"SHOT_ZONE_RANGE"`
+	SHOT_ZONE_RANGE string  `json:"SHOT_ZONE_RANGE"`
 	FGA             int     `json:"FGA"`
 	FGM             int     `json:"FGM"`
 	FG_PCT          float64 `json:"FG_PCT"`
@@ -112,7 +112,7 @@ func GetShotChartLineupDetail(ctx context.Context, client *stats.Client, req Sho
 					SHOT_TYPE:           toString(row[12]),
 					SHOT_ZONE_BASIC:     toString(row[13]),
 					SHOT_ZONE_AREA:      toString(row[14]),
-					SHOT_ZONE_RANGE:     toInt(row[15]),
+					SHOT_ZONE_RANGE:     toString(row[15]),
 					SHOT_DISTANCE:       toString(row[16]),
 					LOC_X:               toString(row[17]),
 					LOC_Y:               toString(row[18]),
@@ -134,7 +134,7 @@ func GetShotChartLineupDetail(ctx context.Context, client *stats.Client, req Sho
 					GRID_TYPE:       toString(row[0]),
 					SHOT_ZONE_BASIC: toString(row[1]),
 					SHOT_ZONE_AREA:  toString(row[2]),
-					SHOT_ZONE_RANGE: toInt(row[3]),
+					SHOT_ZONE_RANGE: toString(row[3]),
 					FGA:             toInt(row[4]),
 					FGM:             toInt(row[5]),
 					FG_PCT:          toFloat(row[6]),

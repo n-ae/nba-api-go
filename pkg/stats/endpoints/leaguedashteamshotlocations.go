@@ -28,25 +28,25 @@ type LeagueDashTeamShotLocationsShotLocations struct {
 	W_PCT                 float64 `json:"W_PCT"`
 	FGM_RA                int     `json:"FGM_RA"`
 	FGA_RA                int     `json:"FGA_RA"`
-	FG_PCT_RA             string  `json:"FG_PCT_RA"`
+	FG_PCT_RA             float64 `json:"FG_PCT_RA"`
 	FGM_IN_PAINT          float64 `json:"FGM_IN_PAINT"`
 	FGA_IN_PAINT          float64 `json:"FGA_IN_PAINT"`
-	FG_PCT_IN_PAINT       string  `json:"FG_PCT_IN_PAINT"`
+	FG_PCT_IN_PAINT       float64 `json:"FG_PCT_IN_PAINT"`
 	FGM_MID_RANGE         float64 `json:"FGM_MID_RANGE"`
 	FGA_MID_RANGE         float64 `json:"FGA_MID_RANGE"`
-	FG_PCT_MID_RANGE      int     `json:"FG_PCT_MID_RANGE"`
+	FG_PCT_MID_RANGE      float64 `json:"FG_PCT_MID_RANGE"`
 	FGM_LEFT_CORNER_3     float64 `json:"FGM_LEFT_CORNER_3"`
 	FGA_LEFT_CORNER_3     float64 `json:"FGA_LEFT_CORNER_3"`
-	FG_PCT_LEFT_CORNER_3  string  `json:"FG_PCT_LEFT_CORNER_3"`
+	FG_PCT_LEFT_CORNER_3  float64 `json:"FG_PCT_LEFT_CORNER_3"`
 	FGM_RIGHT_CORNER_3    float64 `json:"FGM_RIGHT_CORNER_3"`
 	FGA_RIGHT_CORNER_3    float64 `json:"FGA_RIGHT_CORNER_3"`
-	FG_PCT_RIGHT_CORNER_3 string  `json:"FG_PCT_RIGHT_CORNER_3"`
+	FG_PCT_RIGHT_CORNER_3 float64 `json:"FG_PCT_RIGHT_CORNER_3"`
 	FGM_ABOVE_BREAK_3     float64 `json:"FGM_ABOVE_BREAK_3"`
 	FGA_ABOVE_BREAK_3     float64 `json:"FGA_ABOVE_BREAK_3"`
-	FG_PCT_ABOVE_BREAK_3  string  `json:"FG_PCT_ABOVE_BREAK_3"`
+	FG_PCT_ABOVE_BREAK_3  float64 `json:"FG_PCT_ABOVE_BREAK_3"`
 	FGM_BACKCOURT         float64 `json:"FGM_BACKCOURT"`
 	FGA_BACKCOURT         float64 `json:"FGA_BACKCOURT"`
-	FG_PCT_BACKCOURT      string  `json:"FG_PCT_BACKCOURT"`
+	FG_PCT_BACKCOURT      float64 `json:"FG_PCT_BACKCOURT"`
 }
 
 // LeagueDashTeamShotLocationsResponse contains the response data from the LeagueDashTeamShotLocations endpoint
@@ -90,25 +90,25 @@ func GetLeagueDashTeamShotLocations(ctx context.Context, client *stats.Client, r
 					W_PCT:                 toFloat(row[6]),
 					FGM_RA:                toInt(row[7]),
 					FGA_RA:                toInt(row[8]),
-					FG_PCT_RA:             toString(row[9]),
+					FG_PCT_RA:             toFloat(row[9]),
 					FGM_IN_PAINT:          toFloat(row[10]),
 					FGA_IN_PAINT:          toFloat(row[11]),
-					FG_PCT_IN_PAINT:       toString(row[12]),
+					FG_PCT_IN_PAINT:       toFloat(row[12]),
 					FGM_MID_RANGE:         toFloat(row[13]),
 					FGA_MID_RANGE:         toFloat(row[14]),
-					FG_PCT_MID_RANGE:      toInt(row[15]),
+					FG_PCT_MID_RANGE:      toFloat(row[15]),
 					FGM_LEFT_CORNER_3:     toFloat(row[16]),
 					FGA_LEFT_CORNER_3:     toFloat(row[17]),
-					FG_PCT_LEFT_CORNER_3:  toString(row[18]),
+					FG_PCT_LEFT_CORNER_3:  toFloat(row[18]),
 					FGM_RIGHT_CORNER_3:    toFloat(row[19]),
 					FGA_RIGHT_CORNER_3:    toFloat(row[20]),
-					FG_PCT_RIGHT_CORNER_3: toString(row[21]),
+					FG_PCT_RIGHT_CORNER_3: toFloat(row[21]),
 					FGM_ABOVE_BREAK_3:     toFloat(row[22]),
 					FGA_ABOVE_BREAK_3:     toFloat(row[23]),
-					FG_PCT_ABOVE_BREAK_3:  toString(row[24]),
+					FG_PCT_ABOVE_BREAK_3:  toFloat(row[24]),
 					FGM_BACKCOURT:         toFloat(row[25]),
 					FGA_BACKCOURT:         toFloat(row[26]),
-					FG_PCT_BACKCOURT:      toString(row[27]),
+					FG_PCT_BACKCOURT:      toFloat(row[27]),
 				}
 				response.ShotLocations = append(response.ShotLocations, item)
 			}

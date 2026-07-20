@@ -22,7 +22,7 @@ type PlayerDashPtShotsRequest struct {
 // PlayerDashPtShotsOverallShooting represents the OverallShooting result set for PlayerDashPtShots
 type PlayerDashPtShotsOverallShooting struct {
 	PLAYER_ID              int     `json:"PLAYER_ID"`
-	PLAYER_NAME_LAST_FIRST float64 `json:"PLAYER_NAME_LAST_FIRST"`
+	PLAYER_NAME_LAST_FIRST string  `json:"PLAYER_NAME_LAST_FIRST"`
 	SORT_ORDER             string  `json:"SORT_ORDER"`
 	GP                     int     `json:"GP"`
 	G                      string  `json:"G"`
@@ -44,7 +44,7 @@ type PlayerDashPtShotsOverallShooting struct {
 // PlayerDashPtShotsGeneralShooting represents the GeneralShooting result set for PlayerDashPtShots
 type PlayerDashPtShotsGeneralShooting struct {
 	PLAYER_ID              int     `json:"PLAYER_ID"`
-	PLAYER_NAME_LAST_FIRST float64 `json:"PLAYER_NAME_LAST_FIRST"`
+	PLAYER_NAME_LAST_FIRST string  `json:"PLAYER_NAME_LAST_FIRST"`
 	SHOT_TYPE              string  `json:"SHOT_TYPE"`
 	FGA_FREQUENCY          float64 `json:"FGA_FREQUENCY"`
 	FGM                    int     `json:"FGM"`
@@ -64,8 +64,8 @@ type PlayerDashPtShotsGeneralShooting struct {
 // PlayerDashPtShotsShotClockShooting represents the ShotClockShooting result set for PlayerDashPtShots
 type PlayerDashPtShotsShotClockShooting struct {
 	PLAYER_ID              int     `json:"PLAYER_ID"`
-	PLAYER_NAME_LAST_FIRST float64 `json:"PLAYER_NAME_LAST_FIRST"`
-	SHOT_CLOCK_RANGE       int     `json:"SHOT_CLOCK_RANGE"`
+	PLAYER_NAME_LAST_FIRST string  `json:"PLAYER_NAME_LAST_FIRST"`
+	SHOT_CLOCK_RANGE       string  `json:"SHOT_CLOCK_RANGE"`
 	FGA_FREQUENCY          float64 `json:"FGA_FREQUENCY"`
 	FGM                    int     `json:"FGM"`
 	FGA                    int     `json:"FGA"`
@@ -84,8 +84,8 @@ type PlayerDashPtShotsShotClockShooting struct {
 // PlayerDashPtShotsDribbleShooting represents the DribbleShooting result set for PlayerDashPtShots
 type PlayerDashPtShotsDribbleShooting struct {
 	PLAYER_ID              int     `json:"PLAYER_ID"`
-	PLAYER_NAME_LAST_FIRST float64 `json:"PLAYER_NAME_LAST_FIRST"`
-	DRIBBLE_RANGE          int     `json:"DRIBBLE_RANGE"`
+	PLAYER_NAME_LAST_FIRST string  `json:"PLAYER_NAME_LAST_FIRST"`
+	DRIBBLE_RANGE          string  `json:"DRIBBLE_RANGE"`
 	FGA_FREQUENCY          float64 `json:"FGA_FREQUENCY"`
 	FGM                    int     `json:"FGM"`
 	FGA                    int     `json:"FGA"`
@@ -104,8 +104,8 @@ type PlayerDashPtShotsDribbleShooting struct {
 // PlayerDashPtShotsClosestDefenderShooting represents the ClosestDefenderShooting result set for PlayerDashPtShots
 type PlayerDashPtShotsClosestDefenderShooting struct {
 	PLAYER_ID              int     `json:"PLAYER_ID"`
-	PLAYER_NAME_LAST_FIRST float64 `json:"PLAYER_NAME_LAST_FIRST"`
-	CLOSE_DEF_DIST_RANGE   int     `json:"CLOSE_DEF_DIST_RANGE"`
+	PLAYER_NAME_LAST_FIRST string  `json:"PLAYER_NAME_LAST_FIRST"`
+	CLOSE_DEF_DIST_RANGE   string  `json:"CLOSE_DEF_DIST_RANGE"`
 	FGA_FREQUENCY          float64 `json:"FGA_FREQUENCY"`
 	FGM                    int     `json:"FGM"`
 	FGA                    int     `json:"FGA"`
@@ -124,8 +124,8 @@ type PlayerDashPtShotsClosestDefenderShooting struct {
 // PlayerDashPtShotsTouchTimeShooting represents the TouchTimeShooting result set for PlayerDashPtShots
 type PlayerDashPtShotsTouchTimeShooting struct {
 	PLAYER_ID              int     `json:"PLAYER_ID"`
-	PLAYER_NAME_LAST_FIRST float64 `json:"PLAYER_NAME_LAST_FIRST"`
-	TOUCH_TIME_RANGE       int     `json:"TOUCH_TIME_RANGE"`
+	PLAYER_NAME_LAST_FIRST string  `json:"PLAYER_NAME_LAST_FIRST"`
+	TOUCH_TIME_RANGE       string  `json:"TOUCH_TIME_RANGE"`
 	FGA_FREQUENCY          float64 `json:"FGA_FREQUENCY"`
 	FGM                    int     `json:"FGM"`
 	FGA                    int     `json:"FGA"`
@@ -155,7 +155,7 @@ type PlayerDashPtShotsResponse struct {
 func GetPlayerDashPtShots(ctx context.Context, client *stats.Client, req PlayerDashPtShotsRequest) (*models.Response[*PlayerDashPtShotsResponse], error) {
 	params := url.Values{}
 	if req.PlayerID == "" {
-		return nil, fmt.Errorf("PlayerID is required")
+		return nil, fmt.Errorf("%s is required", "PlayerID")
 	}
 	params.Set("PlayerID", req.PlayerID)
 	if req.Season != nil {
@@ -183,7 +183,7 @@ func GetPlayerDashPtShots(ctx context.Context, client *stats.Client, req PlayerD
 			if len(row) >= 18 {
 				item := PlayerDashPtShotsOverallShooting{
 					PLAYER_ID:              toInt(row[0]),
-					PLAYER_NAME_LAST_FIRST: toFloat(row[1]),
+					PLAYER_NAME_LAST_FIRST: toString(row[1]),
 					SORT_ORDER:             toString(row[2]),
 					GP:                     toInt(row[3]),
 					G:                      toString(row[4]),
@@ -211,7 +211,7 @@ func GetPlayerDashPtShots(ctx context.Context, client *stats.Client, req PlayerD
 			if len(row) >= 16 {
 				item := PlayerDashPtShotsGeneralShooting{
 					PLAYER_ID:              toInt(row[0]),
-					PLAYER_NAME_LAST_FIRST: toFloat(row[1]),
+					PLAYER_NAME_LAST_FIRST: toString(row[1]),
 					SHOT_TYPE:              toString(row[2]),
 					FGA_FREQUENCY:          toFloat(row[3]),
 					FGM:                    toInt(row[4]),
@@ -237,8 +237,8 @@ func GetPlayerDashPtShots(ctx context.Context, client *stats.Client, req PlayerD
 			if len(row) >= 16 {
 				item := PlayerDashPtShotsShotClockShooting{
 					PLAYER_ID:              toInt(row[0]),
-					PLAYER_NAME_LAST_FIRST: toFloat(row[1]),
-					SHOT_CLOCK_RANGE:       toInt(row[2]),
+					PLAYER_NAME_LAST_FIRST: toString(row[1]),
+					SHOT_CLOCK_RANGE:       toString(row[2]),
 					FGA_FREQUENCY:          toFloat(row[3]),
 					FGM:                    toInt(row[4]),
 					FGA:                    toInt(row[5]),
@@ -263,8 +263,8 @@ func GetPlayerDashPtShots(ctx context.Context, client *stats.Client, req PlayerD
 			if len(row) >= 16 {
 				item := PlayerDashPtShotsDribbleShooting{
 					PLAYER_ID:              toInt(row[0]),
-					PLAYER_NAME_LAST_FIRST: toFloat(row[1]),
-					DRIBBLE_RANGE:          toInt(row[2]),
+					PLAYER_NAME_LAST_FIRST: toString(row[1]),
+					DRIBBLE_RANGE:          toString(row[2]),
 					FGA_FREQUENCY:          toFloat(row[3]),
 					FGM:                    toInt(row[4]),
 					FGA:                    toInt(row[5]),
@@ -289,8 +289,8 @@ func GetPlayerDashPtShots(ctx context.Context, client *stats.Client, req PlayerD
 			if len(row) >= 16 {
 				item := PlayerDashPtShotsClosestDefenderShooting{
 					PLAYER_ID:              toInt(row[0]),
-					PLAYER_NAME_LAST_FIRST: toFloat(row[1]),
-					CLOSE_DEF_DIST_RANGE:   toInt(row[2]),
+					PLAYER_NAME_LAST_FIRST: toString(row[1]),
+					CLOSE_DEF_DIST_RANGE:   toString(row[2]),
 					FGA_FREQUENCY:          toFloat(row[3]),
 					FGM:                    toInt(row[4]),
 					FGA:                    toInt(row[5]),
@@ -315,8 +315,8 @@ func GetPlayerDashPtShots(ctx context.Context, client *stats.Client, req PlayerD
 			if len(row) >= 16 {
 				item := PlayerDashPtShotsTouchTimeShooting{
 					PLAYER_ID:              toInt(row[0]),
-					PLAYER_NAME_LAST_FIRST: toFloat(row[1]),
-					TOUCH_TIME_RANGE:       toInt(row[2]),
+					PLAYER_NAME_LAST_FIRST: toString(row[1]),
+					TOUCH_TIME_RANGE:       toString(row[2]),
 					FGA_FREQUENCY:          toFloat(row[3]),
 					FGM:                    toInt(row[4]),
 					FGA:                    toInt(row[5]),

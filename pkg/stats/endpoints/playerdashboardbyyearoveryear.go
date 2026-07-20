@@ -98,7 +98,7 @@ type PlayerDashboardByYearOverYearResponse struct {
 func GetPlayerDashboardByYearOverYear(ctx context.Context, client *stats.Client, req PlayerDashboardByYearOverYearRequest) (*models.Response[*PlayerDashboardByYearOverYearResponse], error) {
 	params := url.Values{}
 	if req.PlayerID == "" {
-		return nil, fmt.Errorf("PlayerID is required")
+		return nil, fmt.Errorf("%s is required", "PlayerID")
 	}
 	params.Set("PlayerID", req.PlayerID)
 	if req.MeasureType != nil {

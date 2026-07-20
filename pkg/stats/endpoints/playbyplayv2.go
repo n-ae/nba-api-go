@@ -70,7 +70,7 @@ type PlayByPlayV2Response struct {
 func GetPlayByPlayV2(ctx context.Context, client *stats.Client, req PlayByPlayV2Request) (*models.Response[*PlayByPlayV2Response], error) {
 	params := url.Values{}
 	if req.GameID == "" {
-		return nil, fmt.Errorf("GameID is required")
+		return nil, fmt.Errorf("%s is required", "GameID")
 	}
 	params.Set("GameID", req.GameID)
 	if req.StartPeriod != nil {

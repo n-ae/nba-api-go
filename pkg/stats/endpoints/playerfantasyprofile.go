@@ -48,7 +48,7 @@ type PlayerFantasyProfileResponse struct {
 func GetPlayerFantasyProfile(ctx context.Context, client *stats.Client, req PlayerFantasyProfileRequest) (*models.Response[*PlayerFantasyProfileResponse], error) {
 	params := url.Values{}
 	if req.PlayerID == "" {
-		return nil, fmt.Errorf("PlayerID is required")
+		return nil, fmt.Errorf("%s is required", "PlayerID")
 	}
 	params.Set("PlayerID", req.PlayerID)
 

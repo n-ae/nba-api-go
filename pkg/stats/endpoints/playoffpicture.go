@@ -65,7 +65,7 @@ func GetPlayoffPicture(ctx context.Context, client *stats.Client, req PlayoffPic
 		params.Set("LeagueID", string(*req.LeagueID))
 	}
 	if req.SeasonID == "" {
-		return nil, fmt.Errorf("SeasonID is required")
+		return nil, fmt.Errorf("%s is required", "SeasonID")
 	}
 	params.Set("SeasonID", string(req.SeasonID))
 

@@ -62,11 +62,11 @@ type TeamVsTeamResponse struct {
 func GetTeamVsTeam(ctx context.Context, client *stats.Client, req TeamVsTeamRequest) (*models.Response[*TeamVsTeamResponse], error) {
 	params := url.Values{}
 	if req.TeamID == "" {
-		return nil, fmt.Errorf("TeamID is required")
+		return nil, fmt.Errorf("%s is required", "TeamID")
 	}
 	params.Set("TeamID", req.TeamID)
 	if req.VsTeamID == "" {
-		return nil, fmt.Errorf("VsTeamID is required")
+		return nil, fmt.Errorf("%s is required", "VsTeamID")
 	}
 	params.Set("VsTeamID", req.VsTeamID)
 	if req.Season != nil {

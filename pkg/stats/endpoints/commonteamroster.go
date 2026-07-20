@@ -62,7 +62,7 @@ type CommonTeamRosterResponse struct {
 func GetCommonTeamRoster(ctx context.Context, client *stats.Client, req CommonTeamRosterRequest) (*models.Response[*CommonTeamRosterResponse], error) {
 	params := url.Values{}
 	if req.TeamID == "" {
-		return nil, fmt.Errorf("TeamID is required")
+		return nil, fmt.Errorf("%s is required", "TeamID")
 	}
 	params.Set("TeamID", req.TeamID)
 	if req.Season != nil {

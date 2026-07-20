@@ -65,7 +65,7 @@ type TeamDashPtShotsGeneralShooting struct {
 type TeamDashPtShotsShotClockShooting struct {
 	TEAM_ID          int     `json:"TEAM_ID"`
 	TEAM_NAME        string  `json:"TEAM_NAME"`
-	SHOT_CLOCK_RANGE int     `json:"SHOT_CLOCK_RANGE"`
+	SHOT_CLOCK_RANGE string  `json:"SHOT_CLOCK_RANGE"`
 	FGA_FREQUENCY    float64 `json:"FGA_FREQUENCY"`
 	FGM              int     `json:"FGM"`
 	FGA              int     `json:"FGA"`
@@ -92,7 +92,7 @@ type TeamDashPtShotsResponse struct {
 func GetTeamDashPtShots(ctx context.Context, client *stats.Client, req TeamDashPtShotsRequest) (*models.Response[*TeamDashPtShotsResponse], error) {
 	params := url.Values{}
 	if req.TeamID == "" {
-		return nil, fmt.Errorf("TeamID is required")
+		return nil, fmt.Errorf("%s is required", "TeamID")
 	}
 	params.Set("TeamID", req.TeamID)
 	if req.Season != nil {
@@ -175,7 +175,7 @@ func GetTeamDashPtShots(ctx context.Context, client *stats.Client, req TeamDashP
 				item := TeamDashPtShotsShotClockShooting{
 					TEAM_ID:          toInt(row[0]),
 					TEAM_NAME:        toString(row[1]),
-					SHOT_CLOCK_RANGE: toInt(row[2]),
+					SHOT_CLOCK_RANGE: toString(row[2]),
 					FGA_FREQUENCY:    toFloat(row[3]),
 					FGM:              toInt(row[4]),
 					FGA:              toInt(row[5]),

@@ -53,7 +53,7 @@ type WinProbabilityPBPResponse struct {
 func GetWinProbabilityPBP(ctx context.Context, client *stats.Client, req WinProbabilityPBPRequest) (*models.Response[*WinProbabilityPBPResponse], error) {
 	params := url.Values{}
 	if req.GameID == "" {
-		return nil, fmt.Errorf("GameID is required")
+		return nil, fmt.Errorf("%s is required", "GameID")
 	}
 	params.Set("GameID", req.GameID)
 	if req.RunType != nil {

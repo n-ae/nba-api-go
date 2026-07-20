@@ -69,7 +69,7 @@ type BoxScoreFourFactorsV2Response struct {
 func GetBoxScoreFourFactorsV2(ctx context.Context, client *stats.Client, req BoxScoreFourFactorsV2Request) (*models.Response[*BoxScoreFourFactorsV2Response], error) {
 	params := url.Values{}
 	if req.GameID == "" {
-		return nil, fmt.Errorf("GameID is required")
+		return nil, fmt.Errorf("%s is required", "GameID")
 	}
 	params.Set("GameID", req.GameID)
 	if req.StartPeriod != nil {

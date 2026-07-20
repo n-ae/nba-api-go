@@ -30,7 +30,7 @@ type TeamInfoCommonV2TeamInfoCommon struct {
 	TEAM_CODE         string  `json:"TEAM_CODE"`
 	W                 string  `json:"W"`
 	L                 string  `json:"L"`
-	PCT               string  `json:"PCT"`
+	PCT               float64 `json:"PCT"`
 	CONF_RANK         float64 `json:"CONF_RANK"`
 	DIV_RANK          float64 `json:"DIV_RANK"`
 	MIN_YEAR          float64 `json:"MIN_YEAR"`
@@ -62,7 +62,7 @@ type TeamInfoCommonV2Response struct {
 func GetTeamInfoCommonV2(ctx context.Context, client *stats.Client, req TeamInfoCommonV2Request) (*models.Response[*TeamInfoCommonV2Response], error) {
 	params := url.Values{}
 	if req.TeamID == "" {
-		return nil, fmt.Errorf("TeamID is required")
+		return nil, fmt.Errorf("%s is required", "TeamID")
 	}
 	params.Set("TeamID", req.TeamID)
 	if req.LeagueID != nil {
@@ -96,7 +96,7 @@ func GetTeamInfoCommonV2(ctx context.Context, client *stats.Client, req TeamInfo
 					TEAM_CODE:         toString(row[7]),
 					W:                 toString(row[8]),
 					L:                 toString(row[9]),
-					PCT:               toString(row[10]),
+					PCT:               toFloat(row[10]),
 					CONF_RANK:         toFloat(row[11]),
 					DIV_RANK:          toFloat(row[12]),
 					MIN_YEAR:          toFloat(row[13]),
