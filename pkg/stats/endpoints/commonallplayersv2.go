@@ -18,20 +18,20 @@ type CommonAllPlayersV2Request struct {
 
 // CommonAllPlayersV2CommonAllPlayers represents the CommonAllPlayers result set for CommonAllPlayersV2
 type CommonAllPlayersV2CommonAllPlayers struct {
-	PERSON_ID                 string  `json:"PERSON_ID"`
-	DISPLAY_LAST_COMMA_FIRST  float64 `json:"DISPLAY_LAST_COMMA_FIRST"`
-	DISPLAY_FIRST_LAST        float64 `json:"DISPLAY_FIRST_LAST"`
-	ROSTERSTATUS              string  `json:"ROSTERSTATUS"`
-	FROM_YEAR                 string  `json:"FROM_YEAR"`
-	TO_YEAR                   string  `json:"TO_YEAR"`
-	PLAYERCODE                string  `json:"PLAYERCODE"`
-	TEAM_ID                   int     `json:"TEAM_ID"`
-	TEAM_CITY                 string  `json:"TEAM_CITY"`
-	TEAM_NAME                 string  `json:"TEAM_NAME"`
-	TEAM_ABBREVIATION         string  `json:"TEAM_ABBREVIATION"`
-	TEAM_CODE                 string  `json:"TEAM_CODE"`
-	GAMES_PLAYED_FLAG         string  `json:"GAMES_PLAYED_FLAG"`
-	OTHERLEAGUE_EXPERIENCE_CH string  `json:"OTHERLEAGUE_EXPERIENCE_CH"`
+	PERSON_ID                 string `json:"PERSON_ID"`
+	DISPLAY_LAST_COMMA_FIRST  string `json:"DISPLAY_LAST_COMMA_FIRST"`
+	DISPLAY_FIRST_LAST        string `json:"DISPLAY_FIRST_LAST"`
+	ROSTERSTATUS              string `json:"ROSTERSTATUS"`
+	FROM_YEAR                 string `json:"FROM_YEAR"`
+	TO_YEAR                   string `json:"TO_YEAR"`
+	PLAYERCODE                string `json:"PLAYERCODE"`
+	TEAM_ID                   int    `json:"TEAM_ID"`
+	TEAM_CITY                 string `json:"TEAM_CITY"`
+	TEAM_NAME                 string `json:"TEAM_NAME"`
+	TEAM_ABBREVIATION         string `json:"TEAM_ABBREVIATION"`
+	TEAM_CODE                 string `json:"TEAM_CODE"`
+	GAMES_PLAYED_FLAG         string `json:"GAMES_PLAYED_FLAG"`
+	OTHERLEAGUE_EXPERIENCE_CH string `json:"OTHERLEAGUE_EXPERIENCE_CH"`
 }
 
 // CommonAllPlayersV2Response contains the response data from the CommonAllPlayersV2 endpoint
@@ -64,8 +64,8 @@ func GetCommonAllPlayersV2(ctx context.Context, client *stats.Client, req Common
 			if len(row) >= 14 {
 				item := CommonAllPlayersV2CommonAllPlayers{
 					PERSON_ID:                 toString(row[0]),
-					DISPLAY_LAST_COMMA_FIRST:  toFloat(row[1]),
-					DISPLAY_FIRST_LAST:        toFloat(row[2]),
+					DISPLAY_LAST_COMMA_FIRST:  toString(row[1]),
+					DISPLAY_FIRST_LAST:        toString(row[2]),
 					ROSTERSTATUS:              toString(row[3]),
 					FROM_YEAR:                 toString(row[4]),
 					TO_YEAR:                   toString(row[5]),

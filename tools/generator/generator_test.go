@@ -428,6 +428,41 @@ func TestShotChartFieldsMatchShotChartDetailPrecedent(t *testing.T) {
 	}
 }
 
+// TestTeamInfoCommonFieldsMatchCodebaseMajority documents a verification
+// step for teaminfocommon.go done differently from every other case above:
+// no fieldtypes.json entry needed correcting - the existing (unreviewed,
+// inferGoType-inherited) global values already agree with the overwhelming
+// committed-code majority, and teaminfocommon.go itself was the outlier.
+// W/L are "int" in only 2 of 87 committed occurrences (the rest, including
+// every "*DashboardBy*Splits" family endpoint, are "string"); PTS_RANK/
+// REB_RANK/AST_RANK are "int" in only teaminfocommon.go among 13-14
+// occurrences each; MIN_YEAR is "string" only in teaminfocommon.go, versus
+// "float64" in its two siblings (commonteamyears.go, teaminfocommonv2.go).
+// None of these are the corruption class fixed elsewhere in this file
+// (int<->string<->float64 for a whole-number value loses no data either
+// direction) - this test exists so a future reader doesn't mistake
+// "teaminfocommon.go's types changed" for "nobody checked whether the
+// dictionary was right first."
+func TestTeamInfoCommonFieldsMatchCodebaseMajority(t *testing.T) {
+	majority := []struct{ resultSet, field, want string }{
+		{"TeamInfoCommon", "W", "string"},
+		{"TeamInfoCommon", "L", "string"},
+		{"TeamInfoCommon", "MIN_YEAR", "float64"},
+		{"TeamSeasonRanks", "PTS_RANK", "float64"},
+		{"TeamSeasonRanks", "REB_RANK", "float64"},
+		{"TeamSeasonRanks", "AST_RANK", "float64"},
+		{"TeamSeasonRanks", "OPP_PTS_RANK", "float64"},
+	}
+	for _, tc := range majority {
+		t.Run(tc.resultSet+"/"+tc.field, func(t *testing.T) {
+			got := resolveFieldGoType("TeamInfoCommon", tc.resultSet, tc.field)
+			if got != tc.want {
+				t.Errorf("resolveFieldGoType(%q, %q, %q) = %q, want %q", "TeamInfoCommon", tc.resultSet, tc.field, got, tc.want)
+			}
+		})
+	}
+}
+
 // TestAllMetadataFieldsHaveExplicitTypes ensures every field name
 // referenced by a committed metadata/*.json file has an explicit entry in
 // fieldtypes.json, so generation never silently falls back to inferGoType

@@ -26,10 +26,10 @@ type TeamInfoCommonTeamInfoCommon struct {
 	TEAM_ABBREVIATION string  `json:"TEAM_ABBREVIATION"`
 	TEAM_CONFERENCE   string  `json:"TEAM_CONFERENCE"`
 	TEAM_DIVISION     string  `json:"TEAM_DIVISION"`
-	W                 int     `json:"W"`
-	L                 int     `json:"L"`
+	W                 string  `json:"W"`
+	L                 string  `json:"L"`
 	PCT               float64 `json:"PCT"`
-	MIN_YEAR          string  `json:"MIN_YEAR"`
+	MIN_YEAR          float64 `json:"MIN_YEAR"`
 	MAX_YEAR          string  `json:"MAX_YEAR"`
 }
 
@@ -38,13 +38,13 @@ type TeamInfoCommonTeamSeasonRanks struct {
 	LEAGUE_ID    string  `json:"LEAGUE_ID"`
 	SEASON_ID    string  `json:"SEASON_ID"`
 	TEAM_ID      int     `json:"TEAM_ID"`
-	PTS_RANK     int     `json:"PTS_RANK"`
+	PTS_RANK     float64 `json:"PTS_RANK"`
 	PTS_PG       float64 `json:"PTS_PG"`
-	REB_RANK     int     `json:"REB_RANK"`
+	REB_RANK     float64 `json:"REB_RANK"`
 	REB_PG       float64 `json:"REB_PG"`
-	AST_RANK     int     `json:"AST_RANK"`
+	AST_RANK     float64 `json:"AST_RANK"`
 	AST_PG       float64 `json:"AST_PG"`
-	OPP_PTS_RANK int     `json:"OPP_PTS_RANK"`
+	OPP_PTS_RANK float64 `json:"OPP_PTS_RANK"`
 	OPP_PTS_PG   float64 `json:"OPP_PTS_PG"`
 }
 
@@ -58,7 +58,7 @@ type TeamInfoCommonResponse struct {
 func GetTeamInfoCommon(ctx context.Context, client *stats.Client, req TeamInfoCommonRequest) (*models.Response[*TeamInfoCommonResponse], error) {
 	params := url.Values{}
 	if req.TeamID == "" {
-		return nil, fmt.Errorf("TeamID is required")
+		return nil, fmt.Errorf("%s is required", "TeamID")
 	}
 	params.Set("TeamID", req.TeamID)
 	if req.LeagueID != nil {
@@ -86,10 +86,10 @@ func GetTeamInfoCommon(ctx context.Context, client *stats.Client, req TeamInfoCo
 					TEAM_ABBREVIATION: toString(row[4]),
 					TEAM_CONFERENCE:   toString(row[5]),
 					TEAM_DIVISION:     toString(row[6]),
-					W:                 toInt(row[7]),
-					L:                 toInt(row[8]),
+					W:                 toString(row[7]),
+					L:                 toString(row[8]),
 					PCT:               toFloat(row[9]),
-					MIN_YEAR:          toString(row[10]),
+					MIN_YEAR:          toFloat(row[10]),
 					MAX_YEAR:          toString(row[11]),
 				}
 				response.TeamInfoCommon = append(response.TeamInfoCommon, item)
@@ -104,13 +104,13 @@ func GetTeamInfoCommon(ctx context.Context, client *stats.Client, req TeamInfoCo
 					LEAGUE_ID:    toString(row[0]),
 					SEASON_ID:    toString(row[1]),
 					TEAM_ID:      toInt(row[2]),
-					PTS_RANK:     toInt(row[3]),
+					PTS_RANK:     toFloat(row[3]),
 					PTS_PG:       toFloat(row[4]),
-					REB_RANK:     toInt(row[5]),
+					REB_RANK:     toFloat(row[5]),
 					REB_PG:       toFloat(row[6]),
-					AST_RANK:     toInt(row[7]),
+					AST_RANK:     toFloat(row[7]),
 					AST_PG:       toFloat(row[8]),
-					OPP_PTS_RANK: toInt(row[9]),
+					OPP_PTS_RANK: toFloat(row[9]),
 					OPP_PTS_PG:   toFloat(row[10]),
 				}
 				response.TeamSeasonRanks = append(response.TeamSeasonRanks, item)
