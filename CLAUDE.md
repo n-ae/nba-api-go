@@ -6,7 +6,7 @@ This file provides guidance to Claude Code when working with the nba-api-go repo
 
 **nba-api-go** is a production-ready Go SDK and HTTP API server providing type-safe access to 141 NBA Stats API endpoints (all standard endpoints plus international broadcast schedule). The project emphasizes maintainability, minimal dependencies, and solo engineer viability.
 
-**Current Status**: `main` is ahead of the latest tagged release (`v1.3.0`) with v2.0.0 work in progress: explicit generator type metadata and per-endpoint overrides have landed, 134 of 135 metadata-covered SDK endpoints now have field names and types matching what the corrected generator would produce (only `videoevents.go` remains blocked, on 7 non-standard field-name capitalizations), and result sets are now looked up by name with header validation instead of positional array indexing across every endpoint using the classic Stats API response shape (`findResultSet`/`validateHeaders`/`jsonTags` in `pkg/stats/endpoints/types.go`) - a real fix for silent data corruption if NBA.com ever reorders result sets or columns, **not yet verified against live NBA.com responses**, so watch for new errors surfacing on upgrade (see `CHANGELOG.md`'s `[Unreleased]` section for the full risk callout). The last known `interface{}` decoding shape (`internationalbroadcasterschedule.go`) is fixed too - an earlier "9 `interface{}` fields" count in this file was wrong, from an unfiltered `grep` that also matched ordinary `[][]interface{}` row-parsing parameters (see `CHANGELOG.md`). Remaining smaller follow-up: 4 of the 6 hand-written endpoints without generator metadata (`commonplayerinfo`, `playergamelog`, `teamgamelog`, `leagueleaders`) already do name-based result-set lookup but don't yet call `validateHeaders`.
+**Current Status**: `main` is at the latest tagged release, `v2.0.0` - "the correctness release": explicit generator field types (`fieldtypes.json`/`fieldtype_overrides.json`), 134 of 135 metadata-covered SDK endpoints regenerated with corrected field names/types, and result-set-name keying with header validation replacing positional array indexing across every endpoint using the classic Stats API response shape. **The header-validation piece is real, deliberate new failure-mode surface that was never verified against live NBA.com responses** (no network access from the environment that built it) - watch for new errors surfacing in production; see `CHANGELOG.md`'s `[2.0.0]` section for the full risk callout and migration guide. Known remaining gaps, not blocking the tag: `videoevents.go` has 7 non-standard field-name capitalizations; 4 of the 6 hand-written endpoints without generator metadata (`commonplayerinfo`, `playergamelog`, `teamgamelog`, `leagueleaders`) do name-based result-set lookup but don't yet call `validateHeaders`.
 **Grade**: See `docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md` for the current assessment of record - do not hardcode a grade here, it goes stale the moment a new assessment lands and nobody remembers to update this file (see that file's own docs-consolidation section for the fix: archive the superseded assessment in the same commit as the new one).
 **Maintenance Burden**: ~1.6 hours/week for the hand-written core; the generated-endpoint surface currently needs more than that until the verification backlog in the current assessment is cleared - see that document's "Is this too complex for one person?" section.
 
@@ -282,7 +282,7 @@ See `DEPLOYMENT.md` for:
 
 ### API Stability
 
-**Latest tagged release: v1.3.0** (no breaking changes since v1.2.0). Note that v1.2.0 itself shipped a source-breaking change in a minor release (`stats.Config`/`live.Config` field types, `models.NewAPIError`/`HTTPStatusToError` signatures) - see `CHANGELOG.md`'s retroactive compatibility note under `[1.2.0]`. Treat the "strict semver" promise below as the target, not an unconditional guarantee of the historical record.
+**Latest tagged release: v2.0.0** - a major version bump for real, extensive breaking changes (public struct field types across ~130 generated endpoint files; see `CHANGELOG.md`'s `[2.0.0]` migration guide). Note that v1.2.0 also shipped a source-breaking change, but in a *minor* release (`stats.Config`/`live.Config` field types, `models.NewAPIError`/`HTTPStatusToError` signatures) - see `CHANGELOG.md`'s retroactive compatibility note under `[1.2.0]`. Treat the "strict semver" promise below as the target, not an unconditional guarantee of the historical record.
 
 **Breaking changes** require:
 - Major version bump
@@ -540,14 +540,14 @@ if err != nil {
 
 ## Version Information
 
-**Latest tagged release**: v1.3.0 (`main` is at this tag; see `CHANGELOG.md`'s `[Unreleased]` section for what's changed since)
+**Latest tagged release**: v2.0.0 (`main` is at this tag; see `CHANGELOG.md`'s `[Unreleased]` section for what's changed since)
 **Go Version**: 1.26.5+ (the `go` directive in `go.mod`; older toolchains cannot build this module)
-**Stability**: See the Versioning/API Stability section above - v1.2.0 itself contained a source-breaking change in a minor release, documented with a retroactive compatibility note in `CHANGELOG.md`; v1.3.0 shipped no breaking changes
+**Stability**: See the Versioning/API Stability section above - v2.0.0 is a deliberate major-version break (public struct field types); v1.2.0 also broke source compatibility but in a minor release, documented with a retroactive compatibility note in `CHANGELOG.md`; v1.3.0 shipped no breaking changes
 
 See `CHANGELOG.md` for full version history.
 
 ---
 
-**This file last updated**: 2026-07-20 (v1.3.0 release)
+**This file last updated**: 2026-07-20 (v2.0.0 release)
 **Maintainability grade**: tracked in the current assessment (see the header of this file), not duplicated here
-**Next assessment**: due whenever the verification-infrastructure backlog in the current assessment's v1.3.0/v2.0.0 plan meaningfully changes, or quarterly, whichever comes first
+**Next assessment**: the v1.3.0/v2.0.0 plan this assessment tracked is now complete - a new assessment reviewing v2.0.0 (including the unverified header-validation risk noted above) is due; otherwise quarterly

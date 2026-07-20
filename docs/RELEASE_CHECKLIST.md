@@ -526,6 +526,7 @@ Consider automating these steps:
 - CHANGELOG.md (always)
 - CLAUDE.md (version references)
 - README.md (badges, examples)
+- `cmd/nba-api-server/main.go`'s `const version` (drives `/health`'s reported version and the startup log line) - missed during the v1.3.0 release and caught late during v2.0.0's prep; the generic "any other hardcoded versions" bullet below wasn't enough to catch it, so it's called out by name now
 - Any other files with hardcoded versions
 
 **Git Commands:**
