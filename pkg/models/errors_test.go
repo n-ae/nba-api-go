@@ -57,3 +57,10 @@ func TestHTTPStatusToError_UnmappedSuccessStatusReturnsNil(t *testing.T) {
 		t.Errorf("expected nil for a 200 status, got %v", err)
 	}
 }
+
+func TestAPIErrorErrorIncludesDiagnosticBody(t *testing.T) {
+	apiErr := NewAPIError(http.StatusBadRequest, "http://example.com", "invalid request", []byte(`{"detail":"bad season"}`), ErrInvalidRequest)
+	if got := apiErr.Error(); !strings.Contains(got, "body:") || !strings.Contains(got, "bad season") {
+		t.Errorf("Error() = %q, want diagnostic response body", got)
+	}
+}
