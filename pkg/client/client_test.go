@@ -141,6 +141,13 @@ func TestClient_buildURL(t *testing.T) {
 	}
 }
 
+func TestClientBuildURLRejectsInvalidBaseURL(t *testing.T) {
+	client := NewClient(Config{BaseURL: "://invalid"})
+	if _, err := client.buildURL("health", nil); err == nil {
+		t.Fatal("buildURL() succeeded with an invalid base URL")
+	}
+}
+
 func TestClientHeaderMutationsAreSafeDuringRequests(t *testing.T) {
 	client := NewClient(Config{
 		BaseURL: "https://api.example.com",

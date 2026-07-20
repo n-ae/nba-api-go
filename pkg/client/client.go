@@ -37,7 +37,8 @@ type HTTPClient interface {
 }
 
 type Client struct {
-	baseURL          string
+	baseURL          *url.URL
+	baseURLErr       error
 	httpClient       HTTPClient
 	headersMu        sync.RWMutex
 	headers          http.Header
@@ -65,6 +66,8 @@ func NewClient(config Config) *Client {
 	if config.MaxResponseBytes <= 0 {
 		config.MaxResponseBytes = DefaultMaxResponseBytes
 	}
+
+	baseURL, baseURLErr := url.Parse(config.BaseURL)
 
 	if config.HTTPClient == nil {
 		// Clone http.DefaultTransport rather than building one from a
@@ -113,7 +116,8 @@ func NewClient(config Config) *Client {
 	}
 
 	return &Client{
-		baseURL:          config.BaseURL,
+		baseURL:          baseURL,
+		baseURLErr:       baseURLErr,
 		httpClient:       config.HTTPClient,
 		headers:          headers,
 		timeout:          config.Timeout,
@@ -193,10 +197,10 @@ func (c *Client) GetJSON(ctx context.Context, endpoint string, params url.Values
 }
 
 func (c *Client) buildURL(endpoint string, params url.Values) (string, error) {
-	baseURL, err := url.Parse(c.baseURL)
-	if err != nil {
-		return "", fmt.Errorf("invalid base URL: %w", err)
+	if c.baseURLErr != nil {
+		return "", fmt.Errorf("invalid base URL: %w", c.baseURLErr)
 	}
+	baseURL := *c.baseURL
 
 	baseURL.Path = path.Join(baseURL.Path, endpoint)
 
