@@ -66,11 +66,11 @@ type TeamGameLogsResponse struct {
 func GetTeamGameLogs(ctx context.Context, client *stats.Client, req TeamGameLogsRequest) (*models.Response[*TeamGameLogsResponse], error) {
 	params := url.Values{}
 	if req.Season == "" {
-		return nil, fmt.Errorf("season is required")
+		return nil, fmt.Errorf("%s is required", "Season")
 	}
 	params.Set("Season", string(req.Season))
 	if req.SeasonType == "" {
-		return nil, fmt.Errorf("SeasonType is required")
+		return nil, fmt.Errorf("%s is required", "SeasonType")
 	}
 	params.Set("SeasonType", string(req.SeasonType))
 	if req.LeagueID != nil {

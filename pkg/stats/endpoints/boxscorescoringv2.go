@@ -40,12 +40,12 @@ type BoxScoreScoringV2PlayerStats struct {
 	PCT_PTS_FT        float64 `json:"PCT_PTS_FT"`
 	PCT_PTS_OFF_TOV   float64 `json:"PCT_PTS_OFF_TOV"`
 	PCT_PTS_PAINT     float64 `json:"PCT_PTS_PAINT"`
-	PCT_AST_2PM       int     `json:"PCT_AST_2PM"`
-	PCT_UAST_2PM      int     `json:"PCT_UAST_2PM"`
-	PCT_AST_3PM       int     `json:"PCT_AST_3PM"`
-	PCT_UAST_3PM      int     `json:"PCT_UAST_3PM"`
-	PCT_AST_FGM       int     `json:"PCT_AST_FGM"`
-	PCT_UAST_FGM      int     `json:"PCT_UAST_FGM"`
+	PCT_AST_2PM       float64 `json:"PCT_AST_2PM"`
+	PCT_UAST_2PM      float64 `json:"PCT_UAST_2PM"`
+	PCT_AST_3PM       float64 `json:"PCT_AST_3PM"`
+	PCT_UAST_3PM      float64 `json:"PCT_UAST_3PM"`
+	PCT_AST_FGM       float64 `json:"PCT_AST_FGM"`
+	PCT_UAST_FGM      float64 `json:"PCT_UAST_FGM"`
 }
 
 // BoxScoreScoringV2TeamStats represents the TeamStats result set for BoxScoreScoringV2
@@ -65,12 +65,12 @@ type BoxScoreScoringV2TeamStats struct {
 	PCT_PTS_FT        float64 `json:"PCT_PTS_FT"`
 	PCT_PTS_OFF_TOV   float64 `json:"PCT_PTS_OFF_TOV"`
 	PCT_PTS_PAINT     float64 `json:"PCT_PTS_PAINT"`
-	PCT_AST_2PM       int     `json:"PCT_AST_2PM"`
-	PCT_UAST_2PM      int     `json:"PCT_UAST_2PM"`
-	PCT_AST_3PM       int     `json:"PCT_AST_3PM"`
-	PCT_UAST_3PM      int     `json:"PCT_UAST_3PM"`
-	PCT_AST_FGM       int     `json:"PCT_AST_FGM"`
-	PCT_UAST_FGM      int     `json:"PCT_UAST_FGM"`
+	PCT_AST_2PM       float64 `json:"PCT_AST_2PM"`
+	PCT_UAST_2PM      float64 `json:"PCT_UAST_2PM"`
+	PCT_AST_3PM       float64 `json:"PCT_AST_3PM"`
+	PCT_UAST_3PM      float64 `json:"PCT_UAST_3PM"`
+	PCT_AST_FGM       float64 `json:"PCT_AST_FGM"`
+	PCT_UAST_FGM      float64 `json:"PCT_UAST_FGM"`
 }
 
 // BoxScoreScoringV2Response contains the response data from the BoxScoreScoringV2 endpoint
@@ -83,7 +83,7 @@ type BoxScoreScoringV2Response struct {
 func GetBoxScoreScoringV2(ctx context.Context, client *stats.Client, req BoxScoreScoringV2Request) (*models.Response[*BoxScoreScoringV2Response], error) {
 	params := url.Values{}
 	if req.GameID == "" {
-		return nil, fmt.Errorf("GameID is required")
+		return nil, fmt.Errorf("%s is required", "GameID")
 	}
 	params.Set("GameID", req.GameID)
 	if req.StartPeriod != nil {
@@ -132,12 +132,12 @@ func GetBoxScoreScoringV2(ctx context.Context, client *stats.Client, req BoxScor
 					PCT_PTS_FT:        toFloat(row[16]),
 					PCT_PTS_OFF_TOV:   toFloat(row[17]),
 					PCT_PTS_PAINT:     toFloat(row[18]),
-					PCT_AST_2PM:       toInt(row[19]),
-					PCT_UAST_2PM:      toInt(row[20]),
-					PCT_AST_3PM:       toInt(row[21]),
-					PCT_UAST_3PM:      toInt(row[22]),
-					PCT_AST_FGM:       toInt(row[23]),
-					PCT_UAST_FGM:      toInt(row[24]),
+					PCT_AST_2PM:       toFloat(row[19]),
+					PCT_UAST_2PM:      toFloat(row[20]),
+					PCT_AST_3PM:       toFloat(row[21]),
+					PCT_UAST_3PM:      toFloat(row[22]),
+					PCT_AST_FGM:       toFloat(row[23]),
+					PCT_UAST_FGM:      toFloat(row[24]),
 				}
 				response.PlayerStats = append(response.PlayerStats, item)
 			}
@@ -163,12 +163,12 @@ func GetBoxScoreScoringV2(ctx context.Context, client *stats.Client, req BoxScor
 					PCT_PTS_FT:        toFloat(row[12]),
 					PCT_PTS_OFF_TOV:   toFloat(row[13]),
 					PCT_PTS_PAINT:     toFloat(row[14]),
-					PCT_AST_2PM:       toInt(row[15]),
-					PCT_UAST_2PM:      toInt(row[16]),
-					PCT_AST_3PM:       toInt(row[17]),
-					PCT_UAST_3PM:      toInt(row[18]),
-					PCT_AST_FGM:       toInt(row[19]),
-					PCT_UAST_FGM:      toInt(row[20]),
+					PCT_AST_2PM:       toFloat(row[15]),
+					PCT_UAST_2PM:      toFloat(row[16]),
+					PCT_AST_3PM:       toFloat(row[17]),
+					PCT_UAST_3PM:      toFloat(row[18]),
+					PCT_AST_FGM:       toFloat(row[19]),
+					PCT_UAST_FGM:      toFloat(row[20]),
 				}
 				response.TeamStats = append(response.TeamStats, item)
 			}

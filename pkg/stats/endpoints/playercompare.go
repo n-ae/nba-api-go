@@ -60,7 +60,7 @@ type PlayerCompareResponse struct {
 func GetPlayerCompare(ctx context.Context, client *stats.Client, req PlayerCompareRequest) (*models.Response[*PlayerCompareResponse], error) {
 	params := url.Values{}
 	if req.PlayerIDList == "" {
-		return nil, fmt.Errorf("PlayerIDList is required")
+		return nil, fmt.Errorf("%s is required", "PlayerIDList")
 	}
 	params.Set("PlayerIDList", req.PlayerIDList)
 	if req.Season != nil {

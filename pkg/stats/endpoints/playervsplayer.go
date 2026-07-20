@@ -96,7 +96,7 @@ type PlayerVsPlayerShotDistanceOverall struct {
 	SORT_ORDER      string  `json:"SORT_ORDER"`
 	VS_PLAYER_ID    int     `json:"VS_PLAYER_ID"`
 	VS_PLAYER_NAME  string  `json:"VS_PLAYER_NAME"`
-	SHOT_DIST_RANGE int     `json:"SHOT_DIST_RANGE"`
+	SHOT_DIST_RANGE string  `json:"SHOT_DIST_RANGE"`
 	FGA             int     `json:"FGA"`
 	FGM             int     `json:"FGM"`
 	FG_PCT          float64 `json:"FG_PCT"`
@@ -109,7 +109,7 @@ type PlayerVsPlayerShotDistanceOnCourt struct {
 	SORT_ORDER      string  `json:"SORT_ORDER"`
 	VS_PLAYER_ID    int     `json:"VS_PLAYER_ID"`
 	VS_PLAYER_NAME  string  `json:"VS_PLAYER_NAME"`
-	SHOT_DIST_RANGE int     `json:"SHOT_DIST_RANGE"`
+	SHOT_DIST_RANGE string  `json:"SHOT_DIST_RANGE"`
 	FGA             int     `json:"FGA"`
 	FGM             int     `json:"FGM"`
 	FG_PCT          float64 `json:"FG_PCT"`
@@ -122,7 +122,7 @@ type PlayerVsPlayerShotDistanceOffCourt struct {
 	SORT_ORDER      string  `json:"SORT_ORDER"`
 	VS_PLAYER_ID    int     `json:"VS_PLAYER_ID"`
 	VS_PLAYER_NAME  string  `json:"VS_PLAYER_NAME"`
-	SHOT_DIST_RANGE int     `json:"SHOT_DIST_RANGE"`
+	SHOT_DIST_RANGE string  `json:"SHOT_DIST_RANGE"`
 	FGA             int     `json:"FGA"`
 	FGM             int     `json:"FGM"`
 	FG_PCT          float64 `json:"FG_PCT"`
@@ -141,11 +141,11 @@ type PlayerVsPlayerResponse struct {
 func GetPlayerVsPlayer(ctx context.Context, client *stats.Client, req PlayerVsPlayerRequest) (*models.Response[*PlayerVsPlayerResponse], error) {
 	params := url.Values{}
 	if req.PlayerID == "" {
-		return nil, fmt.Errorf("PlayerID is required")
+		return nil, fmt.Errorf("%s is required", "PlayerID")
 	}
 	params.Set("PlayerID", req.PlayerID)
 	if req.VsPlayerID == "" {
-		return nil, fmt.Errorf("VsPlayerID is required")
+		return nil, fmt.Errorf("%s is required", "VsPlayerID")
 	}
 	params.Set("VsPlayerID", req.VsPlayerID)
 	if req.Season != nil {
@@ -258,7 +258,7 @@ func GetPlayerVsPlayer(ctx context.Context, client *stats.Client, req PlayerVsPl
 					SORT_ORDER:      toString(row[2]),
 					VS_PLAYER_ID:    toInt(row[3]),
 					VS_PLAYER_NAME:  toString(row[4]),
-					SHOT_DIST_RANGE: toInt(row[5]),
+					SHOT_DIST_RANGE: toString(row[5]),
 					FGA:             toInt(row[6]),
 					FGM:             toInt(row[7]),
 					FG_PCT:          toFloat(row[8]),
@@ -277,7 +277,7 @@ func GetPlayerVsPlayer(ctx context.Context, client *stats.Client, req PlayerVsPl
 					SORT_ORDER:      toString(row[2]),
 					VS_PLAYER_ID:    toInt(row[3]),
 					VS_PLAYER_NAME:  toString(row[4]),
-					SHOT_DIST_RANGE: toInt(row[5]),
+					SHOT_DIST_RANGE: toString(row[5]),
 					FGA:             toInt(row[6]),
 					FGM:             toInt(row[7]),
 					FG_PCT:          toFloat(row[8]),
@@ -296,7 +296,7 @@ func GetPlayerVsPlayer(ctx context.Context, client *stats.Client, req PlayerVsPl
 					SORT_ORDER:      toString(row[2]),
 					VS_PLAYER_ID:    toInt(row[3]),
 					VS_PLAYER_NAME:  toString(row[4]),
-					SHOT_DIST_RANGE: toInt(row[5]),
+					SHOT_DIST_RANGE: toString(row[5]),
 					FGA:             toInt(row[6]),
 					FGM:             toInt(row[7]),
 					FG_PCT:          toFloat(row[8]),

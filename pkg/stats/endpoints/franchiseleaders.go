@@ -45,7 +45,7 @@ type FranchiseLeadersResponse struct {
 func GetFranchiseLeaders(ctx context.Context, client *stats.Client, req FranchiseLeadersRequest) (*models.Response[*FranchiseLeadersResponse], error) {
 	params := url.Values{}
 	if req.TeamID == "" {
-		return nil, fmt.Errorf("TeamID is required")
+		return nil, fmt.Errorf("%s is required", "TeamID")
 	}
 	params.Set("TeamID", req.TeamID)
 	if req.LeagueID != nil {

@@ -56,7 +56,7 @@ type BoxScorePlayerTrackV2Response struct {
 func GetBoxScorePlayerTrackV2(ctx context.Context, client *stats.Client, req BoxScorePlayerTrackV2Request) (*models.Response[*BoxScorePlayerTrackV2Response], error) {
 	params := url.Values{}
 	if req.GameID == "" {
-		return nil, fmt.Errorf("GameID is required")
+		return nil, fmt.Errorf("%s is required", "GameID")
 	}
 	params.Set("GameID", req.GameID)
 

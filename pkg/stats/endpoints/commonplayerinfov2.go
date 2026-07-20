@@ -21,9 +21,9 @@ type CommonPlayerInfoV2CommonPlayerInfo struct {
 	PERSON_ID                        string  `json:"PERSON_ID"`
 	FIRST_NAME                       string  `json:"FIRST_NAME"`
 	LAST_NAME                        string  `json:"LAST_NAME"`
-	DISPLAY_FIRST_LAST               float64 `json:"DISPLAY_FIRST_LAST"`
-	DISPLAY_LAST_COMMA_FIRST         float64 `json:"DISPLAY_LAST_COMMA_FIRST"`
-	DISPLAY_FI_LAST                  float64 `json:"DISPLAY_FI_LAST"`
+	DISPLAY_FIRST_LAST               string  `json:"DISPLAY_FIRST_LAST"`
+	DISPLAY_LAST_COMMA_FIRST         string  `json:"DISPLAY_LAST_COMMA_FIRST"`
+	DISPLAY_FI_LAST                  string  `json:"DISPLAY_FI_LAST"`
 	PLAYER_SLUG                      string  `json:"PLAYER_SLUG"`
 	BIRTHDATE                        string  `json:"BIRTHDATE"`
 	SCHOOL                           string  `json:"SCHOOL"`
@@ -74,7 +74,7 @@ type CommonPlayerInfoV2Response struct {
 func GetCommonPlayerInfoV2(ctx context.Context, client *stats.Client, req CommonPlayerInfoV2Request) (*models.Response[*CommonPlayerInfoV2Response], error) {
 	params := url.Values{}
 	if req.PlayerID == "" {
-		return nil, fmt.Errorf("PlayerID is required")
+		return nil, fmt.Errorf("%s is required", "PlayerID")
 	}
 	params.Set("PlayerID", req.PlayerID)
 	if req.LeagueID != nil {
@@ -95,9 +95,9 @@ func GetCommonPlayerInfoV2(ctx context.Context, client *stats.Client, req Common
 					PERSON_ID:                        toString(row[0]),
 					FIRST_NAME:                       toString(row[1]),
 					LAST_NAME:                        toString(row[2]),
-					DISPLAY_FIRST_LAST:               toFloat(row[3]),
-					DISPLAY_LAST_COMMA_FIRST:         toFloat(row[4]),
-					DISPLAY_FI_LAST:                  toFloat(row[5]),
+					DISPLAY_FIRST_LAST:               toString(row[3]),
+					DISPLAY_LAST_COMMA_FIRST:         toString(row[4]),
+					DISPLAY_FI_LAST:                  toString(row[5]),
 					PLAYER_SLUG:                      toString(row[6]),
 					BIRTHDATE:                        toString(row[7]),
 					SCHOOL:                           toString(row[8]),

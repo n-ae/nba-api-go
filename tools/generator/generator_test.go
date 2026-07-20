@@ -398,6 +398,25 @@ func TestFieldTypeOverridesApplyOnlyWithinTheirEndpoint(t *testing.T) {
 	if unrelatedEndpoint != globalDefault {
 		t.Errorf("resolveFieldGoType(%q, %q, %q) = %q, want the global default %q - override leaked to an unrelated endpoint", "PlayerDashboardByGeneralSplits", "OverallPlayerDashboard", "OREB", unrelatedEndpoint, globalDefault)
 	}
+
+	// TeamYearByYearStats.TeamStats and TeamGameLogs.TeamGameLogs carry a
+	// second, larger set of overrides (season/game totals, not just the
+	// OREB family) because every stat field in those two result sets is a
+	// whole-number total in committed code, not a per-game average -
+	// confirmed by TEAM_ID/GP/FGM/FGA also being int there, not just the
+	// fields fieldtypes.json alone would get wrong.
+	for _, tc := range []struct{ endpoint, resultSet, field string }{
+		{"TeamYearByYearStats", "TeamStats", "WINS"},
+		{"TeamYearByYearStats", "TeamStats", "LOSSES"},
+		{"TeamYearByYearStats", "TeamStats", "TOV"},
+		{"TeamGameLogs", "TeamGameLogs", "TOV"},
+		{"TeamGameLogs", "TeamGameLogs", "DD2"},
+		{"LeagueGameFinder", "LeagueGameFinderResults", "TOV"},
+	} {
+		if got := resolveFieldGoType(tc.endpoint, tc.resultSet, tc.field); got != "int" {
+			t.Errorf("resolveFieldGoType(%q, %q, %q) = %q, want %q", tc.endpoint, tc.resultSet, tc.field, got, "int")
+		}
+	}
 }
 
 // TestFieldTypeOverridesReferenceRealMetadata ensures every

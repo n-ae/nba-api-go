@@ -24,7 +24,7 @@ type TeamDetailsTeamBackground struct {
 	ARENA              string `json:"ARENA"`
 	ARENACAPACITY      string `json:"ARENACAPACITY"`
 	OWNER              string `json:"OWNER"`
-	GENERALMANAGER     int    `json:"GENERALMANAGER"`
+	GENERALMANAGER     string `json:"GENERALMANAGER"`
 	HEADCOACH          string `json:"HEADCOACH"`
 	DLEAGUEAFFILIATION string `json:"DLEAGUEAFFILIATION"`
 }
@@ -98,7 +98,7 @@ type TeamDetailsResponse struct {
 func GetTeamDetails(ctx context.Context, client *stats.Client, req TeamDetailsRequest) (*models.Response[*TeamDetailsResponse], error) {
 	params := url.Values{}
 	if req.TeamID == "" {
-		return nil, fmt.Errorf("TeamID is required")
+		return nil, fmt.Errorf("%s is required", "TeamID")
 	}
 	params.Set("TeamID", req.TeamID)
 
@@ -121,7 +121,7 @@ func GetTeamDetails(ctx context.Context, client *stats.Client, req TeamDetailsRe
 					ARENA:              toString(row[5]),
 					ARENACAPACITY:      toString(row[6]),
 					OWNER:              toString(row[7]),
-					GENERALMANAGER:     toInt(row[8]),
+					GENERALMANAGER:     toString(row[8]),
 					HEADCOACH:          toString(row[9]),
 					DLEAGUEAFFILIATION: toString(row[10]),
 				}

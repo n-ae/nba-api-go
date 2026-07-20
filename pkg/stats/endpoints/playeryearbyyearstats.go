@@ -57,7 +57,7 @@ type PlayerYearByYearStatsResponse struct {
 func GetPlayerYearByYearStats(ctx context.Context, client *stats.Client, req PlayerYearByYearStatsRequest) (*models.Response[*PlayerYearByYearStatsResponse], error) {
 	params := url.Values{}
 	if req.PlayerID == "" {
-		return nil, fmt.Errorf("PlayerID is required")
+		return nil, fmt.Errorf("%s is required", "PlayerID")
 	}
 	params.Set("PlayerID", req.PlayerID)
 	if req.PerMode != nil {

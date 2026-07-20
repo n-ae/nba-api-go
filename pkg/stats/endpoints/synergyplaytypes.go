@@ -27,7 +27,7 @@ type SynergyPlayTypesSynergyPlayType struct {
 	TEAM_ABBREVIATION string  `json:"TEAM_ABBREVIATION"`
 	PLAY_TYPE         string  `json:"PLAY_TYPE"`
 	TYPE_GROUPING     string  `json:"TYPE_GROUPING"`
-	PERCENTILE        string  `json:"PERCENTILE"`
+	PERCENTILE        float64 `json:"PERCENTILE"`
 	GP                int     `json:"GP"`
 	POSS              string  `json:"POSS"`
 	TIME              string  `json:"TIME"`
@@ -90,7 +90,7 @@ func GetSynergyPlayTypes(ctx context.Context, client *stats.Client, req SynergyP
 					TEAM_ABBREVIATION: toString(row[3]),
 					PLAY_TYPE:         toString(row[4]),
 					TYPE_GROUPING:     toString(row[5]),
-					PERCENTILE:        toString(row[6]),
+					PERCENTILE:        toFloat(row[6]),
 					GP:                toInt(row[7]),
 					POSS:              toString(row[8]),
 					TIME:              toString(row[9]),

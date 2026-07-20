@@ -121,9 +121,8 @@ type BoxScoreTraditionalV2Response struct {
 // GetBoxScoreTraditionalV2 retrieves data from the boxscoretraditionalv2 endpoint
 func GetBoxScoreTraditionalV2(ctx context.Context, client *stats.Client, req BoxScoreTraditionalV2Request) (*models.Response[*BoxScoreTraditionalV2Response], error) {
 	params := url.Values{}
-
 	if req.GameID == "" {
-		return nil, fmt.Errorf("GameID is required")
+		return nil, fmt.Errorf("%s is required", "GameID")
 	}
 	params.Set("GameID", req.GameID)
 	if req.StartPeriod != nil {
@@ -148,7 +147,6 @@ func GetBoxScoreTraditionalV2(ctx context.Context, client *stats.Client, req Box
 	}
 
 	response := &BoxScoreTraditionalV2Response{}
-
 	if len(rawResp.ResultSets) > 0 {
 		response.PlayerStats = make([]BoxScoreTraditionalV2PlayerStats, 0, len(rawResp.ResultSets[0].RowSet))
 		for _, row := range rawResp.ResultSets[0].RowSet {
@@ -188,7 +186,6 @@ func GetBoxScoreTraditionalV2(ctx context.Context, client *stats.Client, req Box
 			}
 		}
 	}
-
 	if len(rawResp.ResultSets) > 1 {
 		response.TeamStats = make([]BoxScoreTraditionalV2TeamStats, 0, len(rawResp.ResultSets[1].RowSet))
 		for _, row := range rawResp.ResultSets[1].RowSet {
@@ -224,7 +221,6 @@ func GetBoxScoreTraditionalV2(ctx context.Context, client *stats.Client, req Box
 			}
 		}
 	}
-
 	if len(rawResp.ResultSets) > 2 {
 		response.TeamStarterBenchStats = make([]BoxScoreTraditionalV2TeamStarterBenchStats, 0, len(rawResp.ResultSets[2].RowSet))
 		for _, row := range rawResp.ResultSets[2].RowSet {

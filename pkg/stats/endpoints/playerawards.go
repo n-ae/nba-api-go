@@ -41,7 +41,7 @@ type PlayerAwardsResponse struct {
 func GetPlayerAwards(ctx context.Context, client *stats.Client, req PlayerAwardsRequest) (*models.Response[*PlayerAwardsResponse], error) {
 	params := url.Values{}
 	if req.PlayerID == "" {
-		return nil, fmt.Errorf("PlayerID is required")
+		return nil, fmt.Errorf("%s is required", "PlayerID")
 	}
 	params.Set("PlayerID", req.PlayerID)
 

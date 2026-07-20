@@ -148,7 +148,7 @@ type ScoreboardV2Response struct {
 func GetScoreboardV2(ctx context.Context, client *stats.Client, req ScoreboardV2Request) (*models.Response[*ScoreboardV2Response], error) {
 	params := url.Values{}
 	if req.GameDate == "" {
-		return nil, fmt.Errorf("GameDate is required")
+		return nil, fmt.Errorf("%s is required", "GameDate")
 	}
 	params.Set("GameDate", req.GameDate)
 	if req.LeagueID != nil {
