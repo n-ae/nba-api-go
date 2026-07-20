@@ -16,7 +16,7 @@ import (
 // endpoint code: regenerating from tools/generator/metadata/*.json today
 // produces output that differs from pkg/stats/endpoints/*.go in real,
 // substantive ways (field types, not just formatting) - see
-// docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md's
+// docs/archive/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md's
 // v2.0.0 plan item for explicit per-field type metadata and a full
 // regeneration of all 141 endpoints, which is the only safe way to
 // reconcile that drift (it requires verifying corrected types against
@@ -216,7 +216,7 @@ func TestGoFieldNameOverridesReferenceRealMetadata(t *testing.T) {
 // behavior using real NBA.com field names pulled from committed generated
 // code. Several cases below are marked knownWrong: true - they reproduce
 // the exact data-corruption bugs cataloged in
-// docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md (display
+// docs/archive/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md (display
 // names typed float64, textual range buckets typed int, decimal
 // percentages typed string and truncated). These assertions exist to make
 // any future change to the heuristic - the v2.0.0 explicit-type-metadata

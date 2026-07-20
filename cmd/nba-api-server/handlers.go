@@ -387,7 +387,7 @@ func currentSeasonDefault() string {
 // getSeasonOrDefault returns the request's Season query parameter, or
 // currentSeasonDefault() if omitted. Centralizes what used to be over a
 // hundred call sites each hardcoding a literal season string directly
-// (see docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md
+// (see docs/archive/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md
 // finding #11) - a season rollover, or a change to the default-selection
 // rule itself, is now a one-place change instead of a five-file
 // search-and-replace.

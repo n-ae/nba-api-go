@@ -12,7 +12,7 @@ Contract tests replay recorded NBA.com API responses against the SDK's parsing l
 
 **Assertions are shallow.** `validateBasicSchema` only checks that the fixture's `Data` field is non-empty and, optionally, that one named key exists. It does not check types, specific values, or field counts. A fixture with `null` or near-empty data for an endpoint will pass.
 
-None of this makes the tests useless - they do catch a parser panic, a totally broken response, or a renamed top-level field if you keep local fixtures around - but "contract test" currently overstates what's verified. See the current maintainability assessment (`docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md`) for the planned fix: committed raw fixtures, replayed through `httptest.Server` into the real endpoint functions, asserting result-set names and column headers so upstream drift and generator regressions both get caught.
+None of this makes the tests useless - they do catch a parser panic, a totally broken response, or a renamed top-level field if you keep local fixtures around - but "contract test" currently overstates what's verified. See the current maintainability assessment (`docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-20_8549390.md`) for the planned fix: committed raw fixtures, replayed through `httptest.Server` into the real endpoint functions, asserting result-set names and column headers so upstream drift and generator regressions both get caught.
 
 ## Purpose (as designed; see limitations above for what's actually delivered today)
 
@@ -111,4 +111,4 @@ Then record it: `UPDATE_FIXTURES=1 INTEGRATION_TESTS=1 go test ./tests/contract/
 - [Integration Tests](../integration/README.md) - Live API testing
 - [Maintenance Runbook](../../docs/MAINTENANCE.md) - Operational procedures
 - [Contributing Guide](../../CONTRIBUTING.md) - How to add tests
-- [Current Maintainability Assessment](../../docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md) - Full analysis and the planned fix for this test layer's real-contract gap
+- [Current Maintainability Assessment](../../docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-20_8549390.md) - Full analysis and the planned fix for this test layer's real-contract gap

@@ -10,6 +10,17 @@ import (
 	"github.com/n-ae/nba-api-go/pkg/stats/parameters"
 )
 
+// LeagueLeaders' required-column names, factored out since each is
+// referenced both in required-column validation and row extraction below
+// (and, for PLAYER_ID and RANK, in handwritten_headers_test.go) -
+// golangci-lint's goconst flags repeated string literals for exactly this
+// reason.
+const (
+	leagueLeadersPlayerIDColumn = "PLAYER_ID"
+	leagueLeadersRankColumn     = "RANK"
+	leagueLeadersPlayerColumn   = "PLAYER"
+)
+
 type LeagueLeader struct {
 	PlayerID int     `json:"PLAYER_ID"`
 	Rank     int     `json:"RANK"`
@@ -96,7 +107,7 @@ func LeagueLeaders(ctx context.Context, client *stats.Client, req LeagueLeadersR
 
 	response := &LeagueLeadersResponse{}
 	if rawResp.ResultSet.Name == "LeagueLeaders" {
-		for _, required := range []string{"PLAYER_ID", "RANK", "PLAYER"} {
+		for _, required := range []string{leagueLeadersPlayerIDColumn, leagueLeadersRankColumn, leagueLeadersPlayerColumn} {
 			found := false
 			for _, h := range rawResp.ResultSet.Headers {
 				if h == required {
@@ -136,9 +147,9 @@ func parseLeagueLeaders(headers []string, rows [][]interface{}) []LeagueLeader {
 	leaders := make([]LeagueLeader, 0, len(rows))
 	for _, row := range rows {
 		leader := LeagueLeader{
-			PlayerID: toInt(at(row, "PLAYER_ID")),
-			Rank:     toInt(at(row, "RANK")),
-			Player:   toString(at(row, "PLAYER")),
+			PlayerID: toInt(at(row, leagueLeadersPlayerIDColumn)),
+			Rank:     toInt(at(row, leagueLeadersRankColumn)),
+			Player:   toString(at(row, leagueLeadersPlayerColumn)),
 			TeamID:   toInt(at(row, "TEAM_ID")),
 			Team:     toString(at(row, "TEAM")),
 			GP:       toInt(at(row, "GP")),

@@ -15,8 +15,7 @@ Complete documentation for the nba-api-go project.
 
 ### Development
 - **[Contributing Guide](../CONTRIBUTING.md)** - How to contribute to the project
-- **[Current Maintainability Assessment](./MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md)** - Project maintainability analysis of record
-- **[Current Repository Review](./REPOSITORY_ASSESSMENT_2026-07-19_2363f46.md)** - Companion direct repository review, same revision
+- **[Current Maintainability Assessment](./MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-20_8549390.md)** - Project maintainability analysis of record
 
 ## 🏗️ Architecture
 

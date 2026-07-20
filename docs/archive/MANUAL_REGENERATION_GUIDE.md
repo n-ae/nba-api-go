@@ -1,6 +1,6 @@
 > **Archived.** This documented a manual workaround for a period when `tools/generator`'s documented
 > `go run . -endpoint X` command failed outright (see
-> [`docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md`](../MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md)
+> [`docs/archive/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md`](./MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md)
 > finding #10). The generator is runnable again as of `CHANGELOG.md`'s `[Unreleased]` entry for
 > `go:embed`-based template loading - use `cd tools/generator && go run . -endpoint X` (see
 > `CLAUDE.md`'s "Code Generation System" section) instead of the manual per-field process below.

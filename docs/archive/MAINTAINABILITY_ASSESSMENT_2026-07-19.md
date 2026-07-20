@@ -1,5 +1,5 @@
 > **Superseded.** This assessed `v1.1.7` (`657b4a5`). The current assessment of record is
-> [`docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md`](../MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md),
+> [`docs/archive/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md`](./MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md),
 > covering revision `2363f46` and later. Retained here for history; several findings below were fixed
 > in the interim (see that document's "Reconciling the two input reviews" section for what carried
 > forward vs. what changed).
