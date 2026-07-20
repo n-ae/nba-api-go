@@ -71,10 +71,24 @@ func GetInternationalBroadcasterSchedule(ctx context.Context, client *stats.Clie
 		return nil, err
 	}
 
+	return parseInternationalBroadcasterScheduleResponse(rawResp.Body)
+}
+
+// parseInternationalBroadcasterScheduleResponse decodes a raw
+// internationalbroadcasterschedule response body directly into
+// ScheduledGame, rather than via an interface{}/map[string]interface{}
+// intermediate re-marshaled and re-unmarshaled a second time: the
+// "NextGameList" key is a fixed, known field name, so a plain nested
+// struct with a json tag decodes it in one pass with no interface{}
+// anywhere. Split out from GetInternationalBroadcasterSchedule so this
+// parsing logic is testable without a live HTTP call.
+func parseInternationalBroadcasterScheduleResponse(body []byte) (*InternationalBroadcasterScheduleResponse, error) {
 	var apiResp struct {
-		ResultSets []map[string]interface{} `json:"resultSets"`
+		ResultSets []struct {
+			NextGameList []ScheduledGame `json:"NextGameList"`
+		} `json:"resultSets"`
 	}
-	if err := json.Unmarshal(rawResp.Body, &apiResp); err != nil {
+	if err := json.Unmarshal(body, &apiResp); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
 
@@ -82,19 +96,9 @@ func GetInternationalBroadcasterSchedule(ctx context.Context, client *stats.Clie
 		return &InternationalBroadcasterScheduleResponse{Games: []ScheduledGame{}}, nil
 	}
 
-	nextGameListRaw, ok := apiResp.ResultSets[0]["NextGameList"]
-	if !ok {
-		return &InternationalBroadcasterScheduleResponse{Games: []ScheduledGame{}}, nil
-	}
-
-	nextGameListJSON, err := json.Marshal(nextGameListRaw)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal NextGameList: %w", err)
-	}
-
-	var games []ScheduledGame
-	if err := json.Unmarshal(nextGameListJSON, &games); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal games: %w", err)
+	games := apiResp.ResultSets[0].NextGameList
+	if games == nil {
+		games = []ScheduledGame{}
 	}
 
 	return &InternationalBroadcasterScheduleResponse{Games: games}, nil
