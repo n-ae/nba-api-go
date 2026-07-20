@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `tools/generator/fieldname_overrides.json` - a per-`(endpoint, result set, field)` exception layer for `goFieldName`'s Go-identifier capitalization, mirroring `fieldtype_overrides.json`'s pattern for field *types*. `VideoEvents`' `vl`/`vt`/`gc`/`surl`/`durl`/`vurl`/`purl` fields are hand-committed as fully-uppercase (`VL`, `VT`, `GC`, `SURL`, `DURL`, `VURL`, `PURL`) despite not being recognized initialisms by any standard convention - `v2.0.0` deliberately left these unregenerated rather than guess at a general rule for arbitrary short abbreviations (see `[2.0.0]`'s notes). Rather than add them to the global initialisms list (which would silently affect any future, unrelated field literally named `vl`/`gc`/etc.), they're now a narrow, scoped override consulted before the general capitalization rule. `goFieldName` gained `endpointName`/`resultSetName` parameters to support this (threaded through from `inferFieldTypes`, same as `resolveFieldGoType` already does for types). `TestGoFieldNameOverridesApplyOnlyWithinTheirEndpoint` proves the override doesn't leak beyond its exact scope; `TestGoFieldNameOverridesReferenceRealMetadata` fails CI on a typo'd or stale entry.
+
+### Changed
+- `videoevents.go` is regenerated for the first time since the generator became capable of producing correct output for it. Verified precisely (struct field name/type parity, JSON-tag-to-Go-field mapping, and row-index-to-field mapping all checked against the previously-committed file): **zero changes** to the public struct or its field-to-row-index mapping - the override produces exactly the field names already committed. The only actual diff is the same pre-existing `"X is required"` error-message format change already applied to every other regenerated endpoint in `[2.0.0]`, not a new behavior. **135 of 135 metadata-covered SDK endpoints now have field names and types verified to match what the generator produces** (up from 134 of 135 in `[2.0.0]`).
+
 ## [2.0.0] - 2026-07-20
 
 **The correctness release.** Makes this project's central promise - type-safe, verified access to the NBA Stats API - actually true for the large majority of endpoints, per the plan in `docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md`. Four pieces, in the order they landed:

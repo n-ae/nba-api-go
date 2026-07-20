@@ -151,12 +151,33 @@ matching Go convention. The original field name is untouched as the
 JSON tag - only the Go identifier changes.
 
 This is deliberately conservative: it does not try to guess at
-non-standard abbreviations. `VideoEvents`' `vl`/`vt`/`gc`/`surl`/`durl`/
-`vurl`/`purl` fields are hand-committed as fully-uppercase
+non-standard abbreviations globally. `VideoEvents`' `vl`/`vt`/`gc`/`surl`/
+`durl`/`vurl`/`purl` fields are hand-committed as fully-uppercase
 (`VL`/`VT`/.../`PURL`) despite not being recognized initialisms by any
-standard convention - regenerating that file today would produce
-`Vl`/`Vt`/etc. instead, so it stays excluded from regeneration rather
-than force a guess into the initialisms list that wouldn't generalize.
+standard convention - `goFieldName` alone would produce `Vl`/`Vt`/etc.
+instead. Rather than add these to the global initialisms list (which
+would silently affect any future field literally named `vl`/`gc`/etc. for
+something else), `tools/generator/fieldname_overrides.json` holds them as
+a narrow, `(endpoint, result set, field) -> Go identifier` exception,
+mirroring `fieldtype_overrides.json`'s pattern:
+
+```json
+{
+  "VideoEvents": {
+    "Video": {
+      "vl": "VL"
+    }
+  }
+}
+```
+
+`resolveFieldGoType`'s type-override precedence has a name-override
+equivalent: `goFieldName` checks `fieldname_overrides.json` before
+falling back to the general capitalization rule.
+`TestGoFieldNameOverridesReferenceRealMetadata` fails CI if an entry
+doesn't match real committed metadata;
+`TestGoFieldNameOverridesApplyOnlyWithinTheirEndpoint` proves an override
+doesn't leak beyond its exact scope.
 
 ## Result Set Lookup and Header Validation
 

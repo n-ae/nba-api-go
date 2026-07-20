@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"testing"
 )
 
@@ -101,10 +102,11 @@ func TestGoFieldName(t *testing.T) {
 		// --- A field name that IS an initialism in its entirety ---
 		{field: "uuid", want: "UUID"},
 
-		// --- Not recognized initialisms (deliberately not hardcoded -
-		//     videoevents.go's VL/VT/GC/SURL/DURL/VURL/PURL are a non-
-		//     standard convention this function doesn't try to reproduce;
-		//     see CHANGELOG.md for why those fields stay unregenerated) ---
+		// --- Not recognized initialisms by the general rule (outside any
+		//     endpoint scope, "vl"/"surl" are NOT in fieldname_overrides.json,
+		//     so they fall through to plain capitalization - see
+		//     TestGoFieldNameOverridesApplyOnlyWithinTheirEndpoint for the
+		//     VideoEvents-scoped case where these DO become "VL"/"SURL") ---
 		{field: "vl", want: "Vl"},
 		{field: "surl", want: "Surl"},
 
@@ -115,11 +117,98 @@ func TestGoFieldName(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.field, func(t *testing.T) {
-			got := goFieldName(tt.field)
+			got := goFieldName("", "", tt.field)
 			if got != tt.want {
 				t.Errorf("goFieldName(%q) = %q, want %q (%s)", tt.field, got, tt.want, tt.note)
 			}
 		})
+	}
+}
+
+// TestGoFieldNameOverridesApplyOnlyWithinTheirEndpoint proves
+// fieldname_overrides.json's VideoEvents.Video entries produce VL/VT/GC/
+// SURL/DURL/VURL/PURL (matching the already-committed, hand-fixed field
+// names) only for that exact (endpoint, result set, field) scope - the
+// same short field names anywhere else fall through to the general rule
+// (plain capitalization), matching TestFieldTypeOverridesApplyOnlyWithinTheirEndpoint's
+// pattern for fieldtype_overrides.json. If this test passed with the
+// override applying globally, a future endpoint that happens to have a
+// field literally named "vl" for something else entirely would silently
+// get "VL" instead of the field name it actually declared.
+func TestGoFieldNameOverridesApplyOnlyWithinTheirEndpoint(t *testing.T) {
+	cases := map[string]string{
+		"vl": "VL", "vt": "VT", "gc": "GC",
+		"surl": "SURL", "durl": "DURL", "vurl": "VURL", "purl": "PURL",
+	}
+	for field, want := range cases {
+		t.Run(field, func(t *testing.T) {
+			plainCapitalized := strings.ToUpper(field[:1]) + field[1:]
+			if got := goFieldName("", "", field); got != plainCapitalized {
+				t.Fatalf("goFieldName(%q) outside any endpoint scope = %q, want the general rule's plain capitalization %q - has the general rule changed?", field, got, plainCapitalized)
+			}
+			if got := goFieldName("VideoEvents", "Video", field); got != want {
+				t.Errorf("goFieldName(%q, %q, %q) = %q, want %q (fieldname_overrides.json entry)", "VideoEvents", "Video", field, got, want)
+			}
+			if got := goFieldName("VideoEvents", "SomeOtherResultSetNotInOverrides", field); got == want {
+				t.Errorf("goFieldName(%q, %q, %q) = %q - override leaked to an unlisted result set", "VideoEvents", "SomeOtherResultSetNotInOverrides", field, got)
+			}
+		})
+	}
+}
+
+// TestGoFieldNameOverridesReferenceRealMetadata ensures every
+// (endpoint, result set, field) entry in fieldname_overrides.json
+// actually exists in committed metadata, mirroring
+// TestFieldTypeOverridesReferenceRealMetadata's protection against a
+// typo'd or stale entry silently doing nothing.
+func TestGoFieldNameOverridesReferenceRealMetadata(t *testing.T) {
+	overrides, err := loadFieldNameOverrides()
+	if err != nil {
+		t.Fatalf("loadFieldNameOverrides() failed: %v", err)
+	}
+	if len(overrides) == 0 {
+		t.Fatal("fieldname_overrides.json is empty - this test would trivially pass without exercising anything")
+	}
+
+	metadataFiles, err := filepath.Glob("metadata/*.json")
+	if err != nil {
+		t.Fatalf("failed to glob metadata files: %v", err)
+	}
+
+	realFields := map[string]map[string]map[string]bool{}
+	for _, mf := range metadataFiles {
+		data, err := os.ReadFile(mf)
+		if err != nil {
+			t.Fatalf("failed to read %s: %v", mf, err)
+		}
+		var endpoints []EndpointMetadata
+		if err := json.Unmarshal(data, &endpoints); err != nil {
+			t.Fatalf("failed to parse %s: %v", mf, err)
+		}
+		for _, ep := range endpoints {
+			for _, rs := range ep.ResultSets {
+				if realFields[ep.Name] == nil {
+					realFields[ep.Name] = map[string]map[string]bool{}
+				}
+				if realFields[ep.Name][rs.Name] == nil {
+					realFields[ep.Name][rs.Name] = map[string]bool{}
+				}
+				for _, field := range rs.Fields {
+					realFields[ep.Name][rs.Name][field] = true
+				}
+			}
+		}
+	}
+
+	for endpointName, resultSets := range overrides {
+		for resultSetName, fields := range resultSets {
+			for field := range fields {
+				if !realFields[endpointName][resultSetName][field] {
+					t.Errorf("fieldname_overrides.json has %s.%s.%s, but no committed metadata file has a %q endpoint with a %q result set containing field %q",
+						endpointName, resultSetName, field, endpointName, resultSetName, field)
+				}
+			}
+		}
 	}
 }
 
