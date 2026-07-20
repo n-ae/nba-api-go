@@ -179,6 +179,10 @@ var (
 	fieldTypeOverridesOnce sync.Once
 	fieldTypeOverrides     map[string]map[string]map[string]string // endpoint -> result set -> field -> Go type
 	fieldTypeOverridesErr  error
+
+	fieldNameOverridesOnce sync.Once
+	fieldNameOverrides     map[string]map[string]map[string]string // endpoint -> result set -> field -> Go identifier
+	fieldNameOverridesErr  error
 )
 
 // loadFieldTypes parses the embedded fieldtypes.json dictionary once and
@@ -215,6 +219,30 @@ func loadFieldTypeOverrides() (map[string]map[string]map[string]string, error) {
 		fieldTypeOverridesErr = json.Unmarshal(data, &fieldTypeOverrides)
 	})
 	return fieldTypeOverrides, fieldTypeOverridesErr
+}
+
+// loadFieldNameOverrides parses the embedded fieldname_overrides.json
+// dictionary once and caches the result. This holds exceptions to
+// goFieldName's general camelCase-capitalization rule for field names
+// that don't follow it: e.g. VideoEvents' "vl"/"vt"/"gc"/"surl"/"durl"/
+// "vurl"/"purl" are hand-committed as fully-uppercase short codes
+// (VL, VT, GC, SURL, DURL, VURL, PURL) despite not being recognized
+// initialisms by any standard convention. Scoped per (endpoint, result
+// set, field) like fieldtype_overrides.json, both to avoid a collision if
+// a future endpoint reuses one of these short field names for something
+// that genuinely should follow the general rule, and so a stale/typo'd
+// entry is easy to spot as scoped to the wrong place. See goFieldName for
+// the resolution order.
+func loadFieldNameOverrides() (map[string]map[string]map[string]string, error) {
+	fieldNameOverridesOnce.Do(func() {
+		data, err := fieldNameOverridesFS.ReadFile("fieldname_overrides.json")
+		if err != nil {
+			fieldNameOverridesErr = fmt.Errorf("failed to read embedded fieldname_overrides.json: %w", err)
+			return
+		}
+		fieldNameOverridesErr = json.Unmarshal(data, &fieldNameOverrides)
+	})
+	return fieldNameOverrides, fieldNameOverridesErr
 }
 
 // resolveFieldGoType returns the Go type for a field within a given
@@ -260,17 +288,30 @@ var goInitialisms = map[string]bool{
 }
 
 // goFieldName converts a metadata field name into a valid, exported Go
-// identifier. Field names in this project's metadata are usually already
-// valid, exported Go identifiers (SCREAMING_SNAKE_CASE, e.g. "GAME_ID")
-// and are returned unchanged - this function only acts when the first
-// rune is lowercase. Some NBA Live-Data-style endpoints use camelCase
-// field names (e.g. "gameId") that are NOT valid exported Go identifiers
-// as-is: an unexported struct field is inaccessible to any external
-// caller and invisible to encoding/json in either direction, which is a
-// real bug this fixes, not a style preference. The original field name
-// is preserved verbatim as the JSON tag (see FieldTypeInfo.JSONTag) -
-// only the Go identifier changes.
-func goFieldName(fieldName string) string {
+// identifier, in order of precedence:
+//  1. fieldname_overrides.json[endpointName][resultSetName][fieldName] -
+//     an explicit per-endpoint exception for a field name the general
+//     rule below gets wrong (see loadFieldNameOverrides).
+//  2. The general rule: field names in this project's metadata are
+//     usually already valid, exported Go identifiers
+//     (SCREAMING_SNAKE_CASE, e.g. "GAME_ID") and are returned unchanged -
+//     this only acts when the first rune is lowercase. Some NBA
+//     Live-Data-style endpoints use camelCase field names (e.g. "gameId")
+//     that are NOT valid exported Go identifiers as-is: an unexported
+//     struct field is inaccessible to any external caller and invisible
+//     to encoding/json in either direction, which is a real bug this
+//     fixes, not a style preference.
+//
+// The original field name is preserved verbatim as the JSON tag (see
+// FieldTypeInfo.JSONTag) regardless of which path is taken - only the Go
+// identifier changes.
+func goFieldName(endpointName, resultSetName, fieldName string) string {
+	if overrides, err := loadFieldNameOverrides(); err != nil {
+		fmt.Fprintf(os.Stderr, "warning: failed to load fieldname_overrides.json (%v); ignoring overrides for %q\n", err, fieldName)
+	} else if name, ok := overrides[endpointName][resultSetName][fieldName]; ok {
+		return name
+	}
+
 	if fieldName == "" {
 		return fieldName
 	}
@@ -313,7 +354,7 @@ func inferFieldTypes(endpointName, resultSetName string, fields []string) []Fiel
 	result := make([]FieldTypeInfo, len(fields))
 	for i, field := range fields {
 		result[i] = FieldTypeInfo{
-			Name:    goFieldName(field),
+			Name:    goFieldName(endpointName, resultSetName, field),
 			GoType:  resolveFieldGoType(endpointName, resultSetName, field),
 			JSONTag: field,
 		}

@@ -24,3 +24,10 @@ var fieldTypesFS embed.FS
 //
 //go:embed fieldtype_overrides.json
 var fieldTypeOverridesFS embed.FS
+
+// fieldNameOverridesFS embeds fieldname_overrides.json, the per-endpoint
+// exceptions to goFieldName's general camelCase-capitalization rule. See
+// loadFieldNameOverrides in generator.go for how it's used.
+//
+//go:embed fieldname_overrides.json
+var fieldNameOverridesFS embed.FS

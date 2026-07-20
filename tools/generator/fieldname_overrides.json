@@ -1,0 +1,13 @@
+{
+  "VideoEvents": {
+    "Video": {
+      "vl": "VL",
+      "vt": "VT",
+      "gc": "GC",
+      "surl": "SURL",
+      "durl": "DURL",
+      "vurl": "VURL",
+      "purl": "PURL"
+    }
+  }
+}

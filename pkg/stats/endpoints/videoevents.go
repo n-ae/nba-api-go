@@ -36,11 +36,11 @@ type VideoEventsResponse struct {
 func GetVideoEvents(ctx context.Context, client *stats.Client, req VideoEventsRequest) (*models.Response[*VideoEventsResponse], error) {
 	params := url.Values{}
 	if req.GameID == "" {
-		return nil, fmt.Errorf("gameID is required")
+		return nil, fmt.Errorf("%s is required", "GameID")
 	}
 	params.Set("GameID", req.GameID)
 	if req.GameEventID == "" {
-		return nil, fmt.Errorf("gameEventID is required")
+		return nil, fmt.Errorf("%s is required", "GameEventID")
 	}
 	params.Set("GameEventID", req.GameEventID)
 
