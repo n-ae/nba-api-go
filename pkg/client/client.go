@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"path"
 	"sort"
+	"sync"
 	"time"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -38,6 +39,7 @@ type HTTPClient interface {
 type Client struct {
 	baseURL          string
 	httpClient       HTTPClient
+	headersMu        sync.RWMutex
 	headers          http.Header
 	timeout          time.Duration
 	transport        RoundTripper
@@ -140,7 +142,10 @@ func (c *Client) Get(ctx context.Context, endpoint string, params url.Values) (*
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 
-	for key, values := range c.headers {
+	c.headersMu.RLock()
+	headers := c.headers.Clone()
+	c.headersMu.RUnlock()
+	for key, values := range headers {
 		for _, value := range values {
 			req.Header.Add(key, value)
 		}
@@ -219,10 +224,14 @@ func (c *Client) sortParams(params url.Values) url.Values {
 }
 
 func (c *Client) SetHeader(key, value string) {
+	c.headersMu.Lock()
+	defer c.headersMu.Unlock()
 	c.headers.Set(key, value)
 }
 
 func (c *Client) AddHeader(key, value string) {
+	c.headersMu.Lock()
+	defer c.headersMu.Unlock()
 	c.headers.Add(key, value)
 }
 
@@ -231,9 +240,10 @@ func (c *Client) AddHeader(key, value string) {
 // the map the caller passed in (or to c.headers via SetHeader/AddHeader)
 // can't reach into each other unexpectedly.
 func (c *Client) SetHeaders(headers http.Header) {
-	cloned := make(http.Header, len(headers))
-	for key, values := range headers {
-		cloned[key] = append([]string(nil), values...)
+	c.headersMu.Lock()
+	defer c.headersMu.Unlock()
+	c.headers = headers.Clone()
+	if c.headers == nil {
+		c.headers = make(http.Header)
 	}
-	c.headers = cloned
 }
