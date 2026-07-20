@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -71,9 +72,12 @@ func GetMatchupRollup(ctx context.Context, client *stats.Client, req MatchupRoll
 	}
 
 	response := &MatchupRollupResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.MatchupRollup = make([]MatchupRollupMatchupRollup, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "MatchupRollup"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(MatchupRollupMatchupRollup{})); err != nil {
+			return nil, fmt.Errorf("MatchupRollup: MatchupRollup result set: %w", err)
+		}
+		response.MatchupRollup = make([]MatchupRollupMatchupRollup, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 15 {
 				item := MatchupRollupMatchupRollup{
 					PERSON_ID:         toString(row[0]),

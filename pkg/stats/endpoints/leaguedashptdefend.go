@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -66,9 +67,12 @@ func GetLeagueDashPtDefend(ctx context.Context, client *stats.Client, req League
 	}
 
 	response := &LeagueDashPtDefendResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.LeagueDashPtDefend = make([]LeagueDashPtDefendLeagueDashPtDefend, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "LeagueDashPtDefend"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(LeagueDashPtDefendLeagueDashPtDefend{})); err != nil {
+			return nil, fmt.Errorf("LeagueDashPtDefend: LeagueDashPtDefend result set: %w", err)
+		}
+		response.LeagueDashPtDefend = make([]LeagueDashPtDefendLeagueDashPtDefend, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 14 {
 				item := LeagueDashPtDefendLeagueDashPtDefend{
 					CLOSE_DEF_PERSON_ID:           toString(row[0]),

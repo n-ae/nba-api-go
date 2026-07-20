@@ -167,9 +167,12 @@ func GetPlayerVsPlayer(ctx context.Context, client *stats.Client, req PlayerVsPl
 	}
 
 	response := &PlayerVsPlayerResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.Overall = make([]PlayerVsPlayerOverall, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "Overall"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerVsPlayerOverall{})); err != nil {
+			return nil, fmt.Errorf("PlayerVsPlayer: Overall result set: %w", err)
+		}
+		response.Overall = make([]PlayerVsPlayerOverall, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := PlayerVsPlayerOverall{
 					PLAYER_ID:   toInt(row[0]),
@@ -206,9 +209,12 @@ func GetPlayerVsPlayer(ctx context.Context, client *stats.Client, req PlayerVsPl
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.OnOffCourt = make([]PlayerVsPlayerOnOffCourt, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "OnOffCourt"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerVsPlayerOnOffCourt{})); err != nil {
+			return nil, fmt.Errorf("PlayerVsPlayer: OnOffCourt result set: %w", err)
+		}
+		response.OnOffCourt = make([]PlayerVsPlayerOnOffCourt, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 32 {
 				item := PlayerVsPlayerOnOffCourt{
 					PLAYER_ID:      toInt(row[0]),
@@ -248,9 +254,12 @@ func GetPlayerVsPlayer(ctx context.Context, client *stats.Client, req PlayerVsPl
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 2 {
-		response.ShotDistanceOverall = make([]PlayerVsPlayerShotDistanceOverall, 0, len(rawResp.ResultSets[2].RowSet))
-		for _, row := range rawResp.ResultSets[2].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "ShotDistanceOverall"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerVsPlayerShotDistanceOverall{})); err != nil {
+			return nil, fmt.Errorf("PlayerVsPlayer: ShotDistanceOverall result set: %w", err)
+		}
+		response.ShotDistanceOverall = make([]PlayerVsPlayerShotDistanceOverall, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 9 {
 				item := PlayerVsPlayerShotDistanceOverall{
 					PLAYER_ID:       toInt(row[0]),
@@ -267,9 +276,12 @@ func GetPlayerVsPlayer(ctx context.Context, client *stats.Client, req PlayerVsPl
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 3 {
-		response.ShotDistanceOnCourt = make([]PlayerVsPlayerShotDistanceOnCourt, 0, len(rawResp.ResultSets[3].RowSet))
-		for _, row := range rawResp.ResultSets[3].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "ShotDistanceOnCourt"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerVsPlayerShotDistanceOnCourt{})); err != nil {
+			return nil, fmt.Errorf("PlayerVsPlayer: ShotDistanceOnCourt result set: %w", err)
+		}
+		response.ShotDistanceOnCourt = make([]PlayerVsPlayerShotDistanceOnCourt, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 9 {
 				item := PlayerVsPlayerShotDistanceOnCourt{
 					PLAYER_ID:       toInt(row[0]),
@@ -286,9 +298,12 @@ func GetPlayerVsPlayer(ctx context.Context, client *stats.Client, req PlayerVsPl
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 4 {
-		response.ShotDistanceOffCourt = make([]PlayerVsPlayerShotDistanceOffCourt, 0, len(rawResp.ResultSets[4].RowSet))
-		for _, row := range rawResp.ResultSets[4].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "ShotDistanceOffCourt"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerVsPlayerShotDistanceOffCourt{})); err != nil {
+			return nil, fmt.Errorf("PlayerVsPlayer: ShotDistanceOffCourt result set: %w", err)
+		}
+		response.ShotDistanceOffCourt = make([]PlayerVsPlayerShotDistanceOffCourt, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 9 {
 				item := PlayerVsPlayerShotDistanceOffCourt{
 					PLAYER_ID:       toInt(row[0]),

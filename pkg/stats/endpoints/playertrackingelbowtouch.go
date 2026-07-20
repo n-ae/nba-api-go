@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -65,9 +66,12 @@ func GetPlayerTrackingElbowTouch(ctx context.Context, client *stats.Client, req 
 	}
 
 	response := &PlayerTrackingElbowTouchResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.PlayerTrackingElbowTouch = make([]PlayerTrackingElbowTouchPlayerTrackingElbowTouch, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "PlayerTrackingElbowTouch"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerTrackingElbowTouchPlayerTrackingElbowTouch{})); err != nil {
+			return nil, fmt.Errorf("PlayerTrackingElbowTouch: PlayerTrackingElbowTouch result set: %w", err)
+		}
+		response.PlayerTrackingElbowTouch = make([]PlayerTrackingElbowTouchPlayerTrackingElbowTouch, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 17 {
 				item := PlayerTrackingElbowTouchPlayerTrackingElbowTouch{
 					PLAYER_ID:          toInt(row[0]),

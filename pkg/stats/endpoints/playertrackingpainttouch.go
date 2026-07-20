@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -65,9 +66,12 @@ func GetPlayerTrackingPaintTouch(ctx context.Context, client *stats.Client, req 
 	}
 
 	response := &PlayerTrackingPaintTouchResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.PlayerTrackingPaintTouch = make([]PlayerTrackingPaintTouchPlayerTrackingPaintTouch, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "PlayerTrackingPaintTouch"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerTrackingPaintTouchPlayerTrackingPaintTouch{})); err != nil {
+			return nil, fmt.Errorf("PlayerTrackingPaintTouch: PlayerTrackingPaintTouch result set: %w", err)
+		}
+		response.PlayerTrackingPaintTouch = make([]PlayerTrackingPaintTouchPlayerTrackingPaintTouch, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 17 {
 				item := PlayerTrackingPaintTouchPlayerTrackingPaintTouch{
 					PLAYER_ID:          toInt(row[0]),

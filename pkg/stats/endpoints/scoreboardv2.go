@@ -164,9 +164,12 @@ func GetScoreboardV2(ctx context.Context, client *stats.Client, req ScoreboardV2
 	}
 
 	response := &ScoreboardV2Response{}
-	if len(rawResp.ResultSets) > 0 {
-		response.GameHeader = make([]ScoreboardV2GameHeader, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "GameHeader"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(ScoreboardV2GameHeader{})); err != nil {
+			return nil, fmt.Errorf("ScoreboardV2: GameHeader result set: %w", err)
+		}
+		response.GameHeader = make([]ScoreboardV2GameHeader, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 14 {
 				item := ScoreboardV2GameHeader{
 					GAME_DATE_EST:                    toString(row[0]),
@@ -188,9 +191,12 @@ func GetScoreboardV2(ctx context.Context, client *stats.Client, req ScoreboardV2
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.LineScore = make([]ScoreboardV2LineScore, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "LineScore"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(ScoreboardV2LineScore{})); err != nil {
+			return nil, fmt.Errorf("ScoreboardV2: LineScore result set: %w", err)
+		}
+		response.LineScore = make([]ScoreboardV2LineScore, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 28 {
 				item := ScoreboardV2LineScore{
 					GAME_DATE_EST:     toString(row[0]),
@@ -226,9 +232,12 @@ func GetScoreboardV2(ctx context.Context, client *stats.Client, req ScoreboardV2
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 2 {
-		response.SeriesStandings = make([]ScoreboardV2SeriesStandings, 0, len(rawResp.ResultSets[2].RowSet))
-		for _, row := range rawResp.ResultSets[2].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "SeriesStandings"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(ScoreboardV2SeriesStandings{})); err != nil {
+			return nil, fmt.Errorf("ScoreboardV2: SeriesStandings result set: %w", err)
+		}
+		response.SeriesStandings = make([]ScoreboardV2SeriesStandings, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 7 {
 				item := ScoreboardV2SeriesStandings{
 					GAME_ID:          toString(row[0]),
@@ -243,9 +252,12 @@ func GetScoreboardV2(ctx context.Context, client *stats.Client, req ScoreboardV2
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 3 {
-		response.LastMeeting = make([]ScoreboardV2LastMeeting, 0, len(rawResp.ResultSets[3].RowSet))
-		for _, row := range rawResp.ResultSets[3].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "LastMeeting"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(ScoreboardV2LastMeeting{})); err != nil {
+			return nil, fmt.Errorf("ScoreboardV2: LastMeeting result set: %w", err)
+		}
+		response.LastMeeting = make([]ScoreboardV2LastMeeting, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 13 {
 				item := ScoreboardV2LastMeeting{
 					GAME_ID:                             toString(row[0]),
@@ -266,9 +278,12 @@ func GetScoreboardV2(ctx context.Context, client *stats.Client, req ScoreboardV2
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 4 {
-		response.EastConfStandingsByDay = make([]ScoreboardV2EastConfStandingsByDay, 0, len(rawResp.ResultSets[4].RowSet))
-		for _, row := range rawResp.ResultSets[4].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "EastConfStandingsByDay"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(ScoreboardV2EastConfStandingsByDay{})); err != nil {
+			return nil, fmt.Errorf("ScoreboardV2: EastConfStandingsByDay result set: %w", err)
+		}
+		response.EastConfStandingsByDay = make([]ScoreboardV2EastConfStandingsByDay, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 12 {
 				item := ScoreboardV2EastConfStandingsByDay{
 					TEAM_ID:       toInt(row[0]),
@@ -288,9 +303,12 @@ func GetScoreboardV2(ctx context.Context, client *stats.Client, req ScoreboardV2
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 5 {
-		response.WestConfStandingsByDay = make([]ScoreboardV2WestConfStandingsByDay, 0, len(rawResp.ResultSets[5].RowSet))
-		for _, row := range rawResp.ResultSets[5].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "WestConfStandingsByDay"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(ScoreboardV2WestConfStandingsByDay{})); err != nil {
+			return nil, fmt.Errorf("ScoreboardV2: WestConfStandingsByDay result set: %w", err)
+		}
+		response.WestConfStandingsByDay = make([]ScoreboardV2WestConfStandingsByDay, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 12 {
 				item := ScoreboardV2WestConfStandingsByDay{
 					TEAM_ID:       toInt(row[0]),
@@ -310,9 +328,12 @@ func GetScoreboardV2(ctx context.Context, client *stats.Client, req ScoreboardV2
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 6 {
-		response.Available = make([]ScoreboardV2Available, 0, len(rawResp.ResultSets[6].RowSet))
-		for _, row := range rawResp.ResultSets[6].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "Available"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(ScoreboardV2Available{})); err != nil {
+			return nil, fmt.Errorf("ScoreboardV2: Available result set: %w", err)
+		}
+		response.Available = make([]ScoreboardV2Available, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 2 {
 				item := ScoreboardV2Available{
 					GAME_ID:      toString(row[0]),

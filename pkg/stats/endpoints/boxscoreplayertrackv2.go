@@ -66,9 +66,12 @@ func GetBoxScorePlayerTrackV2(ctx context.Context, client *stats.Client, req Box
 	}
 
 	response := &BoxScorePlayerTrackV2Response{}
-	if len(rawResp.ResultSets) > 0 {
-		response.PlayerTrack = make([]BoxScorePlayerTrackV2PlayerTrack, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "PlayerTrack"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(BoxScorePlayerTrackV2PlayerTrack{})); err != nil {
+			return nil, fmt.Errorf("BoxScorePlayerTrackV2: PlayerTrack result set: %w", err)
+		}
+		response.PlayerTrack = make([]BoxScorePlayerTrackV2PlayerTrack, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := BoxScorePlayerTrackV2PlayerTrack{
 					GAME_ID:           toString(row[0]),

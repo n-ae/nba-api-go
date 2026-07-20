@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -64,9 +65,12 @@ func GetDraftCombineStats(ctx context.Context, client *stats.Client, req DraftCo
 	}
 
 	response := &DraftCombineStatsResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.DraftCombineStats = make([]DraftCombineStatsDraftCombineStats, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "DraftCombineStats"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(DraftCombineStatsDraftCombineStats{})); err != nil {
+			return nil, fmt.Errorf("DraftCombineStats: DraftCombineStats result set: %w", err)
+		}
+		response.DraftCombineStats = make([]DraftCombineStatsDraftCombineStats, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 24 {
 				item := DraftCombineStatsDraftCombineStats{
 					SEASON:                     toString(row[0]),

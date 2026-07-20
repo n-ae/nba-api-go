@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -72,9 +73,12 @@ func GetPlayerGameStreakFinder(ctx context.Context, client *stats.Client, req Pl
 	}
 
 	response := &PlayerGameStreakFinderResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.PlayerGameStreakFinder = make([]PlayerGameStreakFinderPlayerGameStreakFinder, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "PlayerGameStreakFinder"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerGameStreakFinderPlayerGameStreakFinder{})); err != nil {
+			return nil, fmt.Errorf("PlayerGameStreakFinder: PlayerGameStreakFinder result set: %w", err)
+		}
+		response.PlayerGameStreakFinder = make([]PlayerGameStreakFinderPlayerGameStreakFinder, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 28 {
 				item := PlayerGameStreakFinderPlayerGameStreakFinder{
 					PLAYER_ID:         toInt(row[0]),

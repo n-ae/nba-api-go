@@ -87,9 +87,12 @@ func GetCommonPlayerInfoV2(ctx context.Context, client *stats.Client, req Common
 	}
 
 	response := &CommonPlayerInfoV2Response{}
-	if len(rawResp.ResultSets) > 0 {
-		response.CommonPlayerInfo = make([]CommonPlayerInfoV2CommonPlayerInfo, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "CommonPlayerInfo"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(CommonPlayerInfoV2CommonPlayerInfo{})); err != nil {
+			return nil, fmt.Errorf("CommonPlayerInfoV2: CommonPlayerInfo result set: %w", err)
+		}
+		response.CommonPlayerInfo = make([]CommonPlayerInfoV2CommonPlayerInfo, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 33 {
 				item := CommonPlayerInfoV2CommonPlayerInfo{
 					PERSON_ID:                        toString(row[0]),
@@ -130,9 +133,12 @@ func GetCommonPlayerInfoV2(ctx context.Context, client *stats.Client, req Common
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.PlayerHeadlineStats = make([]CommonPlayerInfoV2PlayerHeadlineStats, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "PlayerHeadlineStats"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(CommonPlayerInfoV2PlayerHeadlineStats{})); err != nil {
+			return nil, fmt.Errorf("CommonPlayerInfoV2: PlayerHeadlineStats result set: %w", err)
+		}
+		response.PlayerHeadlineStats = make([]CommonPlayerInfoV2PlayerHeadlineStats, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 7 {
 				item := CommonPlayerInfoV2PlayerHeadlineStats{
 					PLAYER_ID:   toInt(row[0]),

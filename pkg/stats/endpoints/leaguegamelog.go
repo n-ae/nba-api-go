@@ -99,9 +99,12 @@ func GetLeagueGameLog(ctx context.Context, client *stats.Client, req LeagueGameL
 	}
 
 	response := &LeagueGameLogResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.LeagueGameLog = make([]LeagueGameLogLeagueGameLog, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "LeagueGameLog"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(LeagueGameLogLeagueGameLog{})); err != nil {
+			return nil, fmt.Errorf("LeagueGameLog: LeagueGameLog result set: %w", err)
+		}
+		response.LeagueGameLog = make([]LeagueGameLogLeagueGameLog, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := LeagueGameLogLeagueGameLog{
 					SEASON_ID:         toString(row[0]),

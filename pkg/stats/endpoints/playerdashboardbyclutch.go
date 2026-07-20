@@ -132,9 +132,12 @@ func GetPlayerDashboardByClutch(ctx context.Context, client *stats.Client, req P
 	}
 
 	response := &PlayerDashboardByClutchResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.OverallPlayerDashboard = make([]PlayerDashboardByClutchOverallPlayerDashboard, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "OverallPlayerDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerDashboardByClutchOverallPlayerDashboard{})); err != nil {
+			return nil, fmt.Errorf("PlayerDashboardByClutch: OverallPlayerDashboard result set: %w", err)
+		}
+		response.OverallPlayerDashboard = make([]PlayerDashboardByClutchOverallPlayerDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 28 {
 				item := PlayerDashboardByClutchOverallPlayerDashboard{
 					PLAYER_ID:   toInt(row[0]),
@@ -170,9 +173,12 @@ func GetPlayerDashboardByClutch(ctx context.Context, client *stats.Client, req P
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.Last5MinCloseGame5PointPlayerDashboard = make([]PlayerDashboardByClutchLast5MinCloseGame5PointPlayerDashboard, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "Last5MinCloseGame5PointPlayerDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerDashboardByClutchLast5MinCloseGame5PointPlayerDashboard{})); err != nil {
+			return nil, fmt.Errorf("PlayerDashboardByClutch: Last5MinCloseGame5PointPlayerDashboard result set: %w", err)
+		}
+		response.Last5MinCloseGame5PointPlayerDashboard = make([]PlayerDashboardByClutchLast5MinCloseGame5PointPlayerDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := PlayerDashboardByClutchLast5MinCloseGame5PointPlayerDashboard{
 					PLAYER_ID:   toInt(row[0]),

@@ -104,9 +104,12 @@ func GetBoxScoreMatchupsV3(ctx context.Context, client *stats.Client, req BoxSco
 	}
 
 	response := &BoxScoreMatchupsV3Response{}
-	if len(rawResp.ResultSets) > 0 {
-		response.HomeTeamPlayerMatchups = make([]BoxScoreMatchupsV3HomeTeamPlayerMatchups, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "HomeTeamPlayerMatchups"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(BoxScoreMatchupsV3HomeTeamPlayerMatchups{})); err != nil {
+			return nil, fmt.Errorf("BoxScoreMatchupsV3: HomeTeamPlayerMatchups result set: %w", err)
+		}
+		response.HomeTeamPlayerMatchups = make([]BoxScoreMatchupsV3HomeTeamPlayerMatchups, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 27 {
 				item := BoxScoreMatchupsV3HomeTeamPlayerMatchups{
 					GAME_ID:              toString(row[0]),
@@ -141,9 +144,12 @@ func GetBoxScoreMatchupsV3(ctx context.Context, client *stats.Client, req BoxSco
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.AwayTeamPlayerMatchups = make([]BoxScoreMatchupsV3AwayTeamPlayerMatchups, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "AwayTeamPlayerMatchups"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(BoxScoreMatchupsV3AwayTeamPlayerMatchups{})); err != nil {
+			return nil, fmt.Errorf("BoxScoreMatchupsV3: AwayTeamPlayerMatchups result set: %w", err)
+		}
+		response.AwayTeamPlayerMatchups = make([]BoxScoreMatchupsV3AwayTeamPlayerMatchups, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 27 {
 				item := BoxScoreMatchupsV3AwayTeamPlayerMatchups{
 					GAME_ID:              toString(row[0]),

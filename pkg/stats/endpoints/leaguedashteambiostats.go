@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -70,9 +71,12 @@ func GetLeagueDashTeamBioStats(ctx context.Context, client *stats.Client, req Le
 	}
 
 	response := &LeagueDashTeamBioStatsResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.LeagueDashTeamBioStats = make([]LeagueDashTeamBioStatsLeagueDashTeamBioStats, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "LeagueDashTeamBioStats"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(LeagueDashTeamBioStatsLeagueDashTeamBioStats{})); err != nil {
+			return nil, fmt.Errorf("LeagueDashTeamBioStats: LeagueDashTeamBioStats result set: %w", err)
+		}
+		response.LeagueDashTeamBioStats = make([]LeagueDashTeamBioStatsLeagueDashTeamBioStats, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 22 {
 				item := LeagueDashTeamBioStatsLeagueDashTeamBioStats{
 					TEAM_ID:           toInt(row[0]),

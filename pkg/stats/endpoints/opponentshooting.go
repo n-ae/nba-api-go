@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -63,9 +64,12 @@ func GetOpponentShooting(ctx context.Context, client *stats.Client, req Opponent
 	}
 
 	response := &OpponentShootingResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.OpponentShooting = make([]OpponentShootingOpponentShooting, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "OpponentShooting"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(OpponentShootingOpponentShooting{})); err != nil {
+			return nil, fmt.Errorf("OpponentShooting: OpponentShooting result set: %w", err)
+		}
+		response.OpponentShooting = make([]OpponentShootingOpponentShooting, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 15 {
 				item := OpponentShootingOpponentShooting{
 					PLAYER_ID:         toInt(row[0]),

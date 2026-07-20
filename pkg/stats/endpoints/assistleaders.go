@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -55,9 +56,12 @@ func GetAssistLeaders(ctx context.Context, client *stats.Client, req AssistLeade
 	}
 
 	response := &AssistLeadersResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.AssistLeaders = make([]AssistLeadersAssistLeaders, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "AssistLeaders"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(AssistLeadersAssistLeaders{})); err != nil {
+			return nil, fmt.Errorf("AssistLeaders: AssistLeaders result set: %w", err)
+		}
+		response.AssistLeaders = make([]AssistLeadersAssistLeaders, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 7 {
 				item := AssistLeadersAssistLeaders{
 					PLAYER_ID:         toInt(row[0]),

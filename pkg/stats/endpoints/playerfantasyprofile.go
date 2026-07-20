@@ -58,9 +58,12 @@ func GetPlayerFantasyProfile(ctx context.Context, client *stats.Client, req Play
 	}
 
 	response := &PlayerFantasyProfileResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.LastNGames = make([]PlayerFantasyProfileLastNGames, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "LastNGames"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerFantasyProfileLastNGames{})); err != nil {
+			return nil, fmt.Errorf("PlayerFantasyProfile: LastNGames result set: %w", err)
+		}
+		response.LastNGames = make([]PlayerFantasyProfileLastNGames, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 21 {
 				item := PlayerFantasyProfileLastNGames{
 					PLAYER_ID:       toInt(row[0]),

@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -68,9 +69,12 @@ func GetLeagueDashPlayerPtShot(ctx context.Context, client *stats.Client, req Le
 	}
 
 	response := &LeagueDashPlayerPtShotResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.LeagueDashPlayerPtShot = make([]LeagueDashPlayerPtShotLeagueDashPlayerPtShot, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "LeagueDashPlayerPtShot"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(LeagueDashPlayerPtShotLeagueDashPlayerPtShot{})); err != nil {
+			return nil, fmt.Errorf("LeagueDashPlayerPtShot: LeagueDashPlayerPtShot result set: %w", err)
+		}
+		response.LeagueDashPlayerPtShot = make([]LeagueDashPlayerPtShotLeagueDashPlayerPtShot, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 20 {
 				item := LeagueDashPlayerPtShotLeagueDashPlayerPtShot{
 					PLAYER_ID:                     toInt(row[0]),

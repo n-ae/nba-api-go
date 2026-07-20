@@ -122,9 +122,12 @@ func GetTeamAndPlayersVsPlayers(ctx context.Context, client *stats.Client, req T
 	}
 
 	response := &TeamAndPlayersVsPlayersResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.Overall = make([]TeamAndPlayersVsPlayersOverall, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "Overall"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamAndPlayersVsPlayersOverall{})); err != nil {
+			return nil, fmt.Errorf("TeamAndPlayersVsPlayers: Overall result set: %w", err)
+		}
+		response.Overall = make([]TeamAndPlayersVsPlayersOverall, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := TeamAndPlayersVsPlayersOverall{
 					TEAM_ID:    toInt(row[0]),
@@ -161,9 +164,12 @@ func GetTeamAndPlayersVsPlayers(ctx context.Context, client *stats.Client, req T
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.PlayersVsPlayer = make([]TeamAndPlayersVsPlayersPlayersVsPlayer, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "PlayersVsPlayer"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamAndPlayersVsPlayersPlayersVsPlayer{})); err != nil {
+			return nil, fmt.Errorf("TeamAndPlayersVsPlayers: PlayersVsPlayer result set: %w", err)
+		}
+		response.PlayersVsPlayer = make([]TeamAndPlayersVsPlayersPlayersVsPlayer, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := TeamAndPlayersVsPlayersPlayersVsPlayer{
 					PLAYER_ID:   toInt(row[0]),

@@ -103,9 +103,12 @@ func GetCumeStatsTeam(ctx context.Context, client *stats.Client, req CumeStatsTe
 	}
 
 	response := &CumeStatsTeamResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.GameByGameStats = make([]CumeStatsTeamGameByGameStats, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "GameByGameStats"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(CumeStatsTeamGameByGameStats{})); err != nil {
+			return nil, fmt.Errorf("CumeStatsTeam: GameByGameStats result set: %w", err)
+		}
+		response.GameByGameStats = make([]CumeStatsTeamGameByGameStats, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 26 {
 				item := CumeStatsTeamGameByGameStats{
 					TEAM_ID:    toInt(row[0]),
@@ -139,9 +142,12 @@ func GetCumeStatsTeam(ctx context.Context, client *stats.Client, req CumeStatsTe
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.TotalStats = make([]CumeStatsTeamTotalStats, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "TotalStats"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(CumeStatsTeamTotalStats{})); err != nil {
+			return nil, fmt.Errorf("CumeStatsTeam: TotalStats result set: %w", err)
+		}
+		response.TotalStats = make([]CumeStatsTeamTotalStats, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 22 {
 				item := CumeStatsTeamTotalStats{
 					TEAM_ID:   toInt(row[0]),

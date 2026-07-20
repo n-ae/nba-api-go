@@ -256,9 +256,12 @@ func GetTeamDashboardByGameSplits(ctx context.Context, client *stats.Client, req
 	}
 
 	response := &TeamDashboardByGameSplitsResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.OverallTeamDashboard = make([]TeamDashboardByGameSplitsOverallTeamDashboard, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "OverallTeamDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDashboardByGameSplitsOverallTeamDashboard{})); err != nil {
+			return nil, fmt.Errorf("TeamDashboardByGameSplits: OverallTeamDashboard result set: %w", err)
+		}
+		response.OverallTeamDashboard = make([]TeamDashboardByGameSplitsOverallTeamDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 28 {
 				item := TeamDashboardByGameSplitsOverallTeamDashboard{
 					TEAM_ID:    toInt(row[0]),
@@ -294,9 +297,12 @@ func GetTeamDashboardByGameSplits(ctx context.Context, client *stats.Client, req
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.LocationTeamDashboard = make([]TeamDashboardByGameSplitsLocationTeamDashboard, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "LocationTeamDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDashboardByGameSplitsLocationTeamDashboard{})); err != nil {
+			return nil, fmt.Errorf("TeamDashboardByGameSplits: LocationTeamDashboard result set: %w", err)
+		}
+		response.LocationTeamDashboard = make([]TeamDashboardByGameSplitsLocationTeamDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := TeamDashboardByGameSplitsLocationTeamDashboard{
 					TEAM_ID:    toInt(row[0]),
@@ -333,9 +339,12 @@ func GetTeamDashboardByGameSplits(ctx context.Context, client *stats.Client, req
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 2 {
-		response.WinsLossesTeamDashboard = make([]TeamDashboardByGameSplitsWinsLossesTeamDashboard, 0, len(rawResp.ResultSets[2].RowSet))
-		for _, row := range rawResp.ResultSets[2].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "WinsLossesTeamDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDashboardByGameSplitsWinsLossesTeamDashboard{})); err != nil {
+			return nil, fmt.Errorf("TeamDashboardByGameSplits: WinsLossesTeamDashboard result set: %w", err)
+		}
+		response.WinsLossesTeamDashboard = make([]TeamDashboardByGameSplitsWinsLossesTeamDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := TeamDashboardByGameSplitsWinsLossesTeamDashboard{
 					TEAM_ID:    toInt(row[0]),
@@ -372,9 +381,12 @@ func GetTeamDashboardByGameSplits(ctx context.Context, client *stats.Client, req
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 3 {
-		response.MonthTeamDashboard = make([]TeamDashboardByGameSplitsMonthTeamDashboard, 0, len(rawResp.ResultSets[3].RowSet))
-		for _, row := range rawResp.ResultSets[3].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "MonthTeamDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDashboardByGameSplitsMonthTeamDashboard{})); err != nil {
+			return nil, fmt.Errorf("TeamDashboardByGameSplits: MonthTeamDashboard result set: %w", err)
+		}
+		response.MonthTeamDashboard = make([]TeamDashboardByGameSplitsMonthTeamDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := TeamDashboardByGameSplitsMonthTeamDashboard{
 					TEAM_ID:    toInt(row[0]),
@@ -411,9 +423,12 @@ func GetTeamDashboardByGameSplits(ctx context.Context, client *stats.Client, req
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 4 {
-		response.PrePostAllStarTeamDashboard = make([]TeamDashboardByGameSplitsPrePostAllStarTeamDashboard, 0, len(rawResp.ResultSets[4].RowSet))
-		for _, row := range rawResp.ResultSets[4].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "PrePostAllStarTeamDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDashboardByGameSplitsPrePostAllStarTeamDashboard{})); err != nil {
+			return nil, fmt.Errorf("TeamDashboardByGameSplits: PrePostAllStarTeamDashboard result set: %w", err)
+		}
+		response.PrePostAllStarTeamDashboard = make([]TeamDashboardByGameSplitsPrePostAllStarTeamDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := TeamDashboardByGameSplitsPrePostAllStarTeamDashboard{
 					TEAM_ID:           toInt(row[0]),
@@ -450,9 +465,12 @@ func GetTeamDashboardByGameSplits(ctx context.Context, client *stats.Client, req
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 5 {
-		response.DaysRestTeamDashboard = make([]TeamDashboardByGameSplitsDaysRestTeamDashboard, 0, len(rawResp.ResultSets[5].RowSet))
-		for _, row := range rawResp.ResultSets[5].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "DaysRestTeamDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDashboardByGameSplitsDaysRestTeamDashboard{})); err != nil {
+			return nil, fmt.Errorf("TeamDashboardByGameSplits: DaysRestTeamDashboard result set: %w", err)
+		}
+		response.DaysRestTeamDashboard = make([]TeamDashboardByGameSplitsDaysRestTeamDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := TeamDashboardByGameSplitsDaysRestTeamDashboard{
 					TEAM_ID:    toInt(row[0]),

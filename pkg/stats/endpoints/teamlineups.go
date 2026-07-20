@@ -92,9 +92,12 @@ func GetTeamLineups(ctx context.Context, client *stats.Client, req TeamLineupsRe
 	}
 
 	response := &TeamLineupsResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.Lineups = make([]TeamLineupsLineups, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "Lineups"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamLineupsLineups{})); err != nil {
+			return nil, fmt.Errorf("TeamLineups: Lineups result set: %w", err)
+		}
+		response.Lineups = make([]TeamLineupsLineups, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 30 {
 				item := TeamLineupsLineups{
 					GROUP_ID:          toString(row[0]),

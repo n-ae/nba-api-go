@@ -51,9 +51,12 @@ func GetCommonPlayoffSeries(ctx context.Context, client *stats.Client, req Commo
 	}
 
 	response := &CommonPlayoffSeriesResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.PlayoffSeries = make([]CommonPlayoffSeriesPlayoffSeries, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "PlayoffSeries"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(CommonPlayoffSeriesPlayoffSeries{})); err != nil {
+			return nil, fmt.Errorf("CommonPlayoffSeries: PlayoffSeries result set: %w", err)
+		}
+		response.PlayoffSeries = make([]CommonPlayoffSeriesPlayoffSeries, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 5 {
 				item := CommonPlayoffSeriesPlayoffSeries{
 					GAME_ID:         toString(row[0]),

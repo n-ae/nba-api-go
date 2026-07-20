@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -91,9 +92,12 @@ func GetLeagueDashPlayerClutch(ctx context.Context, client *stats.Client, req Le
 	}
 
 	response := &LeagueDashPlayerClutchResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.LeagueDashPlayerClutch = make([]LeagueDashPlayerClutchLeagueDashPlayerClutch, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "LeagueDashPlayerClutch"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(LeagueDashPlayerClutchLeagueDashPlayerClutch{})); err != nil {
+			return nil, fmt.Errorf("LeagueDashPlayerClutch: LeagueDashPlayerClutch result set: %w", err)
+		}
+		response.LeagueDashPlayerClutch = make([]LeagueDashPlayerClutchLeagueDashPlayerClutch, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 31 {
 				item := LeagueDashPlayerClutchLeagueDashPlayerClutch{
 					PLAYER_ID:         toInt(row[0]),

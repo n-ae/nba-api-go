@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -60,9 +61,12 @@ func GetPlayerEstimatedAdvancedStats(ctx context.Context, client *stats.Client, 
 	}
 
 	response := &PlayerEstimatedAdvancedStatsResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.PlayerEstimatedAdvancedStats = make([]PlayerEstimatedAdvancedStatsPlayerEstimatedAdvancedStats, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "PlayerEstimatedAdvancedStats"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerEstimatedAdvancedStatsPlayerEstimatedAdvancedStats{})); err != nil {
+			return nil, fmt.Errorf("PlayerEstimatedAdvancedStats: PlayerEstimatedAdvancedStats result set: %w", err)
+		}
+		response.PlayerEstimatedAdvancedStats = make([]PlayerEstimatedAdvancedStatsPlayerEstimatedAdvancedStats, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 16 {
 				item := PlayerEstimatedAdvancedStatsPlayerEstimatedAdvancedStats{
 					PLAYER_ID:         toInt(row[0]),

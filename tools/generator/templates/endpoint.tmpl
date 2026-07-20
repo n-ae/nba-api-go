@@ -2,7 +2,7 @@ package endpoints
 
 import (
 	"context"
-{{- if .HasRequiredParams}}
+{{- if or .HasRequiredParams .ResultSets}}
 	"fmt"
 {{- end}}
 	"net/url"
@@ -69,10 +69,13 @@ func Get{{.Name}}(ctx context.Context, client *stats.Client, req {{.Name}}Reques
 
 	response := &{{.Name}}Response{}
 
-{{- range $idx, $rs := .ResultSets}}
-	if len(rawResp.ResultSets) > {{$idx}} {
-		response.{{$rs.Name}} = make([]{{$.Name}}{{$rs.Name}}, 0, len(rawResp.ResultSets[{{$idx}}].RowSet))
-		for _, row := range rawResp.ResultSets[{{$idx}}].RowSet {
+{{- range $rs := .ResultSets}}
+	if rs, ok := findResultSet(rawResp.ResultSets, "{{$rs.Name}}"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags({{$.Name}}{{$rs.Name}}{})); err != nil {
+			return nil, fmt.Errorf("{{$.Name}}: {{$rs.Name}} result set: %w", err)
+		}
+		response.{{$rs.Name}} = make([]{{$.Name}}{{$rs.Name}}, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= {{len $rs.FieldTypes}} {
 				item := {{$.Name}}{{$rs.Name}}{
 {{- range $fidx, $fieldType := $rs.FieldTypes}}

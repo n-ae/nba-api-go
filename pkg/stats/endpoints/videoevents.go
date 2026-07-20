@@ -50,9 +50,12 @@ func GetVideoEvents(ctx context.Context, client *stats.Client, req VideoEventsRe
 	}
 
 	response := &VideoEventsResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.Video = make([]VideoEventsVideo, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "Video"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(VideoEventsVideo{})); err != nil {
+			return nil, fmt.Errorf("VideoEvents: Video result set: %w", err)
+		}
+		response.Video = make([]VideoEventsVideo, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 8 {
 				item := VideoEventsVideo{
 					UUID: toString(row[0]),

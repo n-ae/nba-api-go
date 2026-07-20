@@ -92,9 +92,12 @@ func GetTeamGameLogs(ctx context.Context, client *stats.Client, req TeamGameLogs
 	}
 
 	response := &TeamGameLogsResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.TeamGameLogs = make([]TeamGameLogsTeamGameLogs, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "TeamGameLogs"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamGameLogsTeamGameLogs{})); err != nil {
+			return nil, fmt.Errorf("TeamGameLogs: TeamGameLogs result set: %w", err)
+		}
+		response.TeamGameLogs = make([]TeamGameLogsTeamGameLogs, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 33 {
 				item := TeamGameLogsTeamGameLogs{
 					SEASON_YEAR:       toString(row[0]),

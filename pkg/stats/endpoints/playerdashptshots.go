@@ -177,9 +177,12 @@ func GetPlayerDashPtShots(ctx context.Context, client *stats.Client, req PlayerD
 	}
 
 	response := &PlayerDashPtShotsResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.OverallShooting = make([]PlayerDashPtShotsOverallShooting, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "OverallShooting"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerDashPtShotsOverallShooting{})); err != nil {
+			return nil, fmt.Errorf("PlayerDashPtShots: OverallShooting result set: %w", err)
+		}
+		response.OverallShooting = make([]PlayerDashPtShotsOverallShooting, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 18 {
 				item := PlayerDashPtShotsOverallShooting{
 					PLAYER_ID:              toInt(row[0]),
@@ -205,9 +208,12 @@ func GetPlayerDashPtShots(ctx context.Context, client *stats.Client, req PlayerD
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.GeneralShooting = make([]PlayerDashPtShotsGeneralShooting, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "GeneralShooting"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerDashPtShotsGeneralShooting{})); err != nil {
+			return nil, fmt.Errorf("PlayerDashPtShots: GeneralShooting result set: %w", err)
+		}
+		response.GeneralShooting = make([]PlayerDashPtShotsGeneralShooting, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 16 {
 				item := PlayerDashPtShotsGeneralShooting{
 					PLAYER_ID:              toInt(row[0]),
@@ -231,9 +237,12 @@ func GetPlayerDashPtShots(ctx context.Context, client *stats.Client, req PlayerD
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 2 {
-		response.ShotClockShooting = make([]PlayerDashPtShotsShotClockShooting, 0, len(rawResp.ResultSets[2].RowSet))
-		for _, row := range rawResp.ResultSets[2].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "ShotClockShooting"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerDashPtShotsShotClockShooting{})); err != nil {
+			return nil, fmt.Errorf("PlayerDashPtShots: ShotClockShooting result set: %w", err)
+		}
+		response.ShotClockShooting = make([]PlayerDashPtShotsShotClockShooting, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 16 {
 				item := PlayerDashPtShotsShotClockShooting{
 					PLAYER_ID:              toInt(row[0]),
@@ -257,9 +266,12 @@ func GetPlayerDashPtShots(ctx context.Context, client *stats.Client, req PlayerD
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 3 {
-		response.DribbleShooting = make([]PlayerDashPtShotsDribbleShooting, 0, len(rawResp.ResultSets[3].RowSet))
-		for _, row := range rawResp.ResultSets[3].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "DribbleShooting"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerDashPtShotsDribbleShooting{})); err != nil {
+			return nil, fmt.Errorf("PlayerDashPtShots: DribbleShooting result set: %w", err)
+		}
+		response.DribbleShooting = make([]PlayerDashPtShotsDribbleShooting, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 16 {
 				item := PlayerDashPtShotsDribbleShooting{
 					PLAYER_ID:              toInt(row[0]),
@@ -283,9 +295,12 @@ func GetPlayerDashPtShots(ctx context.Context, client *stats.Client, req PlayerD
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 4 {
-		response.ClosestDefenderShooting = make([]PlayerDashPtShotsClosestDefenderShooting, 0, len(rawResp.ResultSets[4].RowSet))
-		for _, row := range rawResp.ResultSets[4].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "ClosestDefenderShooting"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerDashPtShotsClosestDefenderShooting{})); err != nil {
+			return nil, fmt.Errorf("PlayerDashPtShots: ClosestDefenderShooting result set: %w", err)
+		}
+		response.ClosestDefenderShooting = make([]PlayerDashPtShotsClosestDefenderShooting, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 16 {
 				item := PlayerDashPtShotsClosestDefenderShooting{
 					PLAYER_ID:              toInt(row[0]),
@@ -309,9 +324,12 @@ func GetPlayerDashPtShots(ctx context.Context, client *stats.Client, req PlayerD
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 5 {
-		response.TouchTimeShooting = make([]PlayerDashPtShotsTouchTimeShooting, 0, len(rawResp.ResultSets[5].RowSet))
-		for _, row := range rawResp.ResultSets[5].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "TouchTimeShooting"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerDashPtShotsTouchTimeShooting{})); err != nil {
+			return nil, fmt.Errorf("PlayerDashPtShots: TouchTimeShooting result set: %w", err)
+		}
+		response.TouchTimeShooting = make([]PlayerDashPtShotsTouchTimeShooting, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 16 {
 				item := PlayerDashPtShotsTouchTimeShooting{
 					PLAYER_ID:              toInt(row[0]),

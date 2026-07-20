@@ -201,9 +201,12 @@ func GetPlayerDashboardByOpponent(ctx context.Context, client *stats.Client, req
 	}
 
 	response := &PlayerDashboardByOpponentResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.OverallPlayerDashboard = make([]PlayerDashboardByOpponentOverallPlayerDashboard, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "OverallPlayerDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerDashboardByOpponentOverallPlayerDashboard{})); err != nil {
+			return nil, fmt.Errorf("PlayerDashboardByOpponent: OverallPlayerDashboard result set: %w", err)
+		}
+		response.OverallPlayerDashboard = make([]PlayerDashboardByOpponentOverallPlayerDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 28 {
 				item := PlayerDashboardByOpponentOverallPlayerDashboard{
 					PLAYER_ID:   toInt(row[0]),
@@ -239,9 +242,12 @@ func GetPlayerDashboardByOpponent(ctx context.Context, client *stats.Client, req
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.ConferencePlayerDashboard = make([]PlayerDashboardByOpponentConferencePlayerDashboard, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "ConferencePlayerDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerDashboardByOpponentConferencePlayerDashboard{})); err != nil {
+			return nil, fmt.Errorf("PlayerDashboardByOpponent: ConferencePlayerDashboard result set: %w", err)
+		}
+		response.ConferencePlayerDashboard = make([]PlayerDashboardByOpponentConferencePlayerDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := PlayerDashboardByOpponentConferencePlayerDashboard{
 					PLAYER_ID:   toInt(row[0]),
@@ -278,9 +284,12 @@ func GetPlayerDashboardByOpponent(ctx context.Context, client *stats.Client, req
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 2 {
-		response.DivisionPlayerDashboard = make([]PlayerDashboardByOpponentDivisionPlayerDashboard, 0, len(rawResp.ResultSets[2].RowSet))
-		for _, row := range rawResp.ResultSets[2].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "DivisionPlayerDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerDashboardByOpponentDivisionPlayerDashboard{})); err != nil {
+			return nil, fmt.Errorf("PlayerDashboardByOpponent: DivisionPlayerDashboard result set: %w", err)
+		}
+		response.DivisionPlayerDashboard = make([]PlayerDashboardByOpponentDivisionPlayerDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := PlayerDashboardByOpponentDivisionPlayerDashboard{
 					PLAYER_ID:   toInt(row[0]),
@@ -317,9 +326,12 @@ func GetPlayerDashboardByOpponent(ctx context.Context, client *stats.Client, req
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 3 {
-		response.OpponentPlayerDashboard = make([]PlayerDashboardByOpponentOpponentPlayerDashboard, 0, len(rawResp.ResultSets[3].RowSet))
-		for _, row := range rawResp.ResultSets[3].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "OpponentPlayerDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerDashboardByOpponentOpponentPlayerDashboard{})); err != nil {
+			return nil, fmt.Errorf("PlayerDashboardByOpponent: OpponentPlayerDashboard result set: %w", err)
+		}
+		response.OpponentPlayerDashboard = make([]PlayerDashboardByOpponentOpponentPlayerDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 30 {
 				item := PlayerDashboardByOpponentOpponentPlayerDashboard{
 					PLAYER_ID:            toInt(row[0]),

@@ -87,9 +87,12 @@ func GetTeamYearOverYearSplits(ctx context.Context, client *stats.Client, req Te
 	}
 
 	response := &TeamYearOverYearSplitsResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.ByYearTeamDashboard = make([]TeamYearOverYearSplitsByYearTeamDashboard, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "ByYearTeamDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamYearOverYearSplitsByYearTeamDashboard{})); err != nil {
+			return nil, fmt.Errorf("TeamYearOverYearSplits: ByYearTeamDashboard result set: %w", err)
+		}
+		response.ByYearTeamDashboard = make([]TeamYearOverYearSplitsByYearTeamDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := TeamYearOverYearSplitsByYearTeamDashboard{
 					TEAM_ID:    toInt(row[0]),

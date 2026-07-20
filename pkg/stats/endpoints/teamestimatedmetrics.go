@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -74,9 +75,12 @@ func GetTeamEstimatedMetrics(ctx context.Context, client *stats.Client, req Team
 	}
 
 	response := &TeamEstimatedMetricsResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.TeamEstimatedMetrics = make([]TeamEstimatedMetricsTeamEstimatedMetrics, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "TeamEstimatedMetrics"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamEstimatedMetricsTeamEstimatedMetrics{})); err != nil {
+			return nil, fmt.Errorf("TeamEstimatedMetrics: TeamEstimatedMetrics result set: %w", err)
+		}
+		response.TeamEstimatedMetrics = make([]TeamEstimatedMetricsTeamEstimatedMetrics, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 30 {
 				item := TeamEstimatedMetricsTeamEstimatedMetrics{
 					TEAM_ID:           toInt(row[0]),

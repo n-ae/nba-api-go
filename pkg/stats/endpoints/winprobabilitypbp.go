@@ -66,9 +66,12 @@ func GetWinProbabilityPBP(ctx context.Context, client *stats.Client, req WinProb
 	}
 
 	response := &WinProbabilityPBPResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.WinProbPBP = make([]WinProbabilityPBPWinProbPBP, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "WinProbPBP"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(WinProbabilityPBPWinProbPBP{})); err != nil {
+			return nil, fmt.Errorf("WinProbabilityPBP: WinProbPBP result set: %w", err)
+		}
+		response.WinProbPBP = make([]WinProbabilityPBPWinProbPBP, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 13 {
 				item := WinProbabilityPBPWinProbPBP{
 					GAME_ID:           toString(row[0]),
@@ -89,9 +92,12 @@ func GetWinProbabilityPBP(ctx context.Context, client *stats.Client, req WinProb
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.GameInfo = make([]WinProbabilityPBPGameInfo, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "GameInfo"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(WinProbabilityPBPGameInfo{})); err != nil {
+			return nil, fmt.Errorf("WinProbabilityPBP: GameInfo result set: %w", err)
+		}
+		response.GameInfo = make([]WinProbabilityPBPGameInfo, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 7 {
 				item := WinProbabilityPBPGameInfo{
 					GAME_ID:             toString(row[0]),

@@ -102,9 +102,12 @@ func GetPlayerProfileV2(ctx context.Context, client *stats.Client, req PlayerPro
 	}
 
 	response := &PlayerProfileV2Response{}
-	if len(rawResp.ResultSets) > 0 {
-		response.SeasonTotalsRegularSeason = make([]PlayerProfileV2SeasonTotalsRegularSeason, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "SeasonTotalsRegularSeason"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerProfileV2SeasonTotalsRegularSeason{})); err != nil {
+			return nil, fmt.Errorf("PlayerProfileV2: SeasonTotalsRegularSeason result set: %w", err)
+		}
+		response.SeasonTotalsRegularSeason = make([]PlayerProfileV2SeasonTotalsRegularSeason, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 27 {
 				item := PlayerProfileV2SeasonTotalsRegularSeason{
 					PLAYER_ID:         toInt(row[0]),
@@ -139,9 +142,12 @@ func GetPlayerProfileV2(ctx context.Context, client *stats.Client, req PlayerPro
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.CareerTotalsRegularSeason = make([]PlayerProfileV2CareerTotalsRegularSeason, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "CareerTotalsRegularSeason"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerProfileV2CareerTotalsRegularSeason{})); err != nil {
+			return nil, fmt.Errorf("PlayerProfileV2: CareerTotalsRegularSeason result set: %w", err)
+		}
+		response.CareerTotalsRegularSeason = make([]PlayerProfileV2CareerTotalsRegularSeason, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 24 {
 				item := PlayerProfileV2CareerTotalsRegularSeason{
 					PLAYER_ID: toInt(row[0]),

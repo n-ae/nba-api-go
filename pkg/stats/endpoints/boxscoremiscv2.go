@@ -102,9 +102,12 @@ func GetBoxScoreMiscV2(ctx context.Context, client *stats.Client, req BoxScoreMi
 	}
 
 	response := &BoxScoreMiscV2Response{}
-	if len(rawResp.ResultSets) > 0 {
-		response.PlayerStats = make([]BoxScoreMiscV2PlayerStats, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "PlayerStats"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(BoxScoreMiscV2PlayerStats{})); err != nil {
+			return nil, fmt.Errorf("BoxScoreMiscV2: PlayerStats result set: %w", err)
+		}
+		response.PlayerStats = make([]BoxScoreMiscV2PlayerStats, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 22 {
 				item := BoxScoreMiscV2PlayerStats{
 					GAME_ID:            toString(row[0]),
@@ -134,9 +137,12 @@ func GetBoxScoreMiscV2(ctx context.Context, client *stats.Client, req BoxScoreMi
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.TeamStats = make([]BoxScoreMiscV2TeamStats, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "TeamStats"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(BoxScoreMiscV2TeamStats{})); err != nil {
+			return nil, fmt.Errorf("BoxScoreMiscV2: TeamStats result set: %w", err)
+		}
+		response.TeamStats = make([]BoxScoreMiscV2TeamStats, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 18 {
 				item := BoxScoreMiscV2TeamStats{
 					GAME_ID:            toString(row[0]),

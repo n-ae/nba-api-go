@@ -86,9 +86,12 @@ func GetGameRotation(ctx context.Context, client *stats.Client, req GameRotation
 	}
 
 	response := &GameRotationResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.AwayTeam = make([]GameRotationAwayTeam, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "AwayTeam"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(GameRotationAwayTeam{})); err != nil {
+			return nil, fmt.Errorf("GameRotation: AwayTeam result set: %w", err)
+		}
+		response.AwayTeam = make([]GameRotationAwayTeam, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 12 {
 				item := GameRotationAwayTeam{
 					GAME_ID:       toString(row[0]),
@@ -108,9 +111,12 @@ func GetGameRotation(ctx context.Context, client *stats.Client, req GameRotation
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.HomeTeam = make([]GameRotationHomeTeam, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "HomeTeam"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(GameRotationHomeTeam{})); err != nil {
+			return nil, fmt.Errorf("GameRotation: HomeTeam result set: %w", err)
+		}
+		response.HomeTeam = make([]GameRotationHomeTeam, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 12 {
 				item := GameRotationHomeTeam{
 					GAME_ID:       toString(row[0]),

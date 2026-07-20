@@ -132,9 +132,12 @@ func GetTeamDashboardByYearOverYear(ctx context.Context, client *stats.Client, r
 	}
 
 	response := &TeamDashboardByYearOverYearResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.OverallTeamDashboard = make([]TeamDashboardByYearOverYearOverallTeamDashboard, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "OverallTeamDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDashboardByYearOverYearOverallTeamDashboard{})); err != nil {
+			return nil, fmt.Errorf("TeamDashboardByYearOverYear: OverallTeamDashboard result set: %w", err)
+		}
+		response.OverallTeamDashboard = make([]TeamDashboardByYearOverYearOverallTeamDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 28 {
 				item := TeamDashboardByYearOverYearOverallTeamDashboard{
 					TEAM_ID:    toInt(row[0]),
@@ -170,9 +173,12 @@ func GetTeamDashboardByYearOverYear(ctx context.Context, client *stats.Client, r
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.ByYearTeamDashboard = make([]TeamDashboardByYearOverYearByYearTeamDashboard, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "ByYearTeamDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDashboardByYearOverYearByYearTeamDashboard{})); err != nil {
+			return nil, fmt.Errorf("TeamDashboardByYearOverYear: ByYearTeamDashboard result set: %w", err)
+		}
+		response.ByYearTeamDashboard = make([]TeamDashboardByYearOverYearByYearTeamDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := TeamDashboardByYearOverYearByYearTeamDashboard{
 					TEAM_ID:    toInt(row[0]),
