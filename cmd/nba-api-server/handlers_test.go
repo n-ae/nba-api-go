@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/n-ae/nba-api-go/pkg/stats"
 )
@@ -376,6 +377,24 @@ func TestMetricsTracking(t *testing.T) {
 
 	if snapshot.RequestsByPath["/api/test"] != 2 {
 		t.Errorf("expected 2 requests to /api/test, got %d", snapshot.RequestsByPath["/api/test"])
+	}
+}
+
+func TestMetricsBoundsPathsAndKeepsRollingLatencySample(t *testing.T) {
+	metrics := newMetrics(2, 2)
+	metrics.RecordRequest("/first", http.StatusOK, 1*time.Millisecond)
+	metrics.RecordRequest("/second", http.StatusOK, 2*time.Millisecond)
+	metrics.RecordRequest("/third", http.StatusOK, 3*time.Millisecond)
+
+	snapshot := metrics.GetSnapshot()
+	if len(snapshot.RequestsByPath) != 3 {
+		t.Fatalf("expected two paths plus the overflow bucket, got %v", snapshot.RequestsByPath)
+	}
+	if snapshot.RequestsByPath[overflowMetricsPathLabel] != 1 {
+		t.Errorf("expected one request in the overflow bucket, got %d", snapshot.RequestsByPath[overflowMetricsPathLabel])
+	}
+	if snapshot.MinResponseTime != 2*time.Millisecond || snapshot.MaxResponseTime != 3*time.Millisecond {
+		t.Errorf("expected rolling latency sample [2ms, 3ms], got min=%v max=%v", snapshot.MinResponseTime, snapshot.MaxResponseTime)
 	}
 }
 
