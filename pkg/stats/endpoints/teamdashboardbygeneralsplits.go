@@ -37,292 +37,292 @@ type TeamDashboardByGeneralSplitsRequest struct {
 
 // TeamDashboardByGeneralSplitsOverallTeamDashboard represents the OverallTeamDashboard result set for TeamDashboardByGeneralSplits
 type TeamDashboardByGeneralSplitsOverallTeamDashboard struct {
-	GROUP_SET       interface{}
-	GROUP_VALUE     interface{}
-	GP              interface{}
-	W               interface{}
-	L               interface{}
-	W_PCT           interface{}
-	MIN             interface{}
-	FGM             interface{}
-	FGA             interface{}
-	FG_PCT          interface{}
-	FG3M            interface{}
-	FG3A            interface{}
-	FG3_PCT         interface{}
-	FTM             interface{}
-	FTA             interface{}
-	FT_PCT          interface{}
-	OREB            interface{}
-	DREB            interface{}
-	REB             interface{}
-	AST             interface{}
-	TOV             interface{}
-	STL             interface{}
-	BLK             interface{}
-	BLKA            interface{}
-	PF              interface{}
-	PFD             interface{}
-	PTS             interface{}
-	PLUS_MINUS      interface{}
-	GP_RANK         interface{}
-	W_RANK          interface{}
-	L_RANK          interface{}
-	W_PCT_RANK      interface{}
-	MIN_RANK        interface{}
-	FGM_RANK        interface{}
-	FGA_RANK        interface{}
-	FG_PCT_RANK     interface{}
-	FG3M_RANK       interface{}
-	FG3A_RANK       interface{}
-	FG3_PCT_RANK    interface{}
-	FTM_RANK        interface{}
-	FTA_RANK        interface{}
-	FT_PCT_RANK     interface{}
-	OREB_RANK       interface{}
-	DREB_RANK       interface{}
-	REB_RANK        interface{}
-	AST_RANK        interface{}
-	TOV_RANK        interface{}
-	STL_RANK        interface{}
-	BLK_RANK        interface{}
-	BLKA_RANK       interface{}
-	PF_RANK         interface{}
-	PFD_RANK        interface{}
-	PTS_RANK        interface{}
-	PLUS_MINUS_RANK interface{}
+	GROUP_SET       string  `json:"GROUP_SET"`
+	GROUP_VALUE     string  `json:"GROUP_VALUE"`
+	GP              int     `json:"GP"`
+	W               string  `json:"W"`
+	L               string  `json:"L"`
+	W_PCT           float64 `json:"W_PCT"`
+	MIN             float64 `json:"MIN"`
+	FGM             int     `json:"FGM"`
+	FGA             int     `json:"FGA"`
+	FG_PCT          float64 `json:"FG_PCT"`
+	FG3M            int     `json:"FG3M"`
+	FG3A            int     `json:"FG3A"`
+	FG3_PCT         float64 `json:"FG3_PCT"`
+	FTM             int     `json:"FTM"`
+	FTA             int     `json:"FTA"`
+	FT_PCT          float64 `json:"FT_PCT"`
+	OREB            float64 `json:"OREB"`
+	DREB            float64 `json:"DREB"`
+	REB             float64 `json:"REB"`
+	AST             float64 `json:"AST"`
+	TOV             float64 `json:"TOV"`
+	STL             float64 `json:"STL"`
+	BLK             float64 `json:"BLK"`
+	BLKA            int     `json:"BLKA"`
+	PF              float64 `json:"PF"`
+	PFD             float64 `json:"PFD"`
+	PTS             float64 `json:"PTS"`
+	PLUS_MINUS      float64 `json:"PLUS_MINUS"`
+	GP_RANK         float64 `json:"GP_RANK"`
+	W_RANK          float64 `json:"W_RANK"`
+	L_RANK          float64 `json:"L_RANK"`
+	W_PCT_RANK      float64 `json:"W_PCT_RANK"`
+	MIN_RANK        float64 `json:"MIN_RANK"`
+	FGM_RANK        float64 `json:"FGM_RANK"`
+	FGA_RANK        float64 `json:"FGA_RANK"`
+	FG_PCT_RANK     float64 `json:"FG_PCT_RANK"`
+	FG3M_RANK       float64 `json:"FG3M_RANK"`
+	FG3A_RANK       float64 `json:"FG3A_RANK"`
+	FG3_PCT_RANK    float64 `json:"FG3_PCT_RANK"`
+	FTM_RANK        float64 `json:"FTM_RANK"`
+	FTA_RANK        float64 `json:"FTA_RANK"`
+	FT_PCT_RANK     float64 `json:"FT_PCT_RANK"`
+	OREB_RANK       float64 `json:"OREB_RANK"`
+	DREB_RANK       float64 `json:"DREB_RANK"`
+	REB_RANK        float64 `json:"REB_RANK"`
+	AST_RANK        float64 `json:"AST_RANK"`
+	TOV_RANK        float64 `json:"TOV_RANK"`
+	STL_RANK        float64 `json:"STL_RANK"`
+	BLK_RANK        float64 `json:"BLK_RANK"`
+	BLKA_RANK       float64 `json:"BLKA_RANK"`
+	PF_RANK         float64 `json:"PF_RANK"`
+	PFD_RANK        float64 `json:"PFD_RANK"`
+	PTS_RANK        float64 `json:"PTS_RANK"`
+	PLUS_MINUS_RANK float64 `json:"PLUS_MINUS_RANK"`
 }
 
 // TeamDashboardByGeneralSplitsLocationTeamDashboard represents the LocationTeamDashboard result set for TeamDashboardByGeneralSplits
 type TeamDashboardByGeneralSplitsLocationTeamDashboard struct {
-	GROUP_SET       interface{}
-	GROUP_VALUE     interface{}
-	GP              interface{}
-	W               interface{}
-	L               interface{}
-	W_PCT           interface{}
-	MIN             interface{}
-	FGM             interface{}
-	FGA             interface{}
-	FG_PCT          interface{}
-	FG3M            interface{}
-	FG3A            interface{}
-	FG3_PCT         interface{}
-	FTM             interface{}
-	FTA             interface{}
-	FT_PCT          interface{}
-	OREB            interface{}
-	DREB            interface{}
-	REB             interface{}
-	AST             interface{}
-	TOV             interface{}
-	STL             interface{}
-	BLK             interface{}
-	BLKA            interface{}
-	PF              interface{}
-	PFD             interface{}
-	PTS             interface{}
-	PLUS_MINUS      interface{}
-	GP_RANK         interface{}
-	W_RANK          interface{}
-	L_RANK          interface{}
-	W_PCT_RANK      interface{}
-	MIN_RANK        interface{}
-	FGM_RANK        interface{}
-	FGA_RANK        interface{}
-	FG_PCT_RANK     interface{}
-	FG3M_RANK       interface{}
-	FG3A_RANK       interface{}
-	FG3_PCT_RANK    interface{}
-	FTM_RANK        interface{}
-	FTA_RANK        interface{}
-	FT_PCT_RANK     interface{}
-	OREB_RANK       interface{}
-	DREB_RANK       interface{}
-	REB_RANK        interface{}
-	AST_RANK        interface{}
-	TOV_RANK        interface{}
-	STL_RANK        interface{}
-	BLK_RANK        interface{}
-	BLKA_RANK       interface{}
-	PF_RANK         interface{}
-	PFD_RANK        interface{}
-	PTS_RANK        interface{}
-	PLUS_MINUS_RANK interface{}
+	GROUP_SET       string  `json:"GROUP_SET"`
+	GROUP_VALUE     string  `json:"GROUP_VALUE"`
+	GP              int     `json:"GP"`
+	W               string  `json:"W"`
+	L               string  `json:"L"`
+	W_PCT           float64 `json:"W_PCT"`
+	MIN             float64 `json:"MIN"`
+	FGM             int     `json:"FGM"`
+	FGA             int     `json:"FGA"`
+	FG_PCT          float64 `json:"FG_PCT"`
+	FG3M            int     `json:"FG3M"`
+	FG3A            int     `json:"FG3A"`
+	FG3_PCT         float64 `json:"FG3_PCT"`
+	FTM             int     `json:"FTM"`
+	FTA             int     `json:"FTA"`
+	FT_PCT          float64 `json:"FT_PCT"`
+	OREB            float64 `json:"OREB"`
+	DREB            float64 `json:"DREB"`
+	REB             float64 `json:"REB"`
+	AST             float64 `json:"AST"`
+	TOV             float64 `json:"TOV"`
+	STL             float64 `json:"STL"`
+	BLK             float64 `json:"BLK"`
+	BLKA            int     `json:"BLKA"`
+	PF              float64 `json:"PF"`
+	PFD             float64 `json:"PFD"`
+	PTS             float64 `json:"PTS"`
+	PLUS_MINUS      float64 `json:"PLUS_MINUS"`
+	GP_RANK         float64 `json:"GP_RANK"`
+	W_RANK          float64 `json:"W_RANK"`
+	L_RANK          float64 `json:"L_RANK"`
+	W_PCT_RANK      float64 `json:"W_PCT_RANK"`
+	MIN_RANK        float64 `json:"MIN_RANK"`
+	FGM_RANK        float64 `json:"FGM_RANK"`
+	FGA_RANK        float64 `json:"FGA_RANK"`
+	FG_PCT_RANK     float64 `json:"FG_PCT_RANK"`
+	FG3M_RANK       float64 `json:"FG3M_RANK"`
+	FG3A_RANK       float64 `json:"FG3A_RANK"`
+	FG3_PCT_RANK    float64 `json:"FG3_PCT_RANK"`
+	FTM_RANK        float64 `json:"FTM_RANK"`
+	FTA_RANK        float64 `json:"FTA_RANK"`
+	FT_PCT_RANK     float64 `json:"FT_PCT_RANK"`
+	OREB_RANK       float64 `json:"OREB_RANK"`
+	DREB_RANK       float64 `json:"DREB_RANK"`
+	REB_RANK        float64 `json:"REB_RANK"`
+	AST_RANK        float64 `json:"AST_RANK"`
+	TOV_RANK        float64 `json:"TOV_RANK"`
+	STL_RANK        float64 `json:"STL_RANK"`
+	BLK_RANK        float64 `json:"BLK_RANK"`
+	BLKA_RANK       float64 `json:"BLKA_RANK"`
+	PF_RANK         float64 `json:"PF_RANK"`
+	PFD_RANK        float64 `json:"PFD_RANK"`
+	PTS_RANK        float64 `json:"PTS_RANK"`
+	PLUS_MINUS_RANK float64 `json:"PLUS_MINUS_RANK"`
 }
 
 // TeamDashboardByGeneralSplitsWinsLossesTeamDashboard represents the WinsLossesTeamDashboard result set for TeamDashboardByGeneralSplits
 type TeamDashboardByGeneralSplitsWinsLossesTeamDashboard struct {
-	GROUP_SET       interface{}
-	GROUP_VALUE     interface{}
-	GP              interface{}
-	W               interface{}
-	L               interface{}
-	W_PCT           interface{}
-	MIN             interface{}
-	FGM             interface{}
-	FGA             interface{}
-	FG_PCT          interface{}
-	FG3M            interface{}
-	FG3A            interface{}
-	FG3_PCT         interface{}
-	FTM             interface{}
-	FTA             interface{}
-	FT_PCT          interface{}
-	OREB            interface{}
-	DREB            interface{}
-	REB             interface{}
-	AST             interface{}
-	TOV             interface{}
-	STL             interface{}
-	BLK             interface{}
-	BLKA            interface{}
-	PF              interface{}
-	PFD             interface{}
-	PTS             interface{}
-	PLUS_MINUS      interface{}
-	GP_RANK         interface{}
-	W_RANK          interface{}
-	L_RANK          interface{}
-	W_PCT_RANK      interface{}
-	MIN_RANK        interface{}
-	FGM_RANK        interface{}
-	FGA_RANK        interface{}
-	FG_PCT_RANK     interface{}
-	FG3M_RANK       interface{}
-	FG3A_RANK       interface{}
-	FG3_PCT_RANK    interface{}
-	FTM_RANK        interface{}
-	FTA_RANK        interface{}
-	FT_PCT_RANK     interface{}
-	OREB_RANK       interface{}
-	DREB_RANK       interface{}
-	REB_RANK        interface{}
-	AST_RANK        interface{}
-	TOV_RANK        interface{}
-	STL_RANK        interface{}
-	BLK_RANK        interface{}
-	BLKA_RANK       interface{}
-	PF_RANK         interface{}
-	PFD_RANK        interface{}
-	PTS_RANK        interface{}
-	PLUS_MINUS_RANK interface{}
+	GROUP_SET       string  `json:"GROUP_SET"`
+	GROUP_VALUE     string  `json:"GROUP_VALUE"`
+	GP              int     `json:"GP"`
+	W               string  `json:"W"`
+	L               string  `json:"L"`
+	W_PCT           float64 `json:"W_PCT"`
+	MIN             float64 `json:"MIN"`
+	FGM             int     `json:"FGM"`
+	FGA             int     `json:"FGA"`
+	FG_PCT          float64 `json:"FG_PCT"`
+	FG3M            int     `json:"FG3M"`
+	FG3A            int     `json:"FG3A"`
+	FG3_PCT         float64 `json:"FG3_PCT"`
+	FTM             int     `json:"FTM"`
+	FTA             int     `json:"FTA"`
+	FT_PCT          float64 `json:"FT_PCT"`
+	OREB            float64 `json:"OREB"`
+	DREB            float64 `json:"DREB"`
+	REB             float64 `json:"REB"`
+	AST             float64 `json:"AST"`
+	TOV             float64 `json:"TOV"`
+	STL             float64 `json:"STL"`
+	BLK             float64 `json:"BLK"`
+	BLKA            int     `json:"BLKA"`
+	PF              float64 `json:"PF"`
+	PFD             float64 `json:"PFD"`
+	PTS             float64 `json:"PTS"`
+	PLUS_MINUS      float64 `json:"PLUS_MINUS"`
+	GP_RANK         float64 `json:"GP_RANK"`
+	W_RANK          float64 `json:"W_RANK"`
+	L_RANK          float64 `json:"L_RANK"`
+	W_PCT_RANK      float64 `json:"W_PCT_RANK"`
+	MIN_RANK        float64 `json:"MIN_RANK"`
+	FGM_RANK        float64 `json:"FGM_RANK"`
+	FGA_RANK        float64 `json:"FGA_RANK"`
+	FG_PCT_RANK     float64 `json:"FG_PCT_RANK"`
+	FG3M_RANK       float64 `json:"FG3M_RANK"`
+	FG3A_RANK       float64 `json:"FG3A_RANK"`
+	FG3_PCT_RANK    float64 `json:"FG3_PCT_RANK"`
+	FTM_RANK        float64 `json:"FTM_RANK"`
+	FTA_RANK        float64 `json:"FTA_RANK"`
+	FT_PCT_RANK     float64 `json:"FT_PCT_RANK"`
+	OREB_RANK       float64 `json:"OREB_RANK"`
+	DREB_RANK       float64 `json:"DREB_RANK"`
+	REB_RANK        float64 `json:"REB_RANK"`
+	AST_RANK        float64 `json:"AST_RANK"`
+	TOV_RANK        float64 `json:"TOV_RANK"`
+	STL_RANK        float64 `json:"STL_RANK"`
+	BLK_RANK        float64 `json:"BLK_RANK"`
+	BLKA_RANK       float64 `json:"BLKA_RANK"`
+	PF_RANK         float64 `json:"PF_RANK"`
+	PFD_RANK        float64 `json:"PFD_RANK"`
+	PTS_RANK        float64 `json:"PTS_RANK"`
+	PLUS_MINUS_RANK float64 `json:"PLUS_MINUS_RANK"`
 }
 
 // TeamDashboardByGeneralSplitsMonthTeamDashboard represents the MonthTeamDashboard result set for TeamDashboardByGeneralSplits
 type TeamDashboardByGeneralSplitsMonthTeamDashboard struct {
-	GROUP_SET       interface{}
-	GROUP_VALUE     interface{}
-	GP              interface{}
-	W               interface{}
-	L               interface{}
-	W_PCT           interface{}
-	MIN             interface{}
-	FGM             interface{}
-	FGA             interface{}
-	FG_PCT          interface{}
-	FG3M            interface{}
-	FG3A            interface{}
-	FG3_PCT         interface{}
-	FTM             interface{}
-	FTA             interface{}
-	FT_PCT          interface{}
-	OREB            interface{}
-	DREB            interface{}
-	REB             interface{}
-	AST             interface{}
-	TOV             interface{}
-	STL             interface{}
-	BLK             interface{}
-	BLKA            interface{}
-	PF              interface{}
-	PFD             interface{}
-	PTS             interface{}
-	PLUS_MINUS      interface{}
-	GP_RANK         interface{}
-	W_RANK          interface{}
-	L_RANK          interface{}
-	W_PCT_RANK      interface{}
-	MIN_RANK        interface{}
-	FGM_RANK        interface{}
-	FGA_RANK        interface{}
-	FG_PCT_RANK     interface{}
-	FG3M_RANK       interface{}
-	FG3A_RANK       interface{}
-	FG3_PCT_RANK    interface{}
-	FTM_RANK        interface{}
-	FTA_RANK        interface{}
-	FT_PCT_RANK     interface{}
-	OREB_RANK       interface{}
-	DREB_RANK       interface{}
-	REB_RANK        interface{}
-	AST_RANK        interface{}
-	TOV_RANK        interface{}
-	STL_RANK        interface{}
-	BLK_RANK        interface{}
-	BLKA_RANK       interface{}
-	PF_RANK         interface{}
-	PFD_RANK        interface{}
-	PTS_RANK        interface{}
-	PLUS_MINUS_RANK interface{}
+	GROUP_SET       string  `json:"GROUP_SET"`
+	GROUP_VALUE     string  `json:"GROUP_VALUE"`
+	GP              int     `json:"GP"`
+	W               string  `json:"W"`
+	L               string  `json:"L"`
+	W_PCT           float64 `json:"W_PCT"`
+	MIN             float64 `json:"MIN"`
+	FGM             int     `json:"FGM"`
+	FGA             int     `json:"FGA"`
+	FG_PCT          float64 `json:"FG_PCT"`
+	FG3M            int     `json:"FG3M"`
+	FG3A            int     `json:"FG3A"`
+	FG3_PCT         float64 `json:"FG3_PCT"`
+	FTM             int     `json:"FTM"`
+	FTA             int     `json:"FTA"`
+	FT_PCT          float64 `json:"FT_PCT"`
+	OREB            float64 `json:"OREB"`
+	DREB            float64 `json:"DREB"`
+	REB             float64 `json:"REB"`
+	AST             float64 `json:"AST"`
+	TOV             float64 `json:"TOV"`
+	STL             float64 `json:"STL"`
+	BLK             float64 `json:"BLK"`
+	BLKA            int     `json:"BLKA"`
+	PF              float64 `json:"PF"`
+	PFD             float64 `json:"PFD"`
+	PTS             float64 `json:"PTS"`
+	PLUS_MINUS      float64 `json:"PLUS_MINUS"`
+	GP_RANK         float64 `json:"GP_RANK"`
+	W_RANK          float64 `json:"W_RANK"`
+	L_RANK          float64 `json:"L_RANK"`
+	W_PCT_RANK      float64 `json:"W_PCT_RANK"`
+	MIN_RANK        float64 `json:"MIN_RANK"`
+	FGM_RANK        float64 `json:"FGM_RANK"`
+	FGA_RANK        float64 `json:"FGA_RANK"`
+	FG_PCT_RANK     float64 `json:"FG_PCT_RANK"`
+	FG3M_RANK       float64 `json:"FG3M_RANK"`
+	FG3A_RANK       float64 `json:"FG3A_RANK"`
+	FG3_PCT_RANK    float64 `json:"FG3_PCT_RANK"`
+	FTM_RANK        float64 `json:"FTM_RANK"`
+	FTA_RANK        float64 `json:"FTA_RANK"`
+	FT_PCT_RANK     float64 `json:"FT_PCT_RANK"`
+	OREB_RANK       float64 `json:"OREB_RANK"`
+	DREB_RANK       float64 `json:"DREB_RANK"`
+	REB_RANK        float64 `json:"REB_RANK"`
+	AST_RANK        float64 `json:"AST_RANK"`
+	TOV_RANK        float64 `json:"TOV_RANK"`
+	STL_RANK        float64 `json:"STL_RANK"`
+	BLK_RANK        float64 `json:"BLK_RANK"`
+	BLKA_RANK       float64 `json:"BLKA_RANK"`
+	PF_RANK         float64 `json:"PF_RANK"`
+	PFD_RANK        float64 `json:"PFD_RANK"`
+	PTS_RANK        float64 `json:"PTS_RANK"`
+	PLUS_MINUS_RANK float64 `json:"PLUS_MINUS_RANK"`
 }
 
 // TeamDashboardByGeneralSplitsPrePostAllStarTeamDashboard represents the PrePostAllStarTeamDashboard result set for TeamDashboardByGeneralSplits
 type TeamDashboardByGeneralSplitsPrePostAllStarTeamDashboard struct {
-	GROUP_SET       interface{}
-	GROUP_VALUE     interface{}
-	GP              interface{}
-	W               interface{}
-	L               interface{}
-	W_PCT           interface{}
-	MIN             interface{}
-	FGM             interface{}
-	FGA             interface{}
-	FG_PCT          interface{}
-	FG3M            interface{}
-	FG3A            interface{}
-	FG3_PCT         interface{}
-	FTM             interface{}
-	FTA             interface{}
-	FT_PCT          interface{}
-	OREB            interface{}
-	DREB            interface{}
-	REB             interface{}
-	AST             interface{}
-	TOV             interface{}
-	STL             interface{}
-	BLK             interface{}
-	BLKA            interface{}
-	PF              interface{}
-	PFD             interface{}
-	PTS             interface{}
-	PLUS_MINUS      interface{}
-	GP_RANK         interface{}
-	W_RANK          interface{}
-	L_RANK          interface{}
-	W_PCT_RANK      interface{}
-	MIN_RANK        interface{}
-	FGM_RANK        interface{}
-	FGA_RANK        interface{}
-	FG_PCT_RANK     interface{}
-	FG3M_RANK       interface{}
-	FG3A_RANK       interface{}
-	FG3_PCT_RANK    interface{}
-	FTM_RANK        interface{}
-	FTA_RANK        interface{}
-	FT_PCT_RANK     interface{}
-	OREB_RANK       interface{}
-	DREB_RANK       interface{}
-	REB_RANK        interface{}
-	AST_RANK        interface{}
-	TOV_RANK        interface{}
-	STL_RANK        interface{}
-	BLK_RANK        interface{}
-	BLKA_RANK       interface{}
-	PF_RANK         interface{}
-	PFD_RANK        interface{}
-	PTS_RANK        interface{}
-	PLUS_MINUS_RANK interface{}
+	GROUP_SET       string  `json:"GROUP_SET"`
+	GROUP_VALUE     string  `json:"GROUP_VALUE"`
+	GP              int     `json:"GP"`
+	W               string  `json:"W"`
+	L               string  `json:"L"`
+	W_PCT           float64 `json:"W_PCT"`
+	MIN             float64 `json:"MIN"`
+	FGM             int     `json:"FGM"`
+	FGA             int     `json:"FGA"`
+	FG_PCT          float64 `json:"FG_PCT"`
+	FG3M            int     `json:"FG3M"`
+	FG3A            int     `json:"FG3A"`
+	FG3_PCT         float64 `json:"FG3_PCT"`
+	FTM             int     `json:"FTM"`
+	FTA             int     `json:"FTA"`
+	FT_PCT          float64 `json:"FT_PCT"`
+	OREB            float64 `json:"OREB"`
+	DREB            float64 `json:"DREB"`
+	REB             float64 `json:"REB"`
+	AST             float64 `json:"AST"`
+	TOV             float64 `json:"TOV"`
+	STL             float64 `json:"STL"`
+	BLK             float64 `json:"BLK"`
+	BLKA            int     `json:"BLKA"`
+	PF              float64 `json:"PF"`
+	PFD             float64 `json:"PFD"`
+	PTS             float64 `json:"PTS"`
+	PLUS_MINUS      float64 `json:"PLUS_MINUS"`
+	GP_RANK         float64 `json:"GP_RANK"`
+	W_RANK          float64 `json:"W_RANK"`
+	L_RANK          float64 `json:"L_RANK"`
+	W_PCT_RANK      float64 `json:"W_PCT_RANK"`
+	MIN_RANK        float64 `json:"MIN_RANK"`
+	FGM_RANK        float64 `json:"FGM_RANK"`
+	FGA_RANK        float64 `json:"FGA_RANK"`
+	FG_PCT_RANK     float64 `json:"FG_PCT_RANK"`
+	FG3M_RANK       float64 `json:"FG3M_RANK"`
+	FG3A_RANK       float64 `json:"FG3A_RANK"`
+	FG3_PCT_RANK    float64 `json:"FG3_PCT_RANK"`
+	FTM_RANK        float64 `json:"FTM_RANK"`
+	FTA_RANK        float64 `json:"FTA_RANK"`
+	FT_PCT_RANK     float64 `json:"FT_PCT_RANK"`
+	OREB_RANK       float64 `json:"OREB_RANK"`
+	DREB_RANK       float64 `json:"DREB_RANK"`
+	REB_RANK        float64 `json:"REB_RANK"`
+	AST_RANK        float64 `json:"AST_RANK"`
+	TOV_RANK        float64 `json:"TOV_RANK"`
+	STL_RANK        float64 `json:"STL_RANK"`
+	BLK_RANK        float64 `json:"BLK_RANK"`
+	BLKA_RANK       float64 `json:"BLKA_RANK"`
+	PF_RANK         float64 `json:"PF_RANK"`
+	PFD_RANK        float64 `json:"PFD_RANK"`
+	PTS_RANK        float64 `json:"PTS_RANK"`
+	PLUS_MINUS_RANK float64 `json:"PLUS_MINUS_RANK"`
 }
 
 // TeamDashboardByGeneralSplitsResponse contains the response data from the TeamDashboardByGeneralSplits endpoint
@@ -338,15 +338,15 @@ type TeamDashboardByGeneralSplitsResponse struct {
 func GetTeamDashboardByGeneralSplits(ctx context.Context, client *stats.Client, req TeamDashboardByGeneralSplitsRequest) (*models.Response[*TeamDashboardByGeneralSplitsResponse], error) {
 	params := url.Values{}
 	if req.TeamID == "" {
-		return nil, fmt.Errorf("TeamID is required")
+		return nil, fmt.Errorf("%s is required", "TeamID")
 	}
 	params.Set("TeamID", req.TeamID)
 	if req.Season == "" {
-		return nil, fmt.Errorf("season is required")
+		return nil, fmt.Errorf("%s is required", "Season")
 	}
 	params.Set("Season", string(req.Season))
 	if req.SeasonType == "" {
-		return nil, fmt.Errorf("SeasonType is required")
+		return nil, fmt.Errorf("%s is required", "SeasonType")
 	}
 	params.Set("SeasonType", string(req.SeasonType))
 	if req.MeasureType != nil {
@@ -411,317 +411,322 @@ func GetTeamDashboardByGeneralSplits(ctx context.Context, client *stats.Client, 
 
 	response := &TeamDashboardByGeneralSplitsResponse{}
 	if len(rawResp.ResultSets) > 0 {
-		response.OverallTeamDashboard = make([]TeamDashboardByGeneralSplitsOverallTeamDashboard, len(rawResp.ResultSets[0].RowSet))
-		for i, row := range rawResp.ResultSets[0].RowSet {
+		response.OverallTeamDashboard = make([]TeamDashboardByGeneralSplitsOverallTeamDashboard, 0, len(rawResp.ResultSets[0].RowSet))
+		for _, row := range rawResp.ResultSets[0].RowSet {
 			if len(row) >= 54 {
-				response.OverallTeamDashboard[i] = TeamDashboardByGeneralSplitsOverallTeamDashboard{
-					GROUP_SET:       row[0],
-					GROUP_VALUE:     row[1],
-					GP:              row[2],
-					W:               row[3],
-					L:               row[4],
-					W_PCT:           row[5],
-					MIN:             row[6],
-					FGM:             row[7],
-					FGA:             row[8],
-					FG_PCT:          row[9],
-					FG3M:            row[10],
-					FG3A:            row[11],
-					FG3_PCT:         row[12],
-					FTM:             row[13],
-					FTA:             row[14],
-					FT_PCT:          row[15],
-					OREB:            row[16],
-					DREB:            row[17],
-					REB:             row[18],
-					AST:             row[19],
-					TOV:             row[20],
-					STL:             row[21],
-					BLK:             row[22],
-					BLKA:            row[23],
-					PF:              row[24],
-					PFD:             row[25],
-					PTS:             row[26],
-					PLUS_MINUS:      row[27],
-					GP_RANK:         row[28],
-					W_RANK:          row[29],
-					L_RANK:          row[30],
-					W_PCT_RANK:      row[31],
-					MIN_RANK:        row[32],
-					FGM_RANK:        row[33],
-					FGA_RANK:        row[34],
-					FG_PCT_RANK:     row[35],
-					FG3M_RANK:       row[36],
-					FG3A_RANK:       row[37],
-					FG3_PCT_RANK:    row[38],
-					FTM_RANK:        row[39],
-					FTA_RANK:        row[40],
-					FT_PCT_RANK:     row[41],
-					OREB_RANK:       row[42],
-					DREB_RANK:       row[43],
-					REB_RANK:        row[44],
-					AST_RANK:        row[45],
-					TOV_RANK:        row[46],
-					STL_RANK:        row[47],
-					BLK_RANK:        row[48],
-					BLKA_RANK:       row[49],
-					PF_RANK:         row[50],
-					PFD_RANK:        row[51],
-					PTS_RANK:        row[52],
-					PLUS_MINUS_RANK: row[53],
+				item := TeamDashboardByGeneralSplitsOverallTeamDashboard{
+					GROUP_SET:       toString(row[0]),
+					GROUP_VALUE:     toString(row[1]),
+					GP:              toInt(row[2]),
+					W:               toString(row[3]),
+					L:               toString(row[4]),
+					W_PCT:           toFloat(row[5]),
+					MIN:             toFloat(row[6]),
+					FGM:             toInt(row[7]),
+					FGA:             toInt(row[8]),
+					FG_PCT:          toFloat(row[9]),
+					FG3M:            toInt(row[10]),
+					FG3A:            toInt(row[11]),
+					FG3_PCT:         toFloat(row[12]),
+					FTM:             toInt(row[13]),
+					FTA:             toInt(row[14]),
+					FT_PCT:          toFloat(row[15]),
+					OREB:            toFloat(row[16]),
+					DREB:            toFloat(row[17]),
+					REB:             toFloat(row[18]),
+					AST:             toFloat(row[19]),
+					TOV:             toFloat(row[20]),
+					STL:             toFloat(row[21]),
+					BLK:             toFloat(row[22]),
+					BLKA:            toInt(row[23]),
+					PF:              toFloat(row[24]),
+					PFD:             toFloat(row[25]),
+					PTS:             toFloat(row[26]),
+					PLUS_MINUS:      toFloat(row[27]),
+					GP_RANK:         toFloat(row[28]),
+					W_RANK:          toFloat(row[29]),
+					L_RANK:          toFloat(row[30]),
+					W_PCT_RANK:      toFloat(row[31]),
+					MIN_RANK:        toFloat(row[32]),
+					FGM_RANK:        toFloat(row[33]),
+					FGA_RANK:        toFloat(row[34]),
+					FG_PCT_RANK:     toFloat(row[35]),
+					FG3M_RANK:       toFloat(row[36]),
+					FG3A_RANK:       toFloat(row[37]),
+					FG3_PCT_RANK:    toFloat(row[38]),
+					FTM_RANK:        toFloat(row[39]),
+					FTA_RANK:        toFloat(row[40]),
+					FT_PCT_RANK:     toFloat(row[41]),
+					OREB_RANK:       toFloat(row[42]),
+					DREB_RANK:       toFloat(row[43]),
+					REB_RANK:        toFloat(row[44]),
+					AST_RANK:        toFloat(row[45]),
+					TOV_RANK:        toFloat(row[46]),
+					STL_RANK:        toFloat(row[47]),
+					BLK_RANK:        toFloat(row[48]),
+					BLKA_RANK:       toFloat(row[49]),
+					PF_RANK:         toFloat(row[50]),
+					PFD_RANK:        toFloat(row[51]),
+					PTS_RANK:        toFloat(row[52]),
+					PLUS_MINUS_RANK: toFloat(row[53]),
 				}
+				response.OverallTeamDashboard = append(response.OverallTeamDashboard, item)
 			}
 		}
 	}
 	if len(rawResp.ResultSets) > 1 {
-		response.LocationTeamDashboard = make([]TeamDashboardByGeneralSplitsLocationTeamDashboard, len(rawResp.ResultSets[1].RowSet))
-		for i, row := range rawResp.ResultSets[1].RowSet {
+		response.LocationTeamDashboard = make([]TeamDashboardByGeneralSplitsLocationTeamDashboard, 0, len(rawResp.ResultSets[1].RowSet))
+		for _, row := range rawResp.ResultSets[1].RowSet {
 			if len(row) >= 54 {
-				response.LocationTeamDashboard[i] = TeamDashboardByGeneralSplitsLocationTeamDashboard{
-					GROUP_SET:       row[0],
-					GROUP_VALUE:     row[1],
-					GP:              row[2],
-					W:               row[3],
-					L:               row[4],
-					W_PCT:           row[5],
-					MIN:             row[6],
-					FGM:             row[7],
-					FGA:             row[8],
-					FG_PCT:          row[9],
-					FG3M:            row[10],
-					FG3A:            row[11],
-					FG3_PCT:         row[12],
-					FTM:             row[13],
-					FTA:             row[14],
-					FT_PCT:          row[15],
-					OREB:            row[16],
-					DREB:            row[17],
-					REB:             row[18],
-					AST:             row[19],
-					TOV:             row[20],
-					STL:             row[21],
-					BLK:             row[22],
-					BLKA:            row[23],
-					PF:              row[24],
-					PFD:             row[25],
-					PTS:             row[26],
-					PLUS_MINUS:      row[27],
-					GP_RANK:         row[28],
-					W_RANK:          row[29],
-					L_RANK:          row[30],
-					W_PCT_RANK:      row[31],
-					MIN_RANK:        row[32],
-					FGM_RANK:        row[33],
-					FGA_RANK:        row[34],
-					FG_PCT_RANK:     row[35],
-					FG3M_RANK:       row[36],
-					FG3A_RANK:       row[37],
-					FG3_PCT_RANK:    row[38],
-					FTM_RANK:        row[39],
-					FTA_RANK:        row[40],
-					FT_PCT_RANK:     row[41],
-					OREB_RANK:       row[42],
-					DREB_RANK:       row[43],
-					REB_RANK:        row[44],
-					AST_RANK:        row[45],
-					TOV_RANK:        row[46],
-					STL_RANK:        row[47],
-					BLK_RANK:        row[48],
-					BLKA_RANK:       row[49],
-					PF_RANK:         row[50],
-					PFD_RANK:        row[51],
-					PTS_RANK:        row[52],
-					PLUS_MINUS_RANK: row[53],
+				item := TeamDashboardByGeneralSplitsLocationTeamDashboard{
+					GROUP_SET:       toString(row[0]),
+					GROUP_VALUE:     toString(row[1]),
+					GP:              toInt(row[2]),
+					W:               toString(row[3]),
+					L:               toString(row[4]),
+					W_PCT:           toFloat(row[5]),
+					MIN:             toFloat(row[6]),
+					FGM:             toInt(row[7]),
+					FGA:             toInt(row[8]),
+					FG_PCT:          toFloat(row[9]),
+					FG3M:            toInt(row[10]),
+					FG3A:            toInt(row[11]),
+					FG3_PCT:         toFloat(row[12]),
+					FTM:             toInt(row[13]),
+					FTA:             toInt(row[14]),
+					FT_PCT:          toFloat(row[15]),
+					OREB:            toFloat(row[16]),
+					DREB:            toFloat(row[17]),
+					REB:             toFloat(row[18]),
+					AST:             toFloat(row[19]),
+					TOV:             toFloat(row[20]),
+					STL:             toFloat(row[21]),
+					BLK:             toFloat(row[22]),
+					BLKA:            toInt(row[23]),
+					PF:              toFloat(row[24]),
+					PFD:             toFloat(row[25]),
+					PTS:             toFloat(row[26]),
+					PLUS_MINUS:      toFloat(row[27]),
+					GP_RANK:         toFloat(row[28]),
+					W_RANK:          toFloat(row[29]),
+					L_RANK:          toFloat(row[30]),
+					W_PCT_RANK:      toFloat(row[31]),
+					MIN_RANK:        toFloat(row[32]),
+					FGM_RANK:        toFloat(row[33]),
+					FGA_RANK:        toFloat(row[34]),
+					FG_PCT_RANK:     toFloat(row[35]),
+					FG3M_RANK:       toFloat(row[36]),
+					FG3A_RANK:       toFloat(row[37]),
+					FG3_PCT_RANK:    toFloat(row[38]),
+					FTM_RANK:        toFloat(row[39]),
+					FTA_RANK:        toFloat(row[40]),
+					FT_PCT_RANK:     toFloat(row[41]),
+					OREB_RANK:       toFloat(row[42]),
+					DREB_RANK:       toFloat(row[43]),
+					REB_RANK:        toFloat(row[44]),
+					AST_RANK:        toFloat(row[45]),
+					TOV_RANK:        toFloat(row[46]),
+					STL_RANK:        toFloat(row[47]),
+					BLK_RANK:        toFloat(row[48]),
+					BLKA_RANK:       toFloat(row[49]),
+					PF_RANK:         toFloat(row[50]),
+					PFD_RANK:        toFloat(row[51]),
+					PTS_RANK:        toFloat(row[52]),
+					PLUS_MINUS_RANK: toFloat(row[53]),
 				}
+				response.LocationTeamDashboard = append(response.LocationTeamDashboard, item)
 			}
 		}
 	}
 	if len(rawResp.ResultSets) > 2 {
-		response.WinsLossesTeamDashboard = make([]TeamDashboardByGeneralSplitsWinsLossesTeamDashboard, len(rawResp.ResultSets[2].RowSet))
-		for i, row := range rawResp.ResultSets[2].RowSet {
+		response.WinsLossesTeamDashboard = make([]TeamDashboardByGeneralSplitsWinsLossesTeamDashboard, 0, len(rawResp.ResultSets[2].RowSet))
+		for _, row := range rawResp.ResultSets[2].RowSet {
 			if len(row) >= 54 {
-				response.WinsLossesTeamDashboard[i] = TeamDashboardByGeneralSplitsWinsLossesTeamDashboard{
-					GROUP_SET:       row[0],
-					GROUP_VALUE:     row[1],
-					GP:              row[2],
-					W:               row[3],
-					L:               row[4],
-					W_PCT:           row[5],
-					MIN:             row[6],
-					FGM:             row[7],
-					FGA:             row[8],
-					FG_PCT:          row[9],
-					FG3M:            row[10],
-					FG3A:            row[11],
-					FG3_PCT:         row[12],
-					FTM:             row[13],
-					FTA:             row[14],
-					FT_PCT:          row[15],
-					OREB:            row[16],
-					DREB:            row[17],
-					REB:             row[18],
-					AST:             row[19],
-					TOV:             row[20],
-					STL:             row[21],
-					BLK:             row[22],
-					BLKA:            row[23],
-					PF:              row[24],
-					PFD:             row[25],
-					PTS:             row[26],
-					PLUS_MINUS:      row[27],
-					GP_RANK:         row[28],
-					W_RANK:          row[29],
-					L_RANK:          row[30],
-					W_PCT_RANK:      row[31],
-					MIN_RANK:        row[32],
-					FGM_RANK:        row[33],
-					FGA_RANK:        row[34],
-					FG_PCT_RANK:     row[35],
-					FG3M_RANK:       row[36],
-					FG3A_RANK:       row[37],
-					FG3_PCT_RANK:    row[38],
-					FTM_RANK:        row[39],
-					FTA_RANK:        row[40],
-					FT_PCT_RANK:     row[41],
-					OREB_RANK:       row[42],
-					DREB_RANK:       row[43],
-					REB_RANK:        row[44],
-					AST_RANK:        row[45],
-					TOV_RANK:        row[46],
-					STL_RANK:        row[47],
-					BLK_RANK:        row[48],
-					BLKA_RANK:       row[49],
-					PF_RANK:         row[50],
-					PFD_RANK:        row[51],
-					PTS_RANK:        row[52],
-					PLUS_MINUS_RANK: row[53],
+				item := TeamDashboardByGeneralSplitsWinsLossesTeamDashboard{
+					GROUP_SET:       toString(row[0]),
+					GROUP_VALUE:     toString(row[1]),
+					GP:              toInt(row[2]),
+					W:               toString(row[3]),
+					L:               toString(row[4]),
+					W_PCT:           toFloat(row[5]),
+					MIN:             toFloat(row[6]),
+					FGM:             toInt(row[7]),
+					FGA:             toInt(row[8]),
+					FG_PCT:          toFloat(row[9]),
+					FG3M:            toInt(row[10]),
+					FG3A:            toInt(row[11]),
+					FG3_PCT:         toFloat(row[12]),
+					FTM:             toInt(row[13]),
+					FTA:             toInt(row[14]),
+					FT_PCT:          toFloat(row[15]),
+					OREB:            toFloat(row[16]),
+					DREB:            toFloat(row[17]),
+					REB:             toFloat(row[18]),
+					AST:             toFloat(row[19]),
+					TOV:             toFloat(row[20]),
+					STL:             toFloat(row[21]),
+					BLK:             toFloat(row[22]),
+					BLKA:            toInt(row[23]),
+					PF:              toFloat(row[24]),
+					PFD:             toFloat(row[25]),
+					PTS:             toFloat(row[26]),
+					PLUS_MINUS:      toFloat(row[27]),
+					GP_RANK:         toFloat(row[28]),
+					W_RANK:          toFloat(row[29]),
+					L_RANK:          toFloat(row[30]),
+					W_PCT_RANK:      toFloat(row[31]),
+					MIN_RANK:        toFloat(row[32]),
+					FGM_RANK:        toFloat(row[33]),
+					FGA_RANK:        toFloat(row[34]),
+					FG_PCT_RANK:     toFloat(row[35]),
+					FG3M_RANK:       toFloat(row[36]),
+					FG3A_RANK:       toFloat(row[37]),
+					FG3_PCT_RANK:    toFloat(row[38]),
+					FTM_RANK:        toFloat(row[39]),
+					FTA_RANK:        toFloat(row[40]),
+					FT_PCT_RANK:     toFloat(row[41]),
+					OREB_RANK:       toFloat(row[42]),
+					DREB_RANK:       toFloat(row[43]),
+					REB_RANK:        toFloat(row[44]),
+					AST_RANK:        toFloat(row[45]),
+					TOV_RANK:        toFloat(row[46]),
+					STL_RANK:        toFloat(row[47]),
+					BLK_RANK:        toFloat(row[48]),
+					BLKA_RANK:       toFloat(row[49]),
+					PF_RANK:         toFloat(row[50]),
+					PFD_RANK:        toFloat(row[51]),
+					PTS_RANK:        toFloat(row[52]),
+					PLUS_MINUS_RANK: toFloat(row[53]),
 				}
+				response.WinsLossesTeamDashboard = append(response.WinsLossesTeamDashboard, item)
 			}
 		}
 	}
 	if len(rawResp.ResultSets) > 3 {
-		response.MonthTeamDashboard = make([]TeamDashboardByGeneralSplitsMonthTeamDashboard, len(rawResp.ResultSets[3].RowSet))
-		for i, row := range rawResp.ResultSets[3].RowSet {
+		response.MonthTeamDashboard = make([]TeamDashboardByGeneralSplitsMonthTeamDashboard, 0, len(rawResp.ResultSets[3].RowSet))
+		for _, row := range rawResp.ResultSets[3].RowSet {
 			if len(row) >= 54 {
-				response.MonthTeamDashboard[i] = TeamDashboardByGeneralSplitsMonthTeamDashboard{
-					GROUP_SET:       row[0],
-					GROUP_VALUE:     row[1],
-					GP:              row[2],
-					W:               row[3],
-					L:               row[4],
-					W_PCT:           row[5],
-					MIN:             row[6],
-					FGM:             row[7],
-					FGA:             row[8],
-					FG_PCT:          row[9],
-					FG3M:            row[10],
-					FG3A:            row[11],
-					FG3_PCT:         row[12],
-					FTM:             row[13],
-					FTA:             row[14],
-					FT_PCT:          row[15],
-					OREB:            row[16],
-					DREB:            row[17],
-					REB:             row[18],
-					AST:             row[19],
-					TOV:             row[20],
-					STL:             row[21],
-					BLK:             row[22],
-					BLKA:            row[23],
-					PF:              row[24],
-					PFD:             row[25],
-					PTS:             row[26],
-					PLUS_MINUS:      row[27],
-					GP_RANK:         row[28],
-					W_RANK:          row[29],
-					L_RANK:          row[30],
-					W_PCT_RANK:      row[31],
-					MIN_RANK:        row[32],
-					FGM_RANK:        row[33],
-					FGA_RANK:        row[34],
-					FG_PCT_RANK:     row[35],
-					FG3M_RANK:       row[36],
-					FG3A_RANK:       row[37],
-					FG3_PCT_RANK:    row[38],
-					FTM_RANK:        row[39],
-					FTA_RANK:        row[40],
-					FT_PCT_RANK:     row[41],
-					OREB_RANK:       row[42],
-					DREB_RANK:       row[43],
-					REB_RANK:        row[44],
-					AST_RANK:        row[45],
-					TOV_RANK:        row[46],
-					STL_RANK:        row[47],
-					BLK_RANK:        row[48],
-					BLKA_RANK:       row[49],
-					PF_RANK:         row[50],
-					PFD_RANK:        row[51],
-					PTS_RANK:        row[52],
-					PLUS_MINUS_RANK: row[53],
+				item := TeamDashboardByGeneralSplitsMonthTeamDashboard{
+					GROUP_SET:       toString(row[0]),
+					GROUP_VALUE:     toString(row[1]),
+					GP:              toInt(row[2]),
+					W:               toString(row[3]),
+					L:               toString(row[4]),
+					W_PCT:           toFloat(row[5]),
+					MIN:             toFloat(row[6]),
+					FGM:             toInt(row[7]),
+					FGA:             toInt(row[8]),
+					FG_PCT:          toFloat(row[9]),
+					FG3M:            toInt(row[10]),
+					FG3A:            toInt(row[11]),
+					FG3_PCT:         toFloat(row[12]),
+					FTM:             toInt(row[13]),
+					FTA:             toInt(row[14]),
+					FT_PCT:          toFloat(row[15]),
+					OREB:            toFloat(row[16]),
+					DREB:            toFloat(row[17]),
+					REB:             toFloat(row[18]),
+					AST:             toFloat(row[19]),
+					TOV:             toFloat(row[20]),
+					STL:             toFloat(row[21]),
+					BLK:             toFloat(row[22]),
+					BLKA:            toInt(row[23]),
+					PF:              toFloat(row[24]),
+					PFD:             toFloat(row[25]),
+					PTS:             toFloat(row[26]),
+					PLUS_MINUS:      toFloat(row[27]),
+					GP_RANK:         toFloat(row[28]),
+					W_RANK:          toFloat(row[29]),
+					L_RANK:          toFloat(row[30]),
+					W_PCT_RANK:      toFloat(row[31]),
+					MIN_RANK:        toFloat(row[32]),
+					FGM_RANK:        toFloat(row[33]),
+					FGA_RANK:        toFloat(row[34]),
+					FG_PCT_RANK:     toFloat(row[35]),
+					FG3M_RANK:       toFloat(row[36]),
+					FG3A_RANK:       toFloat(row[37]),
+					FG3_PCT_RANK:    toFloat(row[38]),
+					FTM_RANK:        toFloat(row[39]),
+					FTA_RANK:        toFloat(row[40]),
+					FT_PCT_RANK:     toFloat(row[41]),
+					OREB_RANK:       toFloat(row[42]),
+					DREB_RANK:       toFloat(row[43]),
+					REB_RANK:        toFloat(row[44]),
+					AST_RANK:        toFloat(row[45]),
+					TOV_RANK:        toFloat(row[46]),
+					STL_RANK:        toFloat(row[47]),
+					BLK_RANK:        toFloat(row[48]),
+					BLKA_RANK:       toFloat(row[49]),
+					PF_RANK:         toFloat(row[50]),
+					PFD_RANK:        toFloat(row[51]),
+					PTS_RANK:        toFloat(row[52]),
+					PLUS_MINUS_RANK: toFloat(row[53]),
 				}
+				response.MonthTeamDashboard = append(response.MonthTeamDashboard, item)
 			}
 		}
 	}
 	if len(rawResp.ResultSets) > 4 {
-		response.PrePostAllStarTeamDashboard = make([]TeamDashboardByGeneralSplitsPrePostAllStarTeamDashboard, len(rawResp.ResultSets[4].RowSet))
-		for i, row := range rawResp.ResultSets[4].RowSet {
+		response.PrePostAllStarTeamDashboard = make([]TeamDashboardByGeneralSplitsPrePostAllStarTeamDashboard, 0, len(rawResp.ResultSets[4].RowSet))
+		for _, row := range rawResp.ResultSets[4].RowSet {
 			if len(row) >= 54 {
-				response.PrePostAllStarTeamDashboard[i] = TeamDashboardByGeneralSplitsPrePostAllStarTeamDashboard{
-					GROUP_SET:       row[0],
-					GROUP_VALUE:     row[1],
-					GP:              row[2],
-					W:               row[3],
-					L:               row[4],
-					W_PCT:           row[5],
-					MIN:             row[6],
-					FGM:             row[7],
-					FGA:             row[8],
-					FG_PCT:          row[9],
-					FG3M:            row[10],
-					FG3A:            row[11],
-					FG3_PCT:         row[12],
-					FTM:             row[13],
-					FTA:             row[14],
-					FT_PCT:          row[15],
-					OREB:            row[16],
-					DREB:            row[17],
-					REB:             row[18],
-					AST:             row[19],
-					TOV:             row[20],
-					STL:             row[21],
-					BLK:             row[22],
-					BLKA:            row[23],
-					PF:              row[24],
-					PFD:             row[25],
-					PTS:             row[26],
-					PLUS_MINUS:      row[27],
-					GP_RANK:         row[28],
-					W_RANK:          row[29],
-					L_RANK:          row[30],
-					W_PCT_RANK:      row[31],
-					MIN_RANK:        row[32],
-					FGM_RANK:        row[33],
-					FGA_RANK:        row[34],
-					FG_PCT_RANK:     row[35],
-					FG3M_RANK:       row[36],
-					FG3A_RANK:       row[37],
-					FG3_PCT_RANK:    row[38],
-					FTM_RANK:        row[39],
-					FTA_RANK:        row[40],
-					FT_PCT_RANK:     row[41],
-					OREB_RANK:       row[42],
-					DREB_RANK:       row[43],
-					REB_RANK:        row[44],
-					AST_RANK:        row[45],
-					TOV_RANK:        row[46],
-					STL_RANK:        row[47],
-					BLK_RANK:        row[48],
-					BLKA_RANK:       row[49],
-					PF_RANK:         row[50],
-					PFD_RANK:        row[51],
-					PTS_RANK:        row[52],
-					PLUS_MINUS_RANK: row[53],
+				item := TeamDashboardByGeneralSplitsPrePostAllStarTeamDashboard{
+					GROUP_SET:       toString(row[0]),
+					GROUP_VALUE:     toString(row[1]),
+					GP:              toInt(row[2]),
+					W:               toString(row[3]),
+					L:               toString(row[4]),
+					W_PCT:           toFloat(row[5]),
+					MIN:             toFloat(row[6]),
+					FGM:             toInt(row[7]),
+					FGA:             toInt(row[8]),
+					FG_PCT:          toFloat(row[9]),
+					FG3M:            toInt(row[10]),
+					FG3A:            toInt(row[11]),
+					FG3_PCT:         toFloat(row[12]),
+					FTM:             toInt(row[13]),
+					FTA:             toInt(row[14]),
+					FT_PCT:          toFloat(row[15]),
+					OREB:            toFloat(row[16]),
+					DREB:            toFloat(row[17]),
+					REB:             toFloat(row[18]),
+					AST:             toFloat(row[19]),
+					TOV:             toFloat(row[20]),
+					STL:             toFloat(row[21]),
+					BLK:             toFloat(row[22]),
+					BLKA:            toInt(row[23]),
+					PF:              toFloat(row[24]),
+					PFD:             toFloat(row[25]),
+					PTS:             toFloat(row[26]),
+					PLUS_MINUS:      toFloat(row[27]),
+					GP_RANK:         toFloat(row[28]),
+					W_RANK:          toFloat(row[29]),
+					L_RANK:          toFloat(row[30]),
+					W_PCT_RANK:      toFloat(row[31]),
+					MIN_RANK:        toFloat(row[32]),
+					FGM_RANK:        toFloat(row[33]),
+					FGA_RANK:        toFloat(row[34]),
+					FG_PCT_RANK:     toFloat(row[35]),
+					FG3M_RANK:       toFloat(row[36]),
+					FG3A_RANK:       toFloat(row[37]),
+					FG3_PCT_RANK:    toFloat(row[38]),
+					FTM_RANK:        toFloat(row[39]),
+					FTA_RANK:        toFloat(row[40]),
+					FT_PCT_RANK:     toFloat(row[41]),
+					OREB_RANK:       toFloat(row[42]),
+					DREB_RANK:       toFloat(row[43]),
+					REB_RANK:        toFloat(row[44]),
+					AST_RANK:        toFloat(row[45]),
+					TOV_RANK:        toFloat(row[46]),
+					STL_RANK:        toFloat(row[47]),
+					BLK_RANK:        toFloat(row[48]),
+					BLKA_RANK:       toFloat(row[49]),
+					PF_RANK:         toFloat(row[50]),
+					PFD_RANK:        toFloat(row[51]),
+					PTS_RANK:        toFloat(row[52]),
+					PLUS_MINUS_RANK: toFloat(row[53]),
 				}
+				response.PrePostAllStarTeamDashboard = append(response.PrePostAllStarTeamDashboard, item)
 			}
 		}
 	}
