@@ -4,12 +4,15 @@ This directory contains recorded NBA.com API responses used for contract testing
 
 ## What Are These?
 
-Fixtures are **snapshots of real NBA.com API responses** captured at a specific point in time. They allow us to:
+Fixtures are snapshots of this SDK's **already-parsed output** for a real NBA.com API call, captured at a specific point in time - not the raw NBA.com response itself. Recording marshals the typed Go struct the endpoint function returns (`json.MarshalIndent(resp, ...)`); the raw `resultSets`/`headers`/`rowSet` shape NBA.com actually sent is never captured, and replay never re-invokes the endpoint's `Get`/parse/`validateHeaders` code path - it only unmarshals the frozen fixture and checks it's non-empty (`validateBasicSchema` in `../endpoints_test.go`). See `../README.md`'s "Current State" section for the full limitation and what would need to change to close it.
+
+Given that, what these fixtures actually give you:
 
 1. Test without hitting live API (faster, no rate limits)
-2. Detect when NBA.com changes their API schema
-3. Document expected response structures
-4. Ensure parsing logic works with real data
+2. A regression check on the *Go struct's own shape* (e.g. a parser panic, or a field silently going missing between recordings)
+3. Document expected response structures, as this SDK models them
+
+What they do **not** give you (despite it being the original design intent - see `../README.md`): detecting an NBA.com schema change, or verifying parsing logic against a fresh raw response. A reordered or renamed upstream column would not be caught by replaying these fixtures, since the parser never runs against them.
 
 ## Recording Fixtures
 
@@ -81,19 +84,14 @@ git commit -m "test: refresh contract test fixtures (Q1 2025)"
 
 ### When Tests Fail
 
-If a contract test fails, it means either:
+**In default (offline replay) mode**, a failure means the SDK's struct shape and the committed fixture have drifted apart - most likely a struct field was renamed/removed without re-recording. It does *not* mean NBA.com changed anything; replay never calls NBA.com, so it can't observe that (see "What Are These?" above).
 
-1. **NBA.com changed their API** (action required)
+**Only while re-recording** (`UPDATE_FIXTURES=1`, which does call live NBA.com) can you actually detect an upstream change: `git diff fixtures/` after recording will show it. If you see a real upstream schema change this way:
    - Review the diff
    - Update SDK structs
    - Update HTTP handlers
-   - Re-record fixture
    - Document the breaking change
-
-2. **Fixture is stale** (non-breaking)
-   - Re-record fixture
-   - Verify tests pass
-   - Commit updated fixture
+   - Commit the updated fixture
 
 ## See Also
 
