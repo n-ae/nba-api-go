@@ -1,0 +1,70 @@
+{
+  "BoxScoreTraditionalV2": {
+    "PlayerStats": {
+      "OREB": "int",
+      "DREB": "int",
+      "REB": "int",
+      "AST": "int",
+      "STL": "int",
+      "BLK": "int",
+      "PF": "int",
+      "PTS": "int"
+    },
+    "TeamStats": {
+      "OREB": "int",
+      "DREB": "int",
+      "REB": "int",
+      "AST": "int",
+      "STL": "int",
+      "BLK": "int",
+      "PF": "int",
+      "PTS": "int"
+    },
+    "TeamStarterBenchStats": {
+      "OREB": "int",
+      "DREB": "int",
+      "REB": "int",
+      "AST": "int",
+      "STL": "int",
+      "BLK": "int",
+      "PF": "int",
+      "PTS": "int"
+    }
+  },
+  "LeagueGameFinder": {
+    "LeagueGameFinderResults": {
+      "OREB": "int",
+      "DREB": "int",
+      "REB": "int",
+      "AST": "int",
+      "STL": "int",
+      "BLK": "int",
+      "PF": "int",
+      "PTS": "int"
+    }
+  },
+  "TeamGameLogs": {
+    "TeamGameLogs": {
+      "OREB": "int",
+      "DREB": "int",
+      "REB": "int",
+      "AST": "int",
+      "STL": "int",
+      "BLK": "int",
+      "PF": "int",
+      "PTS": "int"
+    }
+  },
+  "TeamYearByYearStats": {
+    "TeamStats": {
+      "OREB": "int",
+      "DREB": "int",
+      "REB": "int",
+      "AST": "int",
+      "STL": "int",
+      "BLK": "int",
+      "PF": "int",
+      "PTS": "int"
+    }
+  }
+}

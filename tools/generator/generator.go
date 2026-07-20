@@ -164,7 +164,7 @@ func (g *Generator) processMetadata(metadata EndpointMetadata) EndpointMetadata 
 
 	// Process result sets to infer field types
 	for i := range metadata.ResultSets {
-		metadata.ResultSets[i].FieldTypes = inferFieldTypes(metadata.ResultSets[i].Fields)
+		metadata.ResultSets[i].FieldTypes = inferFieldTypes(metadata.Name, metadata.ResultSets[i].Name, metadata.ResultSets[i].Fields)
 	}
 
 	return metadata
@@ -174,11 +174,15 @@ var (
 	fieldTypesOnce sync.Once
 	fieldTypes     map[string]string
 	fieldTypesErr  error
+
+	fieldTypeOverridesOnce sync.Once
+	fieldTypeOverrides     map[string]map[string]map[string]string // endpoint -> result set -> field -> Go type
+	fieldTypeOverridesErr  error
 )
 
 // loadFieldTypes parses the embedded fieldtypes.json dictionary once and
 // caches the result. This is the canonical, hand-reviewed field-name -> Go
-// type mapping - see fieldGoType for how it's consulted.
+// type mapping - see resolveFieldGoType for how it's consulted.
 func loadFieldTypes() (map[string]string, error) {
 	fieldTypesOnce.Do(func() {
 		data, err := fieldTypesFS.ReadFile("fieldtypes.json")
@@ -191,14 +195,44 @@ func loadFieldTypes() (map[string]string, error) {
 	return fieldTypes, fieldTypesErr
 }
 
-// fieldGoType returns the Go type for a field, preferring the explicit,
-// hand-reviewed fieldtypes.json entry over inferGoType's heuristic. Per the
-// v2.0.0 plan in docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md,
-// inference is demoted to a fallback used only for fields not yet in the
-// dictionary - falling back prints a warning to stderr rather than silently
-// trusting the heuristic, since several of its outputs are documented,
-// confirmed-wrong data-corruption bugs (see TestInferGoType).
-func fieldGoType(fieldName string) string {
+// loadFieldTypeOverrides parses the embedded fieldtype_overrides.json
+// dictionary once and caches the result. This holds the exceptions
+// fieldtypes.json's flat field-name -> Go-type model cannot represent: a
+// field name whose correct type genuinely differs by endpoint. The
+// motivating case is OREB/DREB/REB/AST/STL/BLK/PF/PTS, which are float64
+// in ~90 committed endpoints (per-game averages) but int in exactly a
+// handful of box-score/game-log endpoints (single-game counts) - both
+// correct in their own context, so neither can win in a single global
+// dictionary entry. See resolveFieldGoType for the resolution order.
+func loadFieldTypeOverrides() (map[string]map[string]map[string]string, error) {
+	fieldTypeOverridesOnce.Do(func() {
+		data, err := fieldTypeOverridesFS.ReadFile("fieldtype_overrides.json")
+		if err != nil {
+			fieldTypeOverridesErr = fmt.Errorf("failed to read embedded fieldtype_overrides.json: %w", err)
+			return
+		}
+		fieldTypeOverridesErr = json.Unmarshal(data, &fieldTypeOverrides)
+	})
+	return fieldTypeOverrides, fieldTypeOverridesErr
+}
+
+// resolveFieldGoType returns the Go type for a field within a given
+// endpoint/result-set, in order of precedence:
+//  1. fieldtype_overrides.json[endpointName][resultSetName][fieldName] -
+//     an explicit per-endpoint exception (see loadFieldTypeOverrides).
+//  2. fieldtypes.json[fieldName] - the explicit, hand-reviewed global
+//     dictionary.
+//  3. inferGoType(fieldName) - a fallback for fields reviewed in neither
+//     file, which prints a warning to stderr rather than silently trusting
+//     the heuristic, since several of its outputs are documented,
+//     confirmed-wrong data-corruption bugs (see TestInferGoType).
+func resolveFieldGoType(endpointName, resultSetName, fieldName string) string {
+	if overrides, err := loadFieldTypeOverrides(); err != nil {
+		fmt.Fprintf(os.Stderr, "warning: failed to load fieldtype_overrides.json (%v); ignoring overrides for %q\n", err, fieldName)
+	} else if goType, ok := overrides[endpointName][resultSetName][fieldName]; ok {
+		return goType
+	}
+
 	types, err := loadFieldTypes()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "warning: failed to load fieldtypes.json (%v); falling back to inferGoType for %q\n", err, fieldName)
@@ -212,15 +246,16 @@ func fieldGoType(fieldName string) string {
 	return inferred
 }
 
-// inferFieldTypes resolves Go types for NBA API field names via fieldGoType
-// (the name is historical; despite it, resolution now prefers the explicit
-// fieldtypes.json dictionary and only infers as a fallback).
-func inferFieldTypes(fields []string) []FieldTypeInfo {
+// inferFieldTypes resolves Go types for NBA API field names via
+// resolveFieldGoType (the name is historical; despite it, resolution now
+// prefers fieldtype_overrides.json and fieldtypes.json and only infers as
+// a last-resort fallback).
+func inferFieldTypes(endpointName, resultSetName string, fields []string) []FieldTypeInfo {
 	result := make([]FieldTypeInfo, len(fields))
 	for i, field := range fields {
 		result[i] = FieldTypeInfo{
 			Name:    field,
-			GoType:  fieldGoType(field),
+			GoType:  resolveFieldGoType(endpointName, resultSetName, field),
 			JSONTag: field,
 		}
 	}

@@ -148,12 +148,24 @@ heuristic gets some field families wrong in ways that corrupt data
 `TestFieldTypesOverridesKnownWrongInference`).
 `TestAllMetadataFieldsHaveExplicitTypes` fails CI if any field referenced
 by committed metadata has no `fieldtypes.json` entry. **This dictionary
-seeds from `inferGoType`'s own output plus confirmed corrections found by
-reading each affected field's context in the committed metadata (34
-fields so far) - it is not yet independently verified against 854 live
-NBA.com responses.** Treat it as a large improvement over blind inference,
-not a completed audit; the regeneration in the next assessment revision is
-where remaining drift will surface via the contract tests.
+seeds from `inferGoType`'s own output plus confirmed corrections (48 so
+far: 34 found by reading each affected field's context in the committed
+metadata, 14 more by cross-referencing every field name against the type
+actually used for it across all 143 committed
+`pkg/stats/endpoints/*.go` files) - it is not yet independently verified
+against 854 live NBA.com responses.** Treat it as a large improvement over
+blind inference, not a completed audit; the regeneration in the next
+assessment revision is where remaining drift will surface via the
+contract tests.
+
+Some field names legitimately need different types in different
+endpoints - `OREB`/`DREB`/`REB`/`AST`/`STL`/`BLK`/`PF`/`PTS` are `float64`
+(per-game averages) almost everywhere but `int` (single-game counts) in a
+handful of box-score/game-log endpoints - which a flat dictionary can't
+represent. `tools/generator/fieldtype_overrides.json` holds these as
+explicit `(endpoint, result set, field) -> type` exceptions, checked
+before `fieldtypes.json`; see `tools/generator/README.md`'s "Per-endpoint
+overrides" section.
 
 **Generated files** (not safe to hand-edit and later regenerate over -
 regeneration from current metadata does not reproduce several committed
