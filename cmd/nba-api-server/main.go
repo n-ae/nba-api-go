@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -11,6 +12,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/n-ae/nba-api-go/pkg/client"
 	"github.com/n-ae/nba-api-go/pkg/stats"
 )
 
@@ -29,7 +31,14 @@ func main() {
 	logger.Printf("Starting NBA API Server v%s", version)
 	logger.Printf("Log level: %s", logLevel)
 
-	server := NewServer(logger)
+	upstreamTimeout, err := getDurationEnv("NBA_API_TIMEOUT", client.DefaultTimeout)
+	if err != nil {
+		logger.Fatalf("Invalid NBA_API_TIMEOUT: %v", err)
+	}
+	server := NewServerWithOptions(logger, ServerOptions{
+		NBAAPITimeout:   upstreamTimeout,
+		CORSAllowOrigin: getEnv("CORS_ALLOW_ORIGIN", "*"),
+	})
 
 	healthCtx, cancelHealthCheck := context.WithCancel(context.Background())
 	server.healthChecker.Start(healthCtx, time.Minute)
@@ -73,26 +82,55 @@ func getEnv(key, defaultValue string) string {
 	return defaultValue
 }
 
+func getDurationEnv(key string, defaultValue time.Duration) (time.Duration, error) {
+	value := os.Getenv(key)
+	if value == "" {
+		return defaultValue, nil
+	}
+	duration, err := time.ParseDuration(value)
+	if err != nil || duration <= 0 {
+		return 0, fmt.Errorf("must be a positive Go duration, got %q", value)
+	}
+	return duration, nil
+}
+
 type Server struct {
-	logger        *log.Logger
-	statsHandler  *StatsHandler
-	metrics       *Metrics
-	rateLimiter   *RateLimiter
-	healthChecker *HealthChecker
+	logger          *log.Logger
+	statsHandler    *StatsHandler
+	metrics         *Metrics
+	rateLimiter     *RateLimiter
+	healthChecker   *HealthChecker
+	corsAllowOrigin string
 }
 
 func NewServer(logger *log.Logger) *Server {
+	return NewServerWithOptions(logger, ServerOptions{})
+}
+
+type ServerOptions struct {
+	NBAAPITimeout   time.Duration
+	CORSAllowOrigin string
+}
+
+func NewServerWithOptions(logger *log.Logger, options ServerOptions) *Server {
+	if options.NBAAPITimeout <= 0 {
+		options.NBAAPITimeout = client.DefaultTimeout
+	}
+	if options.CORSAllowOrigin == "" {
+		options.CORSAllowOrigin = "*"
+	}
 	rateLimiter := NewRateLimiter(100, 200)
 	rateLimiter.CleanupOldLimiters(5 * time.Minute)
 
-	statsClient := stats.NewDefaultClient()
+	statsClient := stats.NewClient(stats.Config{Timeout: options.NBAAPITimeout})
 
 	return &Server{
-		logger:        logger,
-		statsHandler:  NewStatsHandler(statsClient),
-		metrics:       NewMetrics(),
-		rateLimiter:   rateLimiter,
-		healthChecker: NewHealthChecker(statsClient),
+		logger:          logger,
+		statsHandler:    NewStatsHandler(statsClient),
+		metrics:         NewMetrics(),
+		rateLimiter:     rateLimiter,
+		healthChecker:   NewHealthChecker(statsClient),
+		corsAllowOrigin: options.CORSAllowOrigin,
 	}
 }
 
@@ -139,7 +177,7 @@ func (s *Server) loggingMiddleware(next http.Handler) http.Handler {
 
 func (s *Server) corsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Origin", s.corsAllowOrigin)
 		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 

@@ -455,6 +455,7 @@ response = requests.get(f"{NBA_API_URL}/api/v1/stats/playergamelog?PlayerID=2544
 - `PORT` - HTTP server port (default: 8080)
 - `LOG_LEVEL` - Logging level: "debug", "info", "warn", "error" (default: "info")
 - `NBA_API_TIMEOUT` - Timeout for NBA.com API requests (default: "30s")
+- `CORS_ALLOW_ORIGIN` - Allowed CORS origin (default: "*")
 
 ---
 

@@ -222,7 +222,8 @@ nba-api-go/
 **Configuration:** Environment variables only
 - `PORT` - HTTP port (default: 8080)
 - `LOG_LEVEL` - Logging level (default: info); currently read and logged at startup but does not yet filter or change log output - see the current maintainability assessment
-- `NBA_API_TIMEOUT` - **Documented here and in `docker-compose.yml` but not currently read by `cmd/nba-api-server`.** The upstream request timeout is presently the SDK's own default (`client.DefaultTimeout`, 30s), not configurable via this variable. Amend this ADR to drop the variable, or implement it - do not leave both the ADR and `docker-compose.yml` claiming a knob that does nothing; see the current maintainability assessment for the full finding.
+- `NBA_API_TIMEOUT` - Positive Go duration limiting upstream NBA API requests (default: `30s`). Invalid values stop startup rather than being silently ignored.
+- `CORS_ALLOW_ORIGIN` - Value returned in `Access-Control-Allow-Origin` (default: `*`).
 
 #### ✅ Container-First for Non-Go Users
 

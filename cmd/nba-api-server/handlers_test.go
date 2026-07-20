@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -395,6 +396,28 @@ func TestMetricsBoundsPathsAndKeepsRollingLatencySample(t *testing.T) {
 	}
 	if snapshot.MinResponseTime != 2*time.Millisecond || snapshot.MaxResponseTime != 3*time.Millisecond {
 		t.Errorf("expected rolling latency sample [2ms, 3ms], got min=%v max=%v", snapshot.MinResponseTime, snapshot.MaxResponseTime)
+	}
+}
+
+func TestNewServerWithOptionsConfiguresCORS(t *testing.T) {
+	server := NewServerWithOptions(log.New(io.Discard, "", 0), ServerOptions{CORSAllowOrigin: "https://example.com"})
+	handler := server.corsMiddleware(http.HandlerFunc(func(http.ResponseWriter, *http.Request) {}))
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, httptest.NewRequest(http.MethodGet, "/", nil))
+	if got := w.Header().Get("Access-Control-Allow-Origin"); got != "https://example.com" {
+		t.Errorf("Access-Control-Allow-Origin = %q, want configured origin", got)
+	}
+}
+
+func TestGetDurationEnv(t *testing.T) {
+	t.Setenv("NBA_API_TIMEOUT", "12s")
+	got, err := getDurationEnv("NBA_API_TIMEOUT", time.Second)
+	if err != nil || got != 12*time.Second {
+		t.Fatalf("getDurationEnv() = %v, %v; want 12s, nil", got, err)
+	}
+	t.Setenv("NBA_API_TIMEOUT", "invalid")
+	if _, err := getDurationEnv("NBA_API_TIMEOUT", time.Second); err == nil {
+		t.Error("getDurationEnv() succeeded with an invalid duration")
 	}
 }
 

@@ -173,6 +173,8 @@ Set environment variables in Railway dashboard:
 |----------|---------|-------------|
 | `PORT` | `8080` | HTTP server port |
 | `LOG_LEVEL` | `info` | Logging verbosity (debug, info, warn, error) |
+| `NBA_API_TIMEOUT` | `30s` | Positive Go duration limiting upstream NBA API requests |
+| `CORS_ALLOW_ORIGIN` | `*` | Value returned in `Access-Control-Allow-Origin` |
 
 ## Monitoring
 
