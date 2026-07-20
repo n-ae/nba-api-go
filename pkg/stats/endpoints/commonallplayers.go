@@ -19,20 +19,20 @@ type CommonAllPlayersRequest struct {
 
 // CommonAllPlayersCommonAllPlayers represents the CommonAllPlayers result set for CommonAllPlayers
 type CommonAllPlayersCommonAllPlayers struct {
-	PERSON_ID                 string  `json:"PERSON_ID"`
-	DISPLAY_LAST_COMMA_FIRST  float64 `json:"DISPLAY_LAST_COMMA_FIRST"`
-	DISPLAY_FIRST_LAST        float64 `json:"DISPLAY_FIRST_LAST"`
-	ROSTERSTATUS              string  `json:"ROSTERSTATUS"`
-	FROM_YEAR                 string  `json:"FROM_YEAR"`
-	TO_YEAR                   string  `json:"TO_YEAR"`
-	PLAYERCODE                string  `json:"PLAYERCODE"`
-	TEAM_ID                   int     `json:"TEAM_ID"`
-	TEAM_CITY                 string  `json:"TEAM_CITY"`
-	TEAM_NAME                 string  `json:"TEAM_NAME"`
-	TEAM_ABBREVIATION         string  `json:"TEAM_ABBREVIATION"`
-	TEAM_CODE                 string  `json:"TEAM_CODE"`
-	GAMES_PLAYED_FLAG         string  `json:"GAMES_PLAYED_FLAG"`
-	OTHERLEAGUE_EXPERIENCE_CH string  `json:"OTHERLEAGUE_EXPERIENCE_CH"`
+	PERSON_ID                 string `json:"PERSON_ID"`
+	DISPLAY_LAST_COMMA_FIRST  string `json:"DISPLAY_LAST_COMMA_FIRST"`
+	DISPLAY_FIRST_LAST        string `json:"DISPLAY_FIRST_LAST"`
+	ROSTERSTATUS              string `json:"ROSTERSTATUS"`
+	FROM_YEAR                 string `json:"FROM_YEAR"`
+	TO_YEAR                   string `json:"TO_YEAR"`
+	PLAYERCODE                string `json:"PLAYERCODE"`
+	TEAM_ID                   int    `json:"TEAM_ID"`
+	TEAM_CITY                 string `json:"TEAM_CITY"`
+	TEAM_NAME                 string `json:"TEAM_NAME"`
+	TEAM_ABBREVIATION         string `json:"TEAM_ABBREVIATION"`
+	TEAM_CODE                 string `json:"TEAM_CODE"`
+	GAMES_PLAYED_FLAG         string `json:"GAMES_PLAYED_FLAG"`
+	OTHERLEAGUE_EXPERIENCE_CH string `json:"OTHERLEAGUE_EXPERIENCE_CH"`
 }
 
 // CommonAllPlayersResponse contains the response data from the CommonAllPlayers endpoint
@@ -47,7 +47,7 @@ func GetCommonAllPlayers(ctx context.Context, client *stats.Client, req CommonAl
 		params.Set("LeagueID", string(*req.LeagueID))
 	}
 	if req.Season == "" {
-		return nil, fmt.Errorf("season is required")
+		return nil, fmt.Errorf("%s is required", "Season")
 	}
 	params.Set("Season", string(req.Season))
 	if req.IsOnlyCurrentSeason != nil {
@@ -66,8 +66,8 @@ func GetCommonAllPlayers(ctx context.Context, client *stats.Client, req CommonAl
 			if len(row) >= 14 {
 				item := CommonAllPlayersCommonAllPlayers{
 					PERSON_ID:                 toString(row[0]),
-					DISPLAY_LAST_COMMA_FIRST:  toFloat(row[1]),
-					DISPLAY_FIRST_LAST:        toFloat(row[2]),
+					DISPLAY_LAST_COMMA_FIRST:  toString(row[1]),
+					DISPLAY_FIRST_LAST:        toString(row[2]),
 					ROSTERSTATUS:              toString(row[3]),
 					FROM_YEAR:                 toString(row[4]),
 					TO_YEAR:                   toString(row[5]),
