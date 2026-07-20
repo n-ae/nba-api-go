@@ -8,6 +8,7 @@ import (
 	"strings"
 	"sync"
 	"text/template"
+	"unicode"
 )
 
 // Go type names inferGoType and toParamType return, as constants so the
@@ -246,6 +247,64 @@ func resolveFieldGoType(endpointName, resultSetName, fieldName string) string {
 	return inferred
 }
 
+// goInitialisms are recognized initialisms that goFieldName fully
+// uppercases when they appear as a whole camelCase word, matching the
+// convention golang.org/x/lint's default initialisms list uses. This is
+// also the convention the hand-fixed committed field names for NBA
+// Live-Data-style endpoints (playbyplayv3.go, scoreboardv3.go,
+// leaguestandings.go) already follow: "gameId" -> "GameID", not
+// "GameId". Keys are lowercase for case-insensitive lookup.
+var goInitialisms = map[string]bool{
+	"id": true, "url": true, "uuid": true, "api": true, "html": true,
+	"http": true, "https": true, "json": true, "xml": true, "ui": true,
+}
+
+// goFieldName converts a metadata field name into a valid, exported Go
+// identifier. Field names in this project's metadata are usually already
+// valid, exported Go identifiers (SCREAMING_SNAKE_CASE, e.g. "GAME_ID")
+// and are returned unchanged - this function only acts when the first
+// rune is lowercase. Some NBA Live-Data-style endpoints use camelCase
+// field names (e.g. "gameId") that are NOT valid exported Go identifiers
+// as-is: an unexported struct field is inaccessible to any external
+// caller and invisible to encoding/json in either direction, which is a
+// real bug this fixes, not a style preference. The original field name
+// is preserved verbatim as the JSON tag (see FieldTypeInfo.JSONTag) -
+// only the Go identifier changes.
+func goFieldName(fieldName string) string {
+	if fieldName == "" {
+		return fieldName
+	}
+	runes := []rune(fieldName)
+	if unicode.IsUpper(runes[0]) {
+		return fieldName
+	}
+
+	var words []string
+	start := 0
+	for i := 1; i < len(runes); i++ {
+		if unicode.IsUpper(runes[i]) && !unicode.IsUpper(runes[i-1]) {
+			words = append(words, string(runes[start:i]))
+			start = i
+		}
+	}
+	words = append(words, string(runes[start:]))
+
+	var b strings.Builder
+	for _, word := range words {
+		if word == "" {
+			continue
+		}
+		if goInitialisms[strings.ToLower(word)] {
+			b.WriteString(strings.ToUpper(word))
+			continue
+		}
+		wr := []rune(word)
+		b.WriteRune(unicode.ToUpper(wr[0]))
+		b.WriteString(string(wr[1:]))
+	}
+	return b.String()
+}
+
 // inferFieldTypes resolves Go types for NBA API field names via
 // resolveFieldGoType (the name is historical; despite it, resolution now
 // prefers fieldtype_overrides.json and fieldtypes.json and only infers as
@@ -254,7 +313,7 @@ func inferFieldTypes(endpointName, resultSetName string, fields []string) []Fiel
 	result := make([]FieldTypeInfo, len(fields))
 	for i, field := range fields {
 		result[i] = FieldTypeInfo{
-			Name:    field,
+			Name:    goFieldName(field),
 			GoType:  resolveFieldGoType(endpointName, resultSetName, field),
 			JSONTag: field,
 		}

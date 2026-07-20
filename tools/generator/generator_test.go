@@ -61,6 +61,68 @@ func TestGenerateFromMetadata_ProducesValidGo(t *testing.T) {
 	}
 }
 
+// TestGoFieldName documents goFieldName's camelCase-to-exported-Go-identifier
+// conversion using real field names from committed metadata. Most metadata
+// field names are already valid, exported Go identifiers
+// (SCREAMING_SNAKE_CASE, e.g. "GAME_ID") and goFieldName is a no-op for
+// them; the interesting cases are the NBA Live-Data-style endpoints
+// (PlayByPlayV3, ScoreboardV3, LeagueStandings) whose field names are
+// camelCase and start with a lowercase letter - an unexported struct field
+// generated from those would be invisible to encoding/json and
+// inaccessible to any external caller, a real bug, not a style choice.
+// Every case below is checked against the actual field name already
+// committed (and presumably hand-fixed at some point) in the corresponding
+// endpoint file, so a regression here would be a visible mismatch against
+// real production code, not just an assertion this test invented.
+func TestGoFieldName(t *testing.T) {
+	tests := []struct {
+		field string
+		want  string
+		note  string
+	}{
+		// --- Already-exported identifiers pass through unchanged ---
+		{field: "GAME_ID", want: "GAME_ID"},
+		{field: "PLAYER_NAME", want: "PLAYER_NAME"},
+
+		// --- Plain camelCase words: capitalize the first letter only ---
+		{field: "actionNumber", want: "ActionNumber"},
+		{field: "teamTricode", want: "TeamTricode"},
+		{field: "isFieldGoal", want: "IsFieldGoal", note: "three words, none an initialism"},
+		{field: "xLegacy", want: "XLegacy", note: "single-letter first word"},
+
+		// --- "Id" is a recognized initialism -> fully uppercased, matching
+		//     playbyplayv3.go/scoreboardv3.go's committed field names ---
+		{field: "gameId", want: "GameID"},
+		{field: "teamId", want: "TeamID"},
+		{field: "personId", want: "PersonID"},
+		{field: "assistPersonId", want: "AssistPersonID", note: "three words, only the last is an initialism"},
+		{field: "homeTeamId", want: "HomeTeamID"},
+
+		// --- A field name that IS an initialism in its entirety ---
+		{field: "uuid", want: "UUID"},
+
+		// --- Not recognized initialisms (deliberately not hardcoded -
+		//     videoevents.go's VL/VT/GC/SURL/DURL/VURL/PURL are a non-
+		//     standard convention this function doesn't try to reproduce;
+		//     see CHANGELOG.md for why those fields stay unregenerated) ---
+		{field: "vl", want: "Vl"},
+		{field: "surl", want: "Surl"},
+
+		// --- "str" prefix isn't an initialism, matching
+		//     leaguestandings.go's committed "StrLongHomeStreak" ---
+		{field: "strLongHomeStreak", want: "StrLongHomeStreak"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.field, func(t *testing.T) {
+			got := goFieldName(tt.field)
+			if got != tt.want {
+				t.Errorf("goFieldName(%q) = %q, want %q (%s)", tt.field, got, tt.want, tt.note)
+			}
+		})
+	}
+}
+
 // TestInferGoType documents inferGoType's current rule-by-rule heuristic
 // behavior using real NBA.com field names pulled from committed generated
 // code. Several cases below are marked knownWrong: true - they reproduce
