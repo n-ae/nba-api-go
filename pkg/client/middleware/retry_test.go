@@ -68,6 +68,29 @@ func TestWithRetry_NonRetryableStatusReturnsImmediately(t *testing.T) {
 	}
 }
 
+func TestWithRetry_NegativeMaxRetriesStillMakesInitialRequest(t *testing.T) {
+	var calls int
+	rt := RoundTripperFunc(func(ctx context.Context, req *http.Request) (*http.Response, error) {
+		calls++
+		return fakeResponse(http.StatusOK, nil), nil
+	})
+
+	config := DefaultRetryConfig()
+	config.MaxRetries = -1
+
+	wrapped := WithRetry(config)(rt)
+	resp, err := wrapped.RoundTrip(context.Background(), httptest.NewRequest(http.MethodGet, "http://example.com", nil))
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if resp == nil || resp.StatusCode != http.StatusOK {
+		t.Fatalf("expected a successful response, got %#v", resp)
+	}
+	if calls != 1 {
+		t.Errorf("expected one initial request with negative MaxRetries, got %d", calls)
+	}
+}
+
 func TestWithRetry_PermanentTransportErrorExitsImmediately(t *testing.T) {
 	for _, permErr := range []error{context.Canceled, context.DeadlineExceeded} {
 		t.Run(permErr.Error(), func(t *testing.T) {
