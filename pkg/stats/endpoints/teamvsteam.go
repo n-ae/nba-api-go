@@ -91,9 +91,12 @@ func GetTeamVsTeam(ctx context.Context, client *stats.Client, req TeamVsTeamRequ
 	}
 
 	response := &TeamVsTeamResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.Overall = make([]TeamVsTeamOverall, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "Overall"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamVsTeamOverall{})); err != nil {
+			return nil, fmt.Errorf("TeamVsTeam: Overall result set: %w", err)
+		}
+		response.Overall = make([]TeamVsTeamOverall, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 28 {
 				item := TeamVsTeamOverall{
 					TEAM_ID:    toInt(row[0]),

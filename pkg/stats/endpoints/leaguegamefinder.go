@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -128,9 +129,12 @@ func GetLeagueGameFinder(ctx context.Context, client *stats.Client, req LeagueGa
 	}
 
 	response := &LeagueGameFinderResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.LeagueGameFinderResults = make([]LeagueGameFinderLeagueGameFinderResults, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "LeagueGameFinderResults"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(LeagueGameFinderLeagueGameFinderResults{})); err != nil {
+			return nil, fmt.Errorf("LeagueGameFinder: LeagueGameFinderResults result set: %w", err)
+		}
+		response.LeagueGameFinderResults = make([]LeagueGameFinderLeagueGameFinderResults, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 28 {
 				item := LeagueGameFinderLeagueGameFinderResults{
 					SEASON_ID:         toString(row[0]),

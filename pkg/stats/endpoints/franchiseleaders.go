@@ -58,9 +58,12 @@ func GetFranchiseLeaders(ctx context.Context, client *stats.Client, req Franchis
 	}
 
 	response := &FranchiseLeadersResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.FranchiseLeaders = make([]FranchiseLeadersFranchiseLeaders, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "FranchiseLeaders"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(FranchiseLeadersFranchiseLeaders{})); err != nil {
+			return nil, fmt.Errorf("FranchiseLeaders: FranchiseLeaders result set: %w", err)
+		}
+		response.FranchiseLeaders = make([]FranchiseLeadersFranchiseLeaders, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 16 {
 				item := FranchiseLeadersFranchiseLeaders{
 					TEAM_ID:       toInt(row[0]),

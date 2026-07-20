@@ -63,9 +63,12 @@ func GetScoreboardV3(ctx context.Context, client *stats.Client, req ScoreboardV3
 	}
 
 	response := &ScoreboardV3Response{}
-	if len(rawResp.ResultSets) > 0 {
-		response.GameHeader = make([]ScoreboardV3GameHeader, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "GameHeader"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(ScoreboardV3GameHeader{})); err != nil {
+			return nil, fmt.Errorf("ScoreboardV3: GameHeader result set: %w", err)
+		}
+		response.GameHeader = make([]ScoreboardV3GameHeader, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 21 {
 				item := ScoreboardV3GameHeader{
 					GameID:             toString(row[0]),

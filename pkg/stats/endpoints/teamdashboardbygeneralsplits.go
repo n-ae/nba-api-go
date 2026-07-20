@@ -410,9 +410,12 @@ func GetTeamDashboardByGeneralSplits(ctx context.Context, client *stats.Client, 
 	}
 
 	response := &TeamDashboardByGeneralSplitsResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.OverallTeamDashboard = make([]TeamDashboardByGeneralSplitsOverallTeamDashboard, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "OverallTeamDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDashboardByGeneralSplitsOverallTeamDashboard{})); err != nil {
+			return nil, fmt.Errorf("TeamDashboardByGeneralSplits: OverallTeamDashboard result set: %w", err)
+		}
+		response.OverallTeamDashboard = make([]TeamDashboardByGeneralSplitsOverallTeamDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 54 {
 				item := TeamDashboardByGeneralSplitsOverallTeamDashboard{
 					GROUP_SET:       toString(row[0]),
@@ -474,9 +477,12 @@ func GetTeamDashboardByGeneralSplits(ctx context.Context, client *stats.Client, 
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.LocationTeamDashboard = make([]TeamDashboardByGeneralSplitsLocationTeamDashboard, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "LocationTeamDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDashboardByGeneralSplitsLocationTeamDashboard{})); err != nil {
+			return nil, fmt.Errorf("TeamDashboardByGeneralSplits: LocationTeamDashboard result set: %w", err)
+		}
+		response.LocationTeamDashboard = make([]TeamDashboardByGeneralSplitsLocationTeamDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 54 {
 				item := TeamDashboardByGeneralSplitsLocationTeamDashboard{
 					GROUP_SET:       toString(row[0]),
@@ -538,9 +544,12 @@ func GetTeamDashboardByGeneralSplits(ctx context.Context, client *stats.Client, 
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 2 {
-		response.WinsLossesTeamDashboard = make([]TeamDashboardByGeneralSplitsWinsLossesTeamDashboard, 0, len(rawResp.ResultSets[2].RowSet))
-		for _, row := range rawResp.ResultSets[2].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "WinsLossesTeamDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDashboardByGeneralSplitsWinsLossesTeamDashboard{})); err != nil {
+			return nil, fmt.Errorf("TeamDashboardByGeneralSplits: WinsLossesTeamDashboard result set: %w", err)
+		}
+		response.WinsLossesTeamDashboard = make([]TeamDashboardByGeneralSplitsWinsLossesTeamDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 54 {
 				item := TeamDashboardByGeneralSplitsWinsLossesTeamDashboard{
 					GROUP_SET:       toString(row[0]),
@@ -602,9 +611,12 @@ func GetTeamDashboardByGeneralSplits(ctx context.Context, client *stats.Client, 
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 3 {
-		response.MonthTeamDashboard = make([]TeamDashboardByGeneralSplitsMonthTeamDashboard, 0, len(rawResp.ResultSets[3].RowSet))
-		for _, row := range rawResp.ResultSets[3].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "MonthTeamDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDashboardByGeneralSplitsMonthTeamDashboard{})); err != nil {
+			return nil, fmt.Errorf("TeamDashboardByGeneralSplits: MonthTeamDashboard result set: %w", err)
+		}
+		response.MonthTeamDashboard = make([]TeamDashboardByGeneralSplitsMonthTeamDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 54 {
 				item := TeamDashboardByGeneralSplitsMonthTeamDashboard{
 					GROUP_SET:       toString(row[0]),
@@ -666,9 +678,12 @@ func GetTeamDashboardByGeneralSplits(ctx context.Context, client *stats.Client, 
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 4 {
-		response.PrePostAllStarTeamDashboard = make([]TeamDashboardByGeneralSplitsPrePostAllStarTeamDashboard, 0, len(rawResp.ResultSets[4].RowSet))
-		for _, row := range rawResp.ResultSets[4].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "PrePostAllStarTeamDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDashboardByGeneralSplitsPrePostAllStarTeamDashboard{})); err != nil {
+			return nil, fmt.Errorf("TeamDashboardByGeneralSplits: PrePostAllStarTeamDashboard result set: %w", err)
+		}
+		response.PrePostAllStarTeamDashboard = make([]TeamDashboardByGeneralSplitsPrePostAllStarTeamDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 54 {
 				item := TeamDashboardByGeneralSplitsPrePostAllStarTeamDashboard{
 					GROUP_SET:       toString(row[0]),

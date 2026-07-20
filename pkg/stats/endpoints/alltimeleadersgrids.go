@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -88,9 +89,12 @@ func GetAllTimeLeadersGrids(ctx context.Context, client *stats.Client, req AllTi
 	}
 
 	response := &AllTimeLeadersGridsResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.AllTimeLeadersPTS = make([]AllTimeLeadersGridsAllTimeLeadersPTS, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "AllTimeLeadersPTS"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(AllTimeLeadersGridsAllTimeLeadersPTS{})); err != nil {
+			return nil, fmt.Errorf("AllTimeLeadersGrids: AllTimeLeadersPTS result set: %w", err)
+		}
+		response.AllTimeLeadersPTS = make([]AllTimeLeadersGridsAllTimeLeadersPTS, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 4 {
 				item := AllTimeLeadersGridsAllTimeLeadersPTS{
 					PLAYER_ID:   toInt(row[0]),
@@ -102,9 +106,12 @@ func GetAllTimeLeadersGrids(ctx context.Context, client *stats.Client, req AllTi
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.AllTimeLeadersAST = make([]AllTimeLeadersGridsAllTimeLeadersAST, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "AllTimeLeadersAST"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(AllTimeLeadersGridsAllTimeLeadersAST{})); err != nil {
+			return nil, fmt.Errorf("AllTimeLeadersGrids: AllTimeLeadersAST result set: %w", err)
+		}
+		response.AllTimeLeadersAST = make([]AllTimeLeadersGridsAllTimeLeadersAST, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 4 {
 				item := AllTimeLeadersGridsAllTimeLeadersAST{
 					PLAYER_ID:   toInt(row[0]),
@@ -116,9 +123,12 @@ func GetAllTimeLeadersGrids(ctx context.Context, client *stats.Client, req AllTi
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 2 {
-		response.AllTimeLeadersREB = make([]AllTimeLeadersGridsAllTimeLeadersREB, 0, len(rawResp.ResultSets[2].RowSet))
-		for _, row := range rawResp.ResultSets[2].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "AllTimeLeadersREB"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(AllTimeLeadersGridsAllTimeLeadersREB{})); err != nil {
+			return nil, fmt.Errorf("AllTimeLeadersGrids: AllTimeLeadersREB result set: %w", err)
+		}
+		response.AllTimeLeadersREB = make([]AllTimeLeadersGridsAllTimeLeadersREB, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 4 {
 				item := AllTimeLeadersGridsAllTimeLeadersREB{
 					PLAYER_ID:   toInt(row[0]),
@@ -130,9 +140,12 @@ func GetAllTimeLeadersGrids(ctx context.Context, client *stats.Client, req AllTi
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 3 {
-		response.AllTimeLeadersBLK = make([]AllTimeLeadersGridsAllTimeLeadersBLK, 0, len(rawResp.ResultSets[3].RowSet))
-		for _, row := range rawResp.ResultSets[3].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "AllTimeLeadersBLK"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(AllTimeLeadersGridsAllTimeLeadersBLK{})); err != nil {
+			return nil, fmt.Errorf("AllTimeLeadersGrids: AllTimeLeadersBLK result set: %w", err)
+		}
+		response.AllTimeLeadersBLK = make([]AllTimeLeadersGridsAllTimeLeadersBLK, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 4 {
 				item := AllTimeLeadersGridsAllTimeLeadersBLK{
 					PLAYER_ID:   toInt(row[0]),
@@ -144,9 +157,12 @@ func GetAllTimeLeadersGrids(ctx context.Context, client *stats.Client, req AllTi
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 4 {
-		response.AllTimeLeadersSTL = make([]AllTimeLeadersGridsAllTimeLeadersSTL, 0, len(rawResp.ResultSets[4].RowSet))
-		for _, row := range rawResp.ResultSets[4].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "AllTimeLeadersSTL"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(AllTimeLeadersGridsAllTimeLeadersSTL{})); err != nil {
+			return nil, fmt.Errorf("AllTimeLeadersGrids: AllTimeLeadersSTL result set: %w", err)
+		}
+		response.AllTimeLeadersSTL = make([]AllTimeLeadersGridsAllTimeLeadersSTL, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 4 {
 				item := AllTimeLeadersGridsAllTimeLeadersSTL{
 					PLAYER_ID:   toInt(row[0]),

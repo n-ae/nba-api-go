@@ -166,9 +166,12 @@ func GetTeamDashboardByShootingSplits(ctx context.Context, client *stats.Client,
 	}
 
 	response := &TeamDashboardByShootingSplitsResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.OverallTeamDashboard = make([]TeamDashboardByShootingSplitsOverallTeamDashboard, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "OverallTeamDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDashboardByShootingSplitsOverallTeamDashboard{})); err != nil {
+			return nil, fmt.Errorf("TeamDashboardByShootingSplits: OverallTeamDashboard result set: %w", err)
+		}
+		response.OverallTeamDashboard = make([]TeamDashboardByShootingSplitsOverallTeamDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 28 {
 				item := TeamDashboardByShootingSplitsOverallTeamDashboard{
 					TEAM_ID:    toInt(row[0]),
@@ -204,9 +207,12 @@ func GetTeamDashboardByShootingSplits(ctx context.Context, client *stats.Client,
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.Shot5FTTeamDashboard = make([]TeamDashboardByShootingSplitsShot5FTTeamDashboard, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "Shot5FTTeamDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDashboardByShootingSplitsShot5FTTeamDashboard{})); err != nil {
+			return nil, fmt.Errorf("TeamDashboardByShootingSplits: Shot5FTTeamDashboard result set: %w", err)
+		}
+		response.Shot5FTTeamDashboard = make([]TeamDashboardByShootingSplitsShot5FTTeamDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := TeamDashboardByShootingSplitsShot5FTTeamDashboard{
 					TEAM_ID:    toInt(row[0]),
@@ -243,9 +249,12 @@ func GetTeamDashboardByShootingSplits(ctx context.Context, client *stats.Client,
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 2 {
-		response.ShotAreaTeamDashboard = make([]TeamDashboardByShootingSplitsShotAreaTeamDashboard, 0, len(rawResp.ResultSets[2].RowSet))
-		for _, row := range rawResp.ResultSets[2].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "ShotAreaTeamDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDashboardByShootingSplitsShotAreaTeamDashboard{})); err != nil {
+			return nil, fmt.Errorf("TeamDashboardByShootingSplits: ShotAreaTeamDashboard result set: %w", err)
+		}
+		response.ShotAreaTeamDashboard = make([]TeamDashboardByShootingSplitsShotAreaTeamDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := TeamDashboardByShootingSplitsShotAreaTeamDashboard{
 					TEAM_ID:    toInt(row[0]),

@@ -60,9 +60,12 @@ func GetCommonAllPlayers(ctx context.Context, client *stats.Client, req CommonAl
 	}
 
 	response := &CommonAllPlayersResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.CommonAllPlayers = make([]CommonAllPlayersCommonAllPlayers, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "CommonAllPlayers"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(CommonAllPlayersCommonAllPlayers{})); err != nil {
+			return nil, fmt.Errorf("CommonAllPlayers: CommonAllPlayers result set: %w", err)
+		}
+		response.CommonAllPlayers = make([]CommonAllPlayersCommonAllPlayers, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 14 {
 				item := CommonAllPlayersCommonAllPlayers{
 					PERSON_ID:                 toString(row[0]),

@@ -75,9 +75,12 @@ func GetPlayoffPicture(ctx context.Context, client *stats.Client, req PlayoffPic
 	}
 
 	response := &PlayoffPictureResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.EastConfPlayoffPicture = make([]PlayoffPictureEastConfPlayoffPicture, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "EastConfPlayoffPicture"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayoffPictureEastConfPlayoffPicture{})); err != nil {
+			return nil, fmt.Errorf("PlayoffPicture: EastConfPlayoffPicture result set: %w", err)
+		}
+		response.EastConfPlayoffPicture = make([]PlayoffPictureEastConfPlayoffPicture, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 14 {
 				item := PlayoffPictureEastConfPlayoffPicture{
 					TEAM_ID:                  toInt(row[0]),
@@ -99,9 +102,12 @@ func GetPlayoffPicture(ctx context.Context, client *stats.Client, req PlayoffPic
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.WestConfPlayoffPicture = make([]PlayoffPictureWestConfPlayoffPicture, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "WestConfPlayoffPicture"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayoffPictureWestConfPlayoffPicture{})); err != nil {
+			return nil, fmt.Errorf("PlayoffPicture: WestConfPlayoffPicture result set: %w", err)
+		}
+		response.WestConfPlayoffPicture = make([]PlayoffPictureWestConfPlayoffPicture, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 14 {
 				item := PlayoffPictureWestConfPlayoffPicture{
 					TEAM_ID:                  toInt(row[0]),

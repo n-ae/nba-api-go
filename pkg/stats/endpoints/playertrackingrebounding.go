@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -67,9 +68,12 @@ func GetPlayerTrackingRebounding(ctx context.Context, client *stats.Client, req 
 	}
 
 	response := &PlayerTrackingReboundingResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.PlayerTrackingRebounding = make([]PlayerTrackingReboundingPlayerTrackingRebounding, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "PlayerTrackingRebounding"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerTrackingReboundingPlayerTrackingRebounding{})); err != nil {
+			return nil, fmt.Errorf("PlayerTrackingRebounding: PlayerTrackingRebounding result set: %w", err)
+		}
+		response.PlayerTrackingRebounding = make([]PlayerTrackingReboundingPlayerTrackingRebounding, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 19 {
 				item := PlayerTrackingReboundingPlayerTrackingRebounding{
 					PLAYER_ID:         toInt(row[0]),

@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -63,9 +64,12 @@ func GetPlayerTrackingPasses(ctx context.Context, client *stats.Client, req Play
 	}
 
 	response := &PlayerTrackingPassesResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.PlayerTrackingPasses = make([]PlayerTrackingPassesPlayerTrackingPasses, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "PlayerTrackingPasses"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerTrackingPassesPlayerTrackingPasses{})); err != nil {
+			return nil, fmt.Errorf("PlayerTrackingPasses: PlayerTrackingPasses result set: %w", err)
+		}
+		response.PlayerTrackingPasses = make([]PlayerTrackingPassesPlayerTrackingPasses, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 15 {
 				item := PlayerTrackingPassesPlayerTrackingPasses{
 					PLAYER_ID:           toInt(row[0]),

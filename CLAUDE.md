@@ -6,7 +6,7 @@ This file provides guidance to Claude Code when working with the nba-api-go repo
 
 **nba-api-go** is a production-ready Go SDK and HTTP API server providing type-safe access to 141 NBA Stats API endpoints (all standard endpoints plus international broadcast schedule). The project emphasizes maintainability, minimal dependencies, and solo engineer viability.
 
-**Current Status**: `main` is ahead of the latest tagged release (`v1.3.0`) with v2.0.0 work in progress: explicit generator type metadata and per-endpoint overrides have landed, and (verified by parsing every committed struct, not just counting regeneration commits) 134 of 135 metadata-covered SDK endpoints now have field names and types matching what the corrected generator would produce - a breaking change to public struct fields, not yet tagged. Only `videoevents.go` remains genuinely blocked (7 non-standard field-name capitalizations); `gamerotation.go` and `leaguedashplayerstats.go` were already correct and intentionally left un-regenerated (hand-written value the generator can't reproduce). 9 `interface{}` fields remain scattered across the 6 hand-written endpoints with no generator metadata (see `CHANGELOG.md`'s `[Unreleased]` section for the full list and reasons); result-set-name keying and the other v2.0.0 items are not yet done.
+**Current Status**: `main` is ahead of the latest tagged release (`v1.3.0`) with v2.0.0 work in progress: explicit generator type metadata and per-endpoint overrides have landed, 134 of 135 metadata-covered SDK endpoints now have field names and types matching what the corrected generator would produce (only `videoevents.go` remains blocked, on 7 non-standard field-name capitalizations), and result sets are now looked up by name with header validation instead of positional array indexing across every endpoint using the classic Stats API response shape (`findResultSet`/`validateHeaders`/`jsonTags` in `pkg/stats/endpoints/types.go`) - a real fix for silent data corruption if NBA.com ever reorders result sets or columns, **not yet verified against live NBA.com responses**, so watch for new errors surfacing on upgrade (see `CHANGELOG.md`'s `[Unreleased]` section for the full risk callout). 9 `interface{}` fields remain scattered across 4 of the 6 hand-written endpoints with no generator metadata, and 5 of those 6 still lack header validation (smaller follow-ups, tracked in `CHANGELOG.md`).
 **Grade**: See `docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md` for the current assessment of record - do not hardcode a grade here, it goes stale the moment a new assessment lands and nobody remembers to update this file (see that file's own docs-consolidation section for the fix: archive the superseded assessment in the same commit as the new one).
 **Maintenance Burden**: ~1.6 hours/week for the hand-written core; the generated-endpoint surface currently needs more than that until the verification backlog in the current assessment is cleared - see that document's "Is this too complex for one person?" section.
 
@@ -166,6 +166,21 @@ represent. `tools/generator/fieldtype_overrides.json` holds these as
 explicit `(endpoint, result set, field) -> type` exceptions, checked
 before `fieldtypes.json`; see `tools/generator/README.md`'s "Per-endpoint
 overrides" section.
+
+Generated code looks up each result set **by name** (`findResultSet` in
+`pkg/stats/endpoints/types.go`) and **validates its column headers**
+against the field order it's about to index positionally
+(`validateHeaders`, comparing against `jsonTags(StructType{})` - the
+struct's own `json` tags, not a second hand-maintained list) before
+parsing any rows. Previously this was `rawResp.ResultSets[0]`-style
+positional indexing with no header check at all: if NBA.com ever
+reordered result sets or inserted a column, every field after the change
+would silently shift into the wrong struct field. A header mismatch now
+returns an error instead. **This has not been verified against live
+NBA.com responses** - if any endpoint's metadata field order has quietly
+drifted from what NBA.com currently returns, this will surface as a new
+error on upgrade rather than the previous silent wrong-field behavior;
+see `CHANGELOG.md`'s `[Unreleased]` section for the full risk callout.
 
 **Generated files** (not safe to hand-edit and later regenerate over -
 regeneration from current metadata does not reproduce several committed

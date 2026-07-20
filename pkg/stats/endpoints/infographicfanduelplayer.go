@@ -51,9 +51,12 @@ func GetInfographicFanDuelPlayer(ctx context.Context, client *stats.Client, req 
 	}
 
 	response := &InfographicFanDuelPlayerResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.FanDuelPlayer = make([]InfographicFanDuelPlayerFanDuelPlayer, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "FanDuelPlayer"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(InfographicFanDuelPlayerFanDuelPlayer{})); err != nil {
+			return nil, fmt.Errorf("InfographicFanDuelPlayer: FanDuelPlayer result set: %w", err)
+		}
+		response.FanDuelPlayer = make([]InfographicFanDuelPlayerFanDuelPlayer, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 14 {
 				item := InfographicFanDuelPlayerFanDuelPlayer{
 					PLAYER_ID:   toInt(row[0]),

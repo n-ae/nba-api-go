@@ -81,9 +81,12 @@ func GetTeamInfoCommonV2(ctx context.Context, client *stats.Client, req TeamInfo
 	}
 
 	response := &TeamInfoCommonV2Response{}
-	if len(rawResp.ResultSets) > 0 {
-		response.TeamInfoCommon = make([]TeamInfoCommonV2TeamInfoCommon, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "TeamInfoCommon"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamInfoCommonV2TeamInfoCommon{})); err != nil {
+			return nil, fmt.Errorf("TeamInfoCommonV2: TeamInfoCommon result set: %w", err)
+		}
+		response.TeamInfoCommon = make([]TeamInfoCommonV2TeamInfoCommon, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 15 {
 				item := TeamInfoCommonV2TeamInfoCommon{
 					TEAM_ID:           toInt(row[0]),
@@ -106,9 +109,12 @@ func GetTeamInfoCommonV2(ctx context.Context, client *stats.Client, req TeamInfo
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.TeamSeasonRanks = make([]TeamInfoCommonV2TeamSeasonRanks, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "TeamSeasonRanks"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamInfoCommonV2TeamSeasonRanks{})); err != nil {
+			return nil, fmt.Errorf("TeamInfoCommonV2: TeamSeasonRanks result set: %w", err)
+		}
+		response.TeamSeasonRanks = make([]TeamInfoCommonV2TeamSeasonRanks, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 11 {
 				item := TeamInfoCommonV2TeamSeasonRanks{
 					LEAGUE_ID:    toString(row[0]),

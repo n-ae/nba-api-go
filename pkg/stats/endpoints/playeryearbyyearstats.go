@@ -73,9 +73,12 @@ func GetPlayerYearByYearStats(ctx context.Context, client *stats.Client, req Pla
 	}
 
 	response := &PlayerYearByYearStatsResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.PlayerStats = make([]PlayerYearByYearStatsPlayerStats, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "PlayerStats"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerYearByYearStatsPlayerStats{})); err != nil {
+			return nil, fmt.Errorf("PlayerYearByYearStats: PlayerStats result set: %w", err)
+		}
+		response.PlayerStats = make([]PlayerYearByYearStatsPlayerStats, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 27 {
 				item := PlayerYearByYearStatsPlayerStats{
 					PLAYER_ID:         toInt(row[0]),

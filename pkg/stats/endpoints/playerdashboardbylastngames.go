@@ -234,9 +234,12 @@ func GetPlayerDashboardByLastNGames(ctx context.Context, client *stats.Client, r
 	}
 
 	response := &PlayerDashboardByLastNGamesResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.OverallPlayerDashboard = make([]PlayerDashboardByLastNGamesOverallPlayerDashboard, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "OverallPlayerDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerDashboardByLastNGamesOverallPlayerDashboard{})); err != nil {
+			return nil, fmt.Errorf("PlayerDashboardByLastNGames: OverallPlayerDashboard result set: %w", err)
+		}
+		response.OverallPlayerDashboard = make([]PlayerDashboardByLastNGamesOverallPlayerDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 28 {
 				item := PlayerDashboardByLastNGamesOverallPlayerDashboard{
 					PLAYER_ID:   toInt(row[0]),
@@ -272,9 +275,12 @@ func GetPlayerDashboardByLastNGames(ctx context.Context, client *stats.Client, r
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.Last5PlayerDashboard = make([]PlayerDashboardByLastNGamesLast5PlayerDashboard, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "Last5PlayerDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerDashboardByLastNGamesLast5PlayerDashboard{})); err != nil {
+			return nil, fmt.Errorf("PlayerDashboardByLastNGames: Last5PlayerDashboard result set: %w", err)
+		}
+		response.Last5PlayerDashboard = make([]PlayerDashboardByLastNGamesLast5PlayerDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := PlayerDashboardByLastNGamesLast5PlayerDashboard{
 					PLAYER_ID:    toInt(row[0]),
@@ -311,9 +317,12 @@ func GetPlayerDashboardByLastNGames(ctx context.Context, client *stats.Client, r
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 2 {
-		response.Last10PlayerDashboard = make([]PlayerDashboardByLastNGamesLast10PlayerDashboard, 0, len(rawResp.ResultSets[2].RowSet))
-		for _, row := range rawResp.ResultSets[2].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "Last10PlayerDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerDashboardByLastNGamesLast10PlayerDashboard{})); err != nil {
+			return nil, fmt.Errorf("PlayerDashboardByLastNGames: Last10PlayerDashboard result set: %w", err)
+		}
+		response.Last10PlayerDashboard = make([]PlayerDashboardByLastNGamesLast10PlayerDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := PlayerDashboardByLastNGamesLast10PlayerDashboard{
 					PLAYER_ID:    toInt(row[0]),
@@ -350,9 +359,12 @@ func GetPlayerDashboardByLastNGames(ctx context.Context, client *stats.Client, r
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 3 {
-		response.Last15PlayerDashboard = make([]PlayerDashboardByLastNGamesLast15PlayerDashboard, 0, len(rawResp.ResultSets[3].RowSet))
-		for _, row := range rawResp.ResultSets[3].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "Last15PlayerDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerDashboardByLastNGamesLast15PlayerDashboard{})); err != nil {
+			return nil, fmt.Errorf("PlayerDashboardByLastNGames: Last15PlayerDashboard result set: %w", err)
+		}
+		response.Last15PlayerDashboard = make([]PlayerDashboardByLastNGamesLast15PlayerDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := PlayerDashboardByLastNGamesLast15PlayerDashboard{
 					PLAYER_ID:    toInt(row[0]),
@@ -389,9 +401,12 @@ func GetPlayerDashboardByLastNGames(ctx context.Context, client *stats.Client, r
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 4 {
-		response.Last20PlayerDashboard = make([]PlayerDashboardByLastNGamesLast20PlayerDashboard, 0, len(rawResp.ResultSets[4].RowSet))
-		for _, row := range rawResp.ResultSets[4].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "Last20PlayerDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerDashboardByLastNGamesLast20PlayerDashboard{})); err != nil {
+			return nil, fmt.Errorf("PlayerDashboardByLastNGames: Last20PlayerDashboard result set: %w", err)
+		}
+		response.Last20PlayerDashboard = make([]PlayerDashboardByLastNGamesLast20PlayerDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := PlayerDashboardByLastNGamesLast20PlayerDashboard{
 					PLAYER_ID:    toInt(row[0]),

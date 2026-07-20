@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -79,9 +80,12 @@ func GetSynergyPlayTypes(ctx context.Context, client *stats.Client, req SynergyP
 	}
 
 	response := &SynergyPlayTypesResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.SynergyPlayType = make([]SynergyPlayTypesSynergyPlayType, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "SynergyPlayType"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(SynergyPlayTypesSynergyPlayType{})); err != nil {
+			return nil, fmt.Errorf("SynergyPlayTypes: SynergyPlayType result set: %w", err)
+		}
+		response.SynergyPlayType = make([]SynergyPlayTypesSynergyPlayType, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 23 {
 				item := SynergyPlayTypesSynergyPlayType{
 					PLAYER_ID:         toInt(row[0]),

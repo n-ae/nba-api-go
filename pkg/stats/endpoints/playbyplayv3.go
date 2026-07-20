@@ -78,9 +78,12 @@ func GetPlayByPlayV3(ctx context.Context, client *stats.Client, req PlayByPlayV3
 	}
 
 	response := &PlayByPlayV3Response{}
-	if len(rawResp.ResultSets) > 0 {
-		response.PlayByPlay = make([]PlayByPlayV3PlayByPlay, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "PlayByPlay"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayByPlayV3PlayByPlay{})); err != nil {
+			return nil, fmt.Errorf("PlayByPlayV3: PlayByPlay result set: %w", err)
+		}
+		response.PlayByPlay = make([]PlayByPlayV3PlayByPlay, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 33 {
 				item := PlayByPlayV3PlayByPlay{
 					GameID:                  toString(row[0]),

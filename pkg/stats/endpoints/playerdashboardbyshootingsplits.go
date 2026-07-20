@@ -234,9 +234,12 @@ func GetPlayerDashboardByShootingSplits(ctx context.Context, client *stats.Clien
 	}
 
 	response := &PlayerDashboardByShootingSplitsResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.OverallPlayerDashboard = make([]PlayerDashboardByShootingSplitsOverallPlayerDashboard, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "OverallPlayerDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerDashboardByShootingSplitsOverallPlayerDashboard{})); err != nil {
+			return nil, fmt.Errorf("PlayerDashboardByShootingSplits: OverallPlayerDashboard result set: %w", err)
+		}
+		response.OverallPlayerDashboard = make([]PlayerDashboardByShootingSplitsOverallPlayerDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 28 {
 				item := PlayerDashboardByShootingSplitsOverallPlayerDashboard{
 					PLAYER_ID:   toInt(row[0]),
@@ -272,9 +275,12 @@ func GetPlayerDashboardByShootingSplits(ctx context.Context, client *stats.Clien
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.Shot5FTPlayerDashboard = make([]PlayerDashboardByShootingSplitsShot5FTPlayerDashboard, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "Shot5FTPlayerDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerDashboardByShootingSplitsShot5FTPlayerDashboard{})); err != nil {
+			return nil, fmt.Errorf("PlayerDashboardByShootingSplits: Shot5FTPlayerDashboard result set: %w", err)
+		}
+		response.Shot5FTPlayerDashboard = make([]PlayerDashboardByShootingSplitsShot5FTPlayerDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := PlayerDashboardByShootingSplitsShot5FTPlayerDashboard{
 					PLAYER_ID:   toInt(row[0]),
@@ -311,9 +317,12 @@ func GetPlayerDashboardByShootingSplits(ctx context.Context, client *stats.Clien
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 2 {
-		response.Shot8FTPlayerDashboard = make([]PlayerDashboardByShootingSplitsShot8FTPlayerDashboard, 0, len(rawResp.ResultSets[2].RowSet))
-		for _, row := range rawResp.ResultSets[2].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "Shot8FTPlayerDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerDashboardByShootingSplitsShot8FTPlayerDashboard{})); err != nil {
+			return nil, fmt.Errorf("PlayerDashboardByShootingSplits: Shot8FTPlayerDashboard result set: %w", err)
+		}
+		response.Shot8FTPlayerDashboard = make([]PlayerDashboardByShootingSplitsShot8FTPlayerDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := PlayerDashboardByShootingSplitsShot8FTPlayerDashboard{
 					PLAYER_ID:   toInt(row[0]),
@@ -350,9 +359,12 @@ func GetPlayerDashboardByShootingSplits(ctx context.Context, client *stats.Clien
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 3 {
-		response.ShotAreaPlayerDashboard = make([]PlayerDashboardByShootingSplitsShotAreaPlayerDashboard, 0, len(rawResp.ResultSets[3].RowSet))
-		for _, row := range rawResp.ResultSets[3].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "ShotAreaPlayerDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerDashboardByShootingSplitsShotAreaPlayerDashboard{})); err != nil {
+			return nil, fmt.Errorf("PlayerDashboardByShootingSplits: ShotAreaPlayerDashboard result set: %w", err)
+		}
+		response.ShotAreaPlayerDashboard = make([]PlayerDashboardByShootingSplitsShotAreaPlayerDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := PlayerDashboardByShootingSplitsShotAreaPlayerDashboard{
 					PLAYER_ID:   toInt(row[0]),
@@ -389,9 +401,12 @@ func GetPlayerDashboardByShootingSplits(ctx context.Context, client *stats.Clien
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 4 {
-		response.AssistedShotsPlayerDashboard = make([]PlayerDashboardByShootingSplitsAssistedShotsPlayerDashboard, 0, len(rawResp.ResultSets[4].RowSet))
-		for _, row := range rawResp.ResultSets[4].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "AssistedShotsPlayerDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerDashboardByShootingSplitsAssistedShotsPlayerDashboard{})); err != nil {
+			return nil, fmt.Errorf("PlayerDashboardByShootingSplits: AssistedShotsPlayerDashboard result set: %w", err)
+		}
+		response.AssistedShotsPlayerDashboard = make([]PlayerDashboardByShootingSplitsAssistedShotsPlayerDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := PlayerDashboardByShootingSplitsAssistedShotsPlayerDashboard{
 					PLAYER_ID:          toInt(row[0]),

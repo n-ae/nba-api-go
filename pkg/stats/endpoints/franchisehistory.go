@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -71,9 +72,12 @@ func GetFranchiseHistory(ctx context.Context, client *stats.Client, req Franchis
 	}
 
 	response := &FranchiseHistoryResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.FranchiseHistory = make([]FranchiseHistoryFranchiseHistory, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "FranchiseHistory"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(FranchiseHistoryFranchiseHistory{})); err != nil {
+			return nil, fmt.Errorf("FranchiseHistory: FranchiseHistory result set: %w", err)
+		}
+		response.FranchiseHistory = make([]FranchiseHistoryFranchiseHistory, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 15 {
 				item := FranchiseHistoryFranchiseHistory{
 					LEAGUE_ID:      toString(row[0]),
@@ -96,9 +100,12 @@ func GetFranchiseHistory(ctx context.Context, client *stats.Client, req Franchis
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.DefunctTeams = make([]FranchiseHistoryDefunctTeams, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "DefunctTeams"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(FranchiseHistoryDefunctTeams{})); err != nil {
+			return nil, fmt.Errorf("FranchiseHistory: DefunctTeams result set: %w", err)
+		}
+		response.DefunctTeams = make([]FranchiseHistoryDefunctTeams, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 15 {
 				item := FranchiseHistoryDefunctTeams{
 					LEAGUE_ID:      toString(row[0]),

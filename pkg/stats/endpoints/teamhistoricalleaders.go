@@ -87,9 +87,12 @@ func GetTeamHistoricalLeaders(ctx context.Context, client *stats.Client, req Tea
 	}
 
 	response := &TeamHistoricalLeadersResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.CareerLeadersPTS = make([]TeamHistoricalLeadersCareerLeadersPTS, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "CareerLeadersPTS"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamHistoricalLeadersCareerLeadersPTS{})); err != nil {
+			return nil, fmt.Errorf("TeamHistoricalLeaders: CareerLeadersPTS result set: %w", err)
+		}
+		response.CareerLeadersPTS = make([]TeamHistoricalLeadersCareerLeadersPTS, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 5 {
 				item := TeamHistoricalLeadersCareerLeadersPTS{
 					TEAM_ID:   toInt(row[0]),
@@ -102,9 +105,12 @@ func GetTeamHistoricalLeaders(ctx context.Context, client *stats.Client, req Tea
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.CareerLeadersAST = make([]TeamHistoricalLeadersCareerLeadersAST, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "CareerLeadersAST"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamHistoricalLeadersCareerLeadersAST{})); err != nil {
+			return nil, fmt.Errorf("TeamHistoricalLeaders: CareerLeadersAST result set: %w", err)
+		}
+		response.CareerLeadersAST = make([]TeamHistoricalLeadersCareerLeadersAST, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 5 {
 				item := TeamHistoricalLeadersCareerLeadersAST{
 					TEAM_ID:   toInt(row[0]),
@@ -117,9 +123,12 @@ func GetTeamHistoricalLeaders(ctx context.Context, client *stats.Client, req Tea
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 2 {
-		response.CareerLeadersREB = make([]TeamHistoricalLeadersCareerLeadersREB, 0, len(rawResp.ResultSets[2].RowSet))
-		for _, row := range rawResp.ResultSets[2].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "CareerLeadersREB"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamHistoricalLeadersCareerLeadersREB{})); err != nil {
+			return nil, fmt.Errorf("TeamHistoricalLeaders: CareerLeadersREB result set: %w", err)
+		}
+		response.CareerLeadersREB = make([]TeamHistoricalLeadersCareerLeadersREB, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 5 {
 				item := TeamHistoricalLeadersCareerLeadersREB{
 					TEAM_ID:   toInt(row[0]),
@@ -132,9 +141,12 @@ func GetTeamHistoricalLeaders(ctx context.Context, client *stats.Client, req Tea
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 3 {
-		response.CareerLeadersBLK = make([]TeamHistoricalLeadersCareerLeadersBLK, 0, len(rawResp.ResultSets[3].RowSet))
-		for _, row := range rawResp.ResultSets[3].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "CareerLeadersBLK"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamHistoricalLeadersCareerLeadersBLK{})); err != nil {
+			return nil, fmt.Errorf("TeamHistoricalLeaders: CareerLeadersBLK result set: %w", err)
+		}
+		response.CareerLeadersBLK = make([]TeamHistoricalLeadersCareerLeadersBLK, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 5 {
 				item := TeamHistoricalLeadersCareerLeadersBLK{
 					TEAM_ID:   toInt(row[0]),
@@ -147,9 +159,12 @@ func GetTeamHistoricalLeaders(ctx context.Context, client *stats.Client, req Tea
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 4 {
-		response.CareerLeadersSTL = make([]TeamHistoricalLeadersCareerLeadersSTL, 0, len(rawResp.ResultSets[4].RowSet))
-		for _, row := range rawResp.ResultSets[4].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "CareerLeadersSTL"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamHistoricalLeadersCareerLeadersSTL{})); err != nil {
+			return nil, fmt.Errorf("TeamHistoricalLeaders: CareerLeadersSTL result set: %w", err)
+		}
+		response.CareerLeadersSTL = make([]TeamHistoricalLeadersCareerLeadersSTL, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 5 {
 				item := TeamHistoricalLeadersCareerLeadersSTL{
 					TEAM_ID:   toInt(row[0]),

@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -52,9 +53,12 @@ func GetDraftHistory(ctx context.Context, client *stats.Client, req DraftHistory
 	}
 
 	response := &DraftHistoryResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.DraftHistory = make([]DraftHistoryDraftHistory, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "DraftHistory"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(DraftHistoryDraftHistory{})); err != nil {
+			return nil, fmt.Errorf("DraftHistory: DraftHistory result set: %w", err)
+		}
+		response.DraftHistory = make([]DraftHistoryDraftHistory, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 12 {
 				item := DraftHistoryDraftHistory{
 					PERSON_ID:         toString(row[0]),

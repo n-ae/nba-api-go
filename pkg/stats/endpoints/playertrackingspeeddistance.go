@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -61,9 +62,12 @@ func GetPlayerTrackingSpeedDistance(ctx context.Context, client *stats.Client, r
 	}
 
 	response := &PlayerTrackingSpeedDistanceResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.PlayerTrackingSpeedDistance = make([]PlayerTrackingSpeedDistancePlayerTrackingSpeedDistance, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "PlayerTrackingSpeedDistance"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerTrackingSpeedDistancePlayerTrackingSpeedDistance{})); err != nil {
+			return nil, fmt.Errorf("PlayerTrackingSpeedDistance: PlayerTrackingSpeedDistance result set: %w", err)
+		}
+		response.PlayerTrackingSpeedDistance = make([]PlayerTrackingSpeedDistancePlayerTrackingSpeedDistance, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 13 {
 				item := PlayerTrackingSpeedDistancePlayerTrackingSpeedDistance{
 					PLAYER_ID:         toInt(row[0]),

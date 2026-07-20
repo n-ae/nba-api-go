@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -62,9 +63,12 @@ func GetPlayerTrackingCatchShoot(ctx context.Context, client *stats.Client, req 
 	}
 
 	response := &PlayerTrackingCatchShootResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.PlayerTrackingCatchShoot = make([]PlayerTrackingCatchShootPlayerTrackingCatchShoot, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "PlayerTrackingCatchShoot"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerTrackingCatchShootPlayerTrackingCatchShoot{})); err != nil {
+			return nil, fmt.Errorf("PlayerTrackingCatchShoot: PlayerTrackingCatchShoot result set: %w", err)
+		}
+		response.PlayerTrackingCatchShoot = make([]PlayerTrackingCatchShootPlayerTrackingCatchShoot, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 14 {
 				item := PlayerTrackingCatchShootPlayerTrackingCatchShoot{
 					PLAYER_ID:           toInt(row[0]),

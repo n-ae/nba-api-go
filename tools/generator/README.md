@@ -158,6 +158,27 @@ standard convention - regenerating that file today would produce
 `Vl`/`Vt`/etc. instead, so it stays excluded from regeneration rather
 than force a guess into the initialisms list that wouldn't generalize.
 
+## Result Set Lookup and Header Validation
+
+Generated code looks up each result set by its `name` field
+(`findResultSet` in `pkg/stats/endpoints/types.go`), not by its position
+in the response's `resultSets` array. It also validates the result set's
+actual `headers` against the field order the generated struct assumes
+before indexing any row positionally (`validateHeaders`), using the
+struct's own `json` tags as the expected list (`jsonTags`) rather than a
+second, separately-maintained copy of the field names.
+
+This replaced `rawResp.ResultSets[0]`/`[1]`-style positional indexing
+with no header check, which would have silently read the wrong result
+set - or shifted every field after a column change into the wrong struct
+field - if NBA.com ever reordered anything. A header mismatch now
+returns an error instead of corrupting data silently.
+
+**Not verified against live NBA.com responses.** If a field order has
+drifted from what NBA.com currently returns, this surfaces as a new
+error on upgrade rather than the old silent-wrong-data behavior - see
+`CHANGELOG.md` for the full risk callout.
+
 ## Creating Metadata
 
 ### From Python nba_api

@@ -234,9 +234,12 @@ func GetTeamDashboardByLastNGames(ctx context.Context, client *stats.Client, req
 	}
 
 	response := &TeamDashboardByLastNGamesResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.OverallTeamDashboard = make([]TeamDashboardByLastNGamesOverallTeamDashboard, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "OverallTeamDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDashboardByLastNGamesOverallTeamDashboard{})); err != nil {
+			return nil, fmt.Errorf("TeamDashboardByLastNGames: OverallTeamDashboard result set: %w", err)
+		}
+		response.OverallTeamDashboard = make([]TeamDashboardByLastNGamesOverallTeamDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 28 {
 				item := TeamDashboardByLastNGamesOverallTeamDashboard{
 					TEAM_ID:    toInt(row[0]),
@@ -272,9 +275,12 @@ func GetTeamDashboardByLastNGames(ctx context.Context, client *stats.Client, req
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.Last5TeamDashboard = make([]TeamDashboardByLastNGamesLast5TeamDashboard, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "Last5TeamDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDashboardByLastNGamesLast5TeamDashboard{})); err != nil {
+			return nil, fmt.Errorf("TeamDashboardByLastNGames: Last5TeamDashboard result set: %w", err)
+		}
+		response.Last5TeamDashboard = make([]TeamDashboardByLastNGamesLast5TeamDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := TeamDashboardByLastNGamesLast5TeamDashboard{
 					TEAM_ID:      toInt(row[0]),
@@ -311,9 +317,12 @@ func GetTeamDashboardByLastNGames(ctx context.Context, client *stats.Client, req
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 2 {
-		response.Last10TeamDashboard = make([]TeamDashboardByLastNGamesLast10TeamDashboard, 0, len(rawResp.ResultSets[2].RowSet))
-		for _, row := range rawResp.ResultSets[2].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "Last10TeamDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDashboardByLastNGamesLast10TeamDashboard{})); err != nil {
+			return nil, fmt.Errorf("TeamDashboardByLastNGames: Last10TeamDashboard result set: %w", err)
+		}
+		response.Last10TeamDashboard = make([]TeamDashboardByLastNGamesLast10TeamDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := TeamDashboardByLastNGamesLast10TeamDashboard{
 					TEAM_ID:      toInt(row[0]),
@@ -350,9 +359,12 @@ func GetTeamDashboardByLastNGames(ctx context.Context, client *stats.Client, req
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 3 {
-		response.Last15TeamDashboard = make([]TeamDashboardByLastNGamesLast15TeamDashboard, 0, len(rawResp.ResultSets[3].RowSet))
-		for _, row := range rawResp.ResultSets[3].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "Last15TeamDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDashboardByLastNGamesLast15TeamDashboard{})); err != nil {
+			return nil, fmt.Errorf("TeamDashboardByLastNGames: Last15TeamDashboard result set: %w", err)
+		}
+		response.Last15TeamDashboard = make([]TeamDashboardByLastNGamesLast15TeamDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := TeamDashboardByLastNGamesLast15TeamDashboard{
 					TEAM_ID:      toInt(row[0]),
@@ -389,9 +401,12 @@ func GetTeamDashboardByLastNGames(ctx context.Context, client *stats.Client, req
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 4 {
-		response.Last20TeamDashboard = make([]TeamDashboardByLastNGamesLast20TeamDashboard, 0, len(rawResp.ResultSets[4].RowSet))
-		for _, row := range rawResp.ResultSets[4].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "Last20TeamDashboard"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDashboardByLastNGamesLast20TeamDashboard{})); err != nil {
+			return nil, fmt.Errorf("TeamDashboardByLastNGames: Last20TeamDashboard result set: %w", err)
+		}
+		response.Last20TeamDashboard = make([]TeamDashboardByLastNGamesLast20TeamDashboard, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 29 {
 				item := TeamDashboardByLastNGamesLast20TeamDashboard{
 					TEAM_ID:      toInt(row[0]),

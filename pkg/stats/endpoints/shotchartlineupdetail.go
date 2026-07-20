@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -92,9 +93,12 @@ func GetShotChartLineupDetail(ctx context.Context, client *stats.Client, req Sho
 	}
 
 	response := &ShotChartLineupDetailResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.Shot_Chart_Detail = make([]ShotChartLineupDetailShot_Chart_Detail, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "Shot_Chart_Detail"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(ShotChartLineupDetailShot_Chart_Detail{})); err != nil {
+			return nil, fmt.Errorf("ShotChartLineupDetail: Shot_Chart_Detail result set: %w", err)
+		}
+		response.Shot_Chart_Detail = make([]ShotChartLineupDetailShot_Chart_Detail, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 24 {
 				item := ShotChartLineupDetailShot_Chart_Detail{
 					GRID_TYPE:           toString(row[0]),
@@ -126,9 +130,12 @@ func GetShotChartLineupDetail(ctx context.Context, client *stats.Client, req Sho
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.LeagueAverages = make([]ShotChartLineupDetailLeagueAverages, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "LeagueAverages"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(ShotChartLineupDetailLeagueAverages{})); err != nil {
+			return nil, fmt.Errorf("ShotChartLineupDetail: LeagueAverages result set: %w", err)
+		}
+		response.LeagueAverages = make([]ShotChartLineupDetailLeagueAverages, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 7 {
 				item := ShotChartLineupDetailLeagueAverages{
 					GRID_TYPE:       toString(row[0]),

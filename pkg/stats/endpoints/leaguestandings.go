@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -130,9 +131,12 @@ func GetLeagueStandings(ctx context.Context, client *stats.Client, req LeagueSta
 	}
 
 	response := &LeagueStandingsResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.Standings = make([]LeagueStandingsStandings, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "Standings"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(LeagueStandingsStandings{})); err != nil {
+			return nil, fmt.Errorf("LeagueStandings: Standings result set: %w", err)
+		}
+		response.Standings = make([]LeagueStandingsStandings, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 86 {
 				item := LeagueStandingsStandings{
 					LeagueID:                toString(row[0]),

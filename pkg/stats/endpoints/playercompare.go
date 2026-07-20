@@ -82,9 +82,12 @@ func GetPlayerCompare(ctx context.Context, client *stats.Client, req PlayerCompa
 	}
 
 	response := &PlayerCompareResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.OverallCompare = make([]PlayerCompareOverallCompare, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "OverallCompare"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerCompareOverallCompare{})); err != nil {
+			return nil, fmt.Errorf("PlayerCompare: OverallCompare result set: %w", err)
+		}
+		response.OverallCompare = make([]PlayerCompareOverallCompare, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 28 {
 				item := PlayerCompareOverallCompare{
 					PLAYER_ID:   toInt(row[0]),

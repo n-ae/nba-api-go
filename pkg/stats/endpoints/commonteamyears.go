@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -41,9 +42,12 @@ func GetCommonTeamYears(ctx context.Context, client *stats.Client, req CommonTea
 	}
 
 	response := &CommonTeamYearsResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.TeamYears = make([]CommonTeamYearsTeamYears, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "TeamYears"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(CommonTeamYearsTeamYears{})); err != nil {
+			return nil, fmt.Errorf("CommonTeamYears: TeamYears result set: %w", err)
+		}
+		response.TeamYears = make([]CommonTeamYearsTeamYears, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 5 {
 				item := CommonTeamYearsTeamYears{
 					LEAGUE_ID:    toString(row[0]),

@@ -78,9 +78,12 @@ func GetCommonTeamRoster(ctx context.Context, client *stats.Client, req CommonTe
 	}
 
 	response := &CommonTeamRosterResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.CommonTeamRoster = make([]CommonTeamRosterCommonTeamRoster, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "CommonTeamRoster"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(CommonTeamRosterCommonTeamRoster{})); err != nil {
+			return nil, fmt.Errorf("CommonTeamRoster: CommonTeamRoster result set: %w", err)
+		}
+		response.CommonTeamRoster = make([]CommonTeamRosterCommonTeamRoster, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 16 {
 				item := CommonTeamRosterCommonTeamRoster{
 					TeamID:       toString(row[0]),
@@ -104,9 +107,12 @@ func GetCommonTeamRoster(ctx context.Context, client *stats.Client, req CommonTe
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.Coaches = make([]CommonTeamRosterCoaches, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "Coaches"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(CommonTeamRosterCoaches{})); err != nil {
+			return nil, fmt.Errorf("CommonTeamRoster: Coaches result set: %w", err)
+		}
+		response.Coaches = make([]CommonTeamRosterCoaches, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 11 {
 				item := CommonTeamRosterCoaches{
 					TEAM_ID:       toInt(row[0]),

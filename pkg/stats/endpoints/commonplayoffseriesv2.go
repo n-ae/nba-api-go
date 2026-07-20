@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -45,9 +46,12 @@ func GetCommonPlayoffSeriesV2(ctx context.Context, client *stats.Client, req Com
 	}
 
 	response := &CommonPlayoffSeriesV2Response{}
-	if len(rawResp.ResultSets) > 0 {
-		response.PlayoffSeries = make([]CommonPlayoffSeriesV2PlayoffSeries, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "PlayoffSeries"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(CommonPlayoffSeriesV2PlayoffSeries{})); err != nil {
+			return nil, fmt.Errorf("CommonPlayoffSeriesV2: PlayoffSeries result set: %w", err)
+		}
+		response.PlayoffSeries = make([]CommonPlayoffSeriesV2PlayoffSeries, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 5 {
 				item := CommonPlayoffSeriesV2PlayoffSeries{
 					GAME_ID:         toString(row[0]),

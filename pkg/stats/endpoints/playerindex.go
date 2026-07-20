@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -70,9 +71,12 @@ func GetPlayerIndex(ctx context.Context, client *stats.Client, req PlayerIndexRe
 	}
 
 	response := &PlayerIndexResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.PlayerIndex = make([]PlayerIndexPlayerIndex, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "PlayerIndex"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerIndexPlayerIndex{})); err != nil {
+			return nil, fmt.Errorf("PlayerIndex: PlayerIndex result set: %w", err)
+		}
+		response.PlayerIndex = make([]PlayerIndexPlayerIndex, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 22 {
 				item := PlayerIndexPlayerIndex{
 					PERSON_ID:         toString(row[0]),

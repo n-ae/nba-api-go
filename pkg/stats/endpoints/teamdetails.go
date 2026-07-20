@@ -108,9 +108,12 @@ func GetTeamDetails(ctx context.Context, client *stats.Client, req TeamDetailsRe
 	}
 
 	response := &TeamDetailsResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.TeamBackground = make([]TeamDetailsTeamBackground, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "TeamBackground"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDetailsTeamBackground{})); err != nil {
+			return nil, fmt.Errorf("TeamDetails: TeamBackground result set: %w", err)
+		}
+		response.TeamBackground = make([]TeamDetailsTeamBackground, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 11 {
 				item := TeamDetailsTeamBackground{
 					TEAM_ID:            toInt(row[0]),
@@ -129,9 +132,12 @@ func GetTeamDetails(ctx context.Context, client *stats.Client, req TeamDetailsRe
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.TeamHistory = make([]TeamDetailsTeamHistory, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "TeamHistory"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDetailsTeamHistory{})); err != nil {
+			return nil, fmt.Errorf("TeamDetails: TeamHistory result set: %w", err)
+		}
+		response.TeamHistory = make([]TeamDetailsTeamHistory, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 5 {
 				item := TeamDetailsTeamHistory{
 					TEAM_ID:        toInt(row[0]),
@@ -144,9 +150,12 @@ func GetTeamDetails(ctx context.Context, client *stats.Client, req TeamDetailsRe
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 2 {
-		response.TeamSocialSites = make([]TeamDetailsTeamSocialSites, 0, len(rawResp.ResultSets[2].RowSet))
-		for _, row := range rawResp.ResultSets[2].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "TeamSocialSites"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDetailsTeamSocialSites{})); err != nil {
+			return nil, fmt.Errorf("TeamDetails: TeamSocialSites result set: %w", err)
+		}
+		response.TeamSocialSites = make([]TeamDetailsTeamSocialSites, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 2 {
 				item := TeamDetailsTeamSocialSites{
 					ACCOUNTTYPE:  toString(row[0]),
@@ -156,9 +165,12 @@ func GetTeamDetails(ctx context.Context, client *stats.Client, req TeamDetailsRe
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 3 {
-		response.TeamAwardsChampionships = make([]TeamDetailsTeamAwardsChampionships, 0, len(rawResp.ResultSets[3].RowSet))
-		for _, row := range rawResp.ResultSets[3].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "TeamAwardsChampionships"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDetailsTeamAwardsChampionships{})); err != nil {
+			return nil, fmt.Errorf("TeamDetails: TeamAwardsChampionships result set: %w", err)
+		}
+		response.TeamAwardsChampionships = make([]TeamDetailsTeamAwardsChampionships, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 2 {
 				item := TeamDetailsTeamAwardsChampionships{
 					YEARAWARDED:  toString(row[0]),
@@ -168,9 +180,12 @@ func GetTeamDetails(ctx context.Context, client *stats.Client, req TeamDetailsRe
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 4 {
-		response.TeamAwardsConf = make([]TeamDetailsTeamAwardsConf, 0, len(rawResp.ResultSets[4].RowSet))
-		for _, row := range rawResp.ResultSets[4].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "TeamAwardsConf"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDetailsTeamAwardsConf{})); err != nil {
+			return nil, fmt.Errorf("TeamDetails: TeamAwardsConf result set: %w", err)
+		}
+		response.TeamAwardsConf = make([]TeamDetailsTeamAwardsConf, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 2 {
 				item := TeamDetailsTeamAwardsConf{
 					YEARAWARDED:  toString(row[0]),
@@ -180,9 +195,12 @@ func GetTeamDetails(ctx context.Context, client *stats.Client, req TeamDetailsRe
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 5 {
-		response.TeamAwardsDiv = make([]TeamDetailsTeamAwardsDiv, 0, len(rawResp.ResultSets[5].RowSet))
-		for _, row := range rawResp.ResultSets[5].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "TeamAwardsDiv"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDetailsTeamAwardsDiv{})); err != nil {
+			return nil, fmt.Errorf("TeamDetails: TeamAwardsDiv result set: %w", err)
+		}
+		response.TeamAwardsDiv = make([]TeamDetailsTeamAwardsDiv, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 2 {
 				item := TeamDetailsTeamAwardsDiv{
 					YEARAWARDED:  toString(row[0]),
@@ -192,9 +210,12 @@ func GetTeamDetails(ctx context.Context, client *stats.Client, req TeamDetailsRe
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 6 {
-		response.TeamHof = make([]TeamDetailsTeamHof, 0, len(rawResp.ResultSets[6].RowSet))
-		for _, row := range rawResp.ResultSets[6].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "TeamHof"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDetailsTeamHof{})); err != nil {
+			return nil, fmt.Errorf("TeamDetails: TeamHof result set: %w", err)
+		}
+		response.TeamHof = make([]TeamDetailsTeamHof, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 6 {
 				item := TeamDetailsTeamHof{
 					PLAYERID:        toString(row[0]),
@@ -208,9 +229,12 @@ func GetTeamDetails(ctx context.Context, client *stats.Client, req TeamDetailsRe
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 7 {
-		response.TeamRetired = make([]TeamDetailsTeamRetired, 0, len(rawResp.ResultSets[7].RowSet))
-		for _, row := range rawResp.ResultSets[7].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "TeamRetired"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDetailsTeamRetired{})); err != nil {
+			return nil, fmt.Errorf("TeamDetails: TeamRetired result set: %w", err)
+		}
+		response.TeamRetired = make([]TeamDetailsTeamRetired, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 6 {
 				item := TeamDetailsTeamRetired{
 					PLAYERID:        toString(row[0]),

@@ -70,9 +70,12 @@ func GetTeamPlayerOnOffSummary(ctx context.Context, client *stats.Client, req Te
 	}
 
 	response := &TeamPlayerOnOffSummaryResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.TeamPlayerOnOffSummary = make([]TeamPlayerOnOffSummaryTeamPlayerOnOffSummary, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "TeamPlayerOnOffSummary"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamPlayerOnOffSummaryTeamPlayerOnOffSummary{})); err != nil {
+			return nil, fmt.Errorf("TeamPlayerOnOffSummary: TeamPlayerOnOffSummary result set: %w", err)
+		}
+		response.TeamPlayerOnOffSummary = make([]TeamPlayerOnOffSummaryTeamPlayerOnOffSummary, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 12 {
 				item := TeamPlayerOnOffSummaryTeamPlayerOnOffSummary{
 					TEAM_ID:           toInt(row[0]),

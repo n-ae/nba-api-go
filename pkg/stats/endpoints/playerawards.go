@@ -51,9 +51,12 @@ func GetPlayerAwards(ctx context.Context, client *stats.Client, req PlayerAwards
 	}
 
 	response := &PlayerAwardsResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.PlayerAwards = make([]PlayerAwardsPlayerAwards, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "PlayerAwards"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerAwardsPlayerAwards{})); err != nil {
+			return nil, fmt.Errorf("PlayerAwards: PlayerAwards result set: %w", err)
+		}
+		response.PlayerAwards = make([]PlayerAwardsPlayerAwards, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 14 {
 				item := PlayerAwardsPlayerAwards{
 					PERSON_ID:           toString(row[0]),

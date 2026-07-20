@@ -114,9 +114,12 @@ func GetTeamDashPtShots(ctx context.Context, client *stats.Client, req TeamDashP
 	}
 
 	response := &TeamDashPtShotsResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.OverallShooting = make([]TeamDashPtShotsOverallShooting, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "OverallShooting"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDashPtShotsOverallShooting{})); err != nil {
+			return nil, fmt.Errorf("TeamDashPtShots: OverallShooting result set: %w", err)
+		}
+		response.OverallShooting = make([]TeamDashPtShotsOverallShooting, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 18 {
 				item := TeamDashPtShotsOverallShooting{
 					TEAM_ID:        toInt(row[0]),
@@ -142,9 +145,12 @@ func GetTeamDashPtShots(ctx context.Context, client *stats.Client, req TeamDashP
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.GeneralShooting = make([]TeamDashPtShotsGeneralShooting, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "GeneralShooting"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDashPtShotsGeneralShooting{})); err != nil {
+			return nil, fmt.Errorf("TeamDashPtShots: GeneralShooting result set: %w", err)
+		}
+		response.GeneralShooting = make([]TeamDashPtShotsGeneralShooting, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 16 {
 				item := TeamDashPtShotsGeneralShooting{
 					TEAM_ID:        toInt(row[0]),
@@ -168,9 +174,12 @@ func GetTeamDashPtShots(ctx context.Context, client *stats.Client, req TeamDashP
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 2 {
-		response.ShotClockShooting = make([]TeamDashPtShotsShotClockShooting, 0, len(rawResp.ResultSets[2].RowSet))
-		for _, row := range rawResp.ResultSets[2].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "ShotClockShooting"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(TeamDashPtShotsShotClockShooting{})); err != nil {
+			return nil, fmt.Errorf("TeamDashPtShots: ShotClockShooting result set: %w", err)
+		}
+		response.ShotClockShooting = make([]TeamDashPtShotsShotClockShooting, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 16 {
 				item := TeamDashPtShotsShotClockShooting{
 					TEAM_ID:          toInt(row[0]),

@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	"github.com/n-ae/nba-api-go/pkg/models"
@@ -60,9 +61,12 @@ func GetPlayerTrackingShootingEfficiency(ctx context.Context, client *stats.Clie
 	}
 
 	response := &PlayerTrackingShootingEfficiencyResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.PlayerTrackingShootingEfficiency = make([]PlayerTrackingShootingEfficiencyPlayerTrackingShootingEfficiency, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "PlayerTrackingShootingEfficiency"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerTrackingShootingEfficiencyPlayerTrackingShootingEfficiency{})); err != nil {
+			return nil, fmt.Errorf("PlayerTrackingShootingEfficiency: PlayerTrackingShootingEfficiency result set: %w", err)
+		}
+		response.PlayerTrackingShootingEfficiency = make([]PlayerTrackingShootingEfficiencyPlayerTrackingShootingEfficiency, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 12 {
 				item := PlayerTrackingShootingEfficiencyPlayerTrackingShootingEfficiency{
 					PLAYER_ID:          toInt(row[0]),

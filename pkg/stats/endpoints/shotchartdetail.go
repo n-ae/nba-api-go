@@ -187,9 +187,12 @@ func GetShotChartDetail(ctx context.Context, client *stats.Client, req ShotChart
 	}
 
 	response := &ShotChartDetailResponse{}
-	if len(rawResp.ResultSets) > 0 {
-		response.Shot_Chart_Detail = make([]ShotChartDetailShot_Chart_Detail, 0, len(rawResp.ResultSets[0].RowSet))
-		for _, row := range rawResp.ResultSets[0].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "Shot_Chart_Detail"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(ShotChartDetailShot_Chart_Detail{})); err != nil {
+			return nil, fmt.Errorf("ShotChartDetail: Shot_Chart_Detail result set: %w", err)
+		}
+		response.Shot_Chart_Detail = make([]ShotChartDetailShot_Chart_Detail, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 24 {
 				item := ShotChartDetailShot_Chart_Detail{
 					GRID_TYPE:           toString(row[0]),
@@ -221,9 +224,12 @@ func GetShotChartDetail(ctx context.Context, client *stats.Client, req ShotChart
 			}
 		}
 	}
-	if len(rawResp.ResultSets) > 1 {
-		response.LeagueAverages = make([]ShotChartDetailLeagueAverages, 0, len(rawResp.ResultSets[1].RowSet))
-		for _, row := range rawResp.ResultSets[1].RowSet {
+	if rs, ok := findResultSet(rawResp.ResultSets, "LeagueAverages"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(ShotChartDetailLeagueAverages{})); err != nil {
+			return nil, fmt.Errorf("ShotChartDetail: LeagueAverages result set: %w", err)
+		}
+		response.LeagueAverages = make([]ShotChartDetailLeagueAverages, 0, len(rs.RowSet))
+		for _, row := range rs.RowSet {
 			if len(row) >= 7 {
 				item := ShotChartDetailLeagueAverages{
 					GRID_TYPE:       toString(row[0]),
