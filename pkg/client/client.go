@@ -170,14 +170,13 @@ func (c *Client) Get(ctx context.Context, endpoint string, params url.Values) (*
 	if err != nil {
 		return nil, fmt.Errorf("failed to read response body: %w", err)
 	}
-	if int64(len(body)) > c.maxResponseBytes {
-		return nil, fmt.Errorf("%w: %d bytes", models.ErrResponseTooLarge, c.maxResponseBytes)
-	}
-
 	if resp.StatusCode >= 400 {
 		if apiErr := models.HTTPStatusToError(resp.StatusCode, reqURL, body); apiErr != nil {
 			return nil, apiErr
 		}
+	}
+	if int64(len(body)) > c.maxResponseBytes {
+		return nil, fmt.Errorf("%w: %d bytes", models.ErrResponseTooLarge, c.maxResponseBytes)
 	}
 
 	return models.NewRawResponse(body, resp.StatusCode, reqURL, resp.Header), nil
