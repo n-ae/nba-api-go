@@ -6,7 +6,7 @@ This file provides guidance to Claude Code when working with the nba-api-go repo
 
 **nba-api-go** is a production-ready Go SDK and HTTP API server providing type-safe access to 141 NBA Stats API endpoints (all standard endpoints plus international broadcast schedule). The project emphasizes maintainability, minimal dependencies, and solo engineer viability.
 
-**Current Status**: `main` is ahead of the latest tagged release, `v2.0.0` - "the correctness release": explicit generator field types (`fieldtypes.json`/`fieldtype_overrides.json`), 134 of 135 metadata-covered SDK endpoints regenerated with corrected field names/types, and result-set-name keying with header validation replacing positional array indexing across every endpoint using the classic Stats API response shape. **The header-validation piece is real, deliberate new failure-mode surface that was never verified against live NBA.com responses** (no network access from the environment that built it) - watch for new errors surfacing in production; see `CHANGELOG.md`'s `[2.0.0]` section for the full risk callout and migration guide. Since the tag: `videoevents.go`'s 7 non-standard field-name capitalizations are fixed on `main` via `tools/generator/fieldname_overrides.json` (not yet in a tagged release - see `CHANGELOG.md`'s `[Unreleased]` section), so all 135 metadata-covered endpoints are now correct. All 6 hand-written endpoints without generator metadata now validate headers in some form (`commonplayerinfo`/`playergamelog`/`teamgamelog` call `validateHeaders` like generated code; `leagueleaders` needed a different, header-name-driven approach - see below); `playercareerstats` already did before this. Live-verifying `leagueleaders.go` against real `stats.nba.com` traffic surfaced and fixed two real bugs (a singular-`resultSet` envelope shape unique to this endpoint, and a `TEAM_ID` column the struct lacked) plus a genuine API quirk (its column set varies by `PerMode`) - see `CHANGELOG.md`'s `[Unreleased]` section. The other 3 hand-written endpoints and the entire generated-endpoint surface remain unverified against live traffic; `stats.nba.com` began rate-limiting the environment this was done in after a handful of requests, so this is a partial, not complete, discharge of the header-validation risk noted above.
+**Current Status**: `main` is at the latest tagged release, `v2.1.0` - a reliability and correctness follow-up to `v2.0.0` (see `CHANGELOG.md`'s `[2.1.0]` section for the full list). All 135 metadata-covered SDK endpoints (including `videoevents.go`, regenerated this release via `tools/generator/fieldname_overrides.json`) now have field names/types verified to match generator output. All 6 hand-written endpoints without generator metadata now validate headers in some form (`commonplayerinfo`/`playergamelog`/`teamgamelog` call `validateHeaders` like generated code; `leagueleaders` needed a different, header-name-driven approach - see below); `playercareerstats` already did before this. **The header-validation piece introduced in `v2.0.0` is real, deliberate new failure-mode surface, and live verification against real NBA.com responses remains only partially discharged** - see `CHANGELOG.md`'s `[2.0.0]` section for the original risk callout. Live-verifying `leagueleaders.go` against real `stats.nba.com` traffic (part of `v2.1.0`) surfaced and fixed two real bugs (a singular-`resultSet` envelope shape unique to this endpoint, and a `TEAM_ID` column the struct lacked) plus a genuine API quirk (its column set varies by `PerMode`). That's 1 of 142 endpoint files checked against live traffic; the other 3 hand-written endpoints and the entire 121+-file generated-endpoint surface remain unverified - `stats.nba.com` began rate-limiting the environment this was done in after a handful of requests, so this is a partial, not complete, discharge of the header-validation risk.
 **Grade**: See `docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-20_8549390.md` for the current assessment of record - do not hardcode a grade here, it goes stale the moment a new assessment lands and nobody remembers to update this file (see that file's own docs-consolidation section for the fix: archive the superseded assessment in the same commit as the new one).
 **Maintenance Burden**: ~1.6 hours/week for the hand-written core; the generated-endpoint surface currently needs more than that until the verification backlog in the current assessment is cleared - see that document's "Is this too complex for one person?" section.
 
@@ -180,7 +180,7 @@ returns an error instead. **This has not been verified against live
 NBA.com responses** - if any endpoint's metadata field order has quietly
 drifted from what NBA.com currently returns, this will surface as a new
 error on upgrade rather than the previous silent wrong-field behavior;
-see `CHANGELOG.md`'s `[Unreleased]` section for the full risk callout.
+see `CHANGELOG.md`'s `[2.0.0]` section for the full risk callout.
 
 **Generated files** (not safe to hand-edit and later regenerate over -
 regeneration from current metadata does not reproduce several committed
@@ -284,7 +284,7 @@ See `DEPLOYMENT.md` for:
 
 ### API Stability
 
-**Latest tagged release: v2.0.0** - a major version bump for real, extensive breaking changes (public struct field types across ~130 generated endpoint files; see `CHANGELOG.md`'s `[2.0.0]` migration guide). Note that v1.2.0 also shipped a source-breaking change, but in a *minor* release (`stats.Config`/`live.Config` field types, `models.NewAPIError`/`HTTPStatusToError` signatures) - see `CHANGELOG.md`'s retroactive compatibility note under `[1.2.0]`. Treat the "strict semver" promise below as the target, not an unconditional guarantee of the historical record.
+**Latest tagged release: v2.1.0** - no breaking changes (reliability/correctness follow-ups to `v2.0.0`; see `CHANGELOG.md`'s `[2.1.0]` section). The last major version bump was `v2.0.0`, for real, extensive breaking changes (public struct field types across ~130 generated endpoint files; see `CHANGELOG.md`'s `[2.0.0]` migration guide). Note that v1.2.0 also shipped a source-breaking change, but in a *minor* release (`stats.Config`/`live.Config` field types, `models.NewAPIError`/`HTTPStatusToError` signatures) - see `CHANGELOG.md`'s retroactive compatibility note under `[1.2.0]`. Treat the "strict semver" promise below as the target, not an unconditional guarantee of the historical record.
 
 **Breaking changes** require:
 - Major version bump
@@ -541,14 +541,14 @@ if err != nil {
 
 ## Version Information
 
-**Latest tagged release**: v2.0.0 (`main` is at this tag; see `CHANGELOG.md`'s `[Unreleased]` section for what's changed since)
+**Latest tagged release**: v2.1.0 (`main` is at this tag; see `CHANGELOG.md`'s `[Unreleased]` section for what's changed since)
 **Go Version**: 1.26.5+ (the `go` directive in `go.mod`; older toolchains cannot build this module)
-**Stability**: See the Versioning/API Stability section above - v2.0.0 is a deliberate major-version break (public struct field types); v1.2.0 also broke source compatibility but in a minor release, documented with a retroactive compatibility note in `CHANGELOG.md`; v1.3.0 shipped no breaking changes
+**Stability**: See the Versioning/API Stability section above - v2.1.0 shipped no breaking changes; v2.0.0 was a deliberate major-version break (public struct field types); v1.2.0 also broke source compatibility but in a minor release, documented with a retroactive compatibility note in `CHANGELOG.md`; v1.3.0 shipped no breaking changes
 
 See `CHANGELOG.md` for full version history.
 
 ---
 
-**This file last updated**: 2026-07-20 (v2.0.0 release)
+**This file last updated**: 2026-07-20 (v2.1.0 release)
 **Maintainability grade**: tracked in the current assessment (see the header of this file), not duplicated here
-**Next assessment**: the v1.3.0/v2.0.0 plan this assessment tracked is now complete - a new assessment reviewing v2.0.0 (including the unverified header-validation risk noted above) is due; otherwise quarterly
+**Next assessment**: the current assessment of record (`docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-20_8549390.md`) predates the `v2.1.0` fixes - a new assessment reviewing `v2.1.0` (including how much of the header-validation risk it actually discharged) is due; otherwise quarterly
