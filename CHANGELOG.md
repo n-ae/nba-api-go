@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **`playercareerstats.go` now validates result-set headers**, matching the pattern `commonplayerinfo`/`playergamelog`/`teamgamelog` gained in `[2.1.0]`. Found by the `v2.1.0` maintainability assessment: `CLAUDE.md` claimed this endpoint already validated headers, but it only did name-based result-set dispatch and parsed rows by fixed position with a length guard - the exact silent-corruption gap `validateHeaders` exists to close. All 8 of its result sets (`SeasonTotals*`/`CareerTotals*` x Regular/Post/AllStar/College) now call `findResultSet`/`validateHeaders` against `jsonTags(SeasonStat{})`/`jsonTags(CareerTotalStat{})`.
+- **`parseSeasonStats`' row-length guard was off by one** (`len(row) < 28`, found while adding the header-validation test above): `SeasonStat` has 27 fields (indices 0-26), so the guard required one more column than the parser ever reads - a live 27-column NBA.com response would have every row silently dropped. Corrected to `len(row) < 27`. (`CareerTotalStat`'s equivalent guard was already correct.)
+- Added `handwritten_headers_test.go`'s first coverage for `playercareerstats.go` (previously 0%).
+
 ## [2.1.0] - 2026-07-20
 
 ### Added

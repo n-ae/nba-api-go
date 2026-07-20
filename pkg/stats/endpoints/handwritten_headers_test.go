@@ -116,6 +116,33 @@ func TestTeamGameLogValidatesResultSetHeaders(t *testing.T) {
 	}
 }
 
+func TestPlayerCareerStatsValidatesResultSetHeaders(t *testing.T) {
+	valid := rawStatsResponse{ResultSets: []resultSet{
+		{Name: "SeasonTotalsRegularSeason", Headers: jsonTags(SeasonStat{}), RowSet: [][]interface{}{fixtureRow(len(jsonTags(SeasonStat{})), float64(201939), "2023-24")}},
+		{Name: "CareerTotalsRegularSeason", Headers: jsonTags(CareerTotalStat{}), RowSet: [][]interface{}{fixtureRow(len(jsonTags(CareerTotalStat{})), float64(201939))}},
+	}}
+	request := PlayerCareerStatsRequest{PlayerID: "201939"}
+	resp, err := PlayerCareerStats(context.Background(), newStatsFixtureClient(t, valid), request)
+	if err != nil {
+		t.Fatalf("PlayerCareerStats() error = %v", err)
+	}
+	if got := resp.Data.SeasonTotalsRegularSeason[0].PlayerID; got != 201939 {
+		t.Errorf("PlayerCareerStats().SeasonTotalsRegularSeason[0].PlayerID = %d, want 201939", got)
+	}
+	if got := resp.Data.CareerTotalsRegularSeason[0].PlayerID; got != 201939 {
+		t.Errorf("PlayerCareerStats().CareerTotalsRegularSeason[0].PlayerID = %d, want 201939", got)
+	}
+
+	invalid := valid
+	invalid.ResultSets = append([]resultSet(nil), valid.ResultSets...)
+	invalid.ResultSets[0].Headers = append([]string(nil), valid.ResultSets[0].Headers...)
+	invalid.ResultSets[0].Headers[0] = "GP"
+	_, err = PlayerCareerStats(context.Background(), newStatsFixtureClient(t, invalid), request)
+	if err == nil || !strings.Contains(err.Error(), "SeasonTotalsRegularSeason result set") {
+		t.Fatalf("PlayerCareerStats() error = %v, want a SeasonTotalsRegularSeason header error", err)
+	}
+}
+
 func TestLeagueLeadersUsesItsSingularEnvelopeAndHeaderNames(t *testing.T) {
 	valid := struct {
 		ResultSet resultSet `json:"resultSet"`

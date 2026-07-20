@@ -114,24 +114,39 @@ func PlayerCareerStats(ctx context.Context, client *stats.Client, req PlayerCare
 	}
 
 	response := &PlayerCareerStatsResponse{}
-	for _, resultSet := range rawResp.ResultSets {
-		switch resultSet.Name {
-		case "SeasonTotalsRegularSeason":
-			response.SeasonTotalsRegularSeason = parseSeasonStats(resultSet.RowSet)
-		case "CareerTotalsRegularSeason":
-			response.CareerTotalsRegularSeason = parseCareerTotals(resultSet.RowSet)
-		case "SeasonTotalsPostSeason":
-			response.SeasonTotalsPostSeason = parseSeasonStats(resultSet.RowSet)
-		case "CareerTotalsPostSeason":
-			response.CareerTotalsPostSeason = parseCareerTotals(resultSet.RowSet)
-		case "SeasonTotalsAllStarSeason":
-			response.SeasonTotalsAllStarSeason = parseSeasonStats(resultSet.RowSet)
-		case "CareerTotalsAllStarSeason":
-			response.CareerTotalsAllStarSeason = parseCareerTotals(resultSet.RowSet)
-		case "SeasonTotalsCollegeSeason":
-			response.SeasonTotalsCollegeSeason = parseSeasonStats(resultSet.RowSet)
-		case "CareerTotalsCollegeSeason":
-			response.CareerTotalsCollegeSeason = parseCareerTotals(resultSet.RowSet)
+	seasonSets := []struct {
+		name string
+		dest *[]SeasonStat
+	}{
+		{"SeasonTotalsRegularSeason", &response.SeasonTotalsRegularSeason},
+		{"SeasonTotalsPostSeason", &response.SeasonTotalsPostSeason},
+		{"SeasonTotalsAllStarSeason", &response.SeasonTotalsAllStarSeason},
+		{"SeasonTotalsCollegeSeason", &response.SeasonTotalsCollegeSeason},
+	}
+	for _, s := range seasonSets {
+		if rs, ok := findResultSet(rawResp.ResultSets, s.name); ok {
+			if err := validateHeaders(rs.Headers, jsonTags(SeasonStat{})); err != nil {
+				return nil, fmt.Errorf("PlayerCareerStats: %s result set: %w", s.name, err)
+			}
+			*s.dest = parseSeasonStats(rs.RowSet)
+		}
+	}
+
+	careerSets := []struct {
+		name string
+		dest *[]CareerTotalStat
+	}{
+		{"CareerTotalsRegularSeason", &response.CareerTotalsRegularSeason},
+		{"CareerTotalsPostSeason", &response.CareerTotalsPostSeason},
+		{"CareerTotalsAllStarSeason", &response.CareerTotalsAllStarSeason},
+		{"CareerTotalsCollegeSeason", &response.CareerTotalsCollegeSeason},
+	}
+	for _, c := range careerSets {
+		if rs, ok := findResultSet(rawResp.ResultSets, c.name); ok {
+			if err := validateHeaders(rs.Headers, jsonTags(CareerTotalStat{})); err != nil {
+				return nil, fmt.Errorf("PlayerCareerStats: %s result set: %w", c.name, err)
+			}
+			*c.dest = parseCareerTotals(rs.RowSet)
 		}
 	}
 
@@ -141,7 +156,7 @@ func PlayerCareerStats(ctx context.Context, client *stats.Client, req PlayerCare
 func parseSeasonStats(rows [][]interface{}) []SeasonStat {
 	stats := make([]SeasonStat, 0, len(rows))
 	for _, row := range rows {
-		if len(row) < 28 {
+		if len(row) < 27 {
 			continue
 		}
 		stat := SeasonStat{
