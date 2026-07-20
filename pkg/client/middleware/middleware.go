@@ -15,7 +15,7 @@
 package middleware
 
 import (
-	"github.com/n-ae/nba-api-go/pkg/client"
+	"github.com/n-ae/nba-api-go/v2/pkg/client"
 )
 
 type Middleware = client.Middleware

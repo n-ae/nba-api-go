@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/n-ae/nba-api-go/pkg/stats/static"
+	"github.com/n-ae/nba-api-go/v2/pkg/stats/static"
 )
 
 func main() {

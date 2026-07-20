@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/n-ae/nba-api-go/pkg/stats"
+	"github.com/n-ae/nba-api-go/v2/pkg/stats"
 )
 
 // TestHealthEndpoint is fully offline: NewServer constructs a

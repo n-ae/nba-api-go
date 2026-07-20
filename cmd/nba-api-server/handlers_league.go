@@ -3,8 +3,8 @@ package main
 import (
 	"net/http"
 
-	"github.com/n-ae/nba-api-go/pkg/stats/endpoints"
-	"github.com/n-ae/nba-api-go/pkg/stats/parameters"
+	"github.com/n-ae/nba-api-go/v2/pkg/stats/endpoints"
+	"github.com/n-ae/nba-api-go/v2/pkg/stats/parameters"
 )
 
 func (h *StatsHandler) handleLeagueStandings(w http.ResponseWriter, r *http.Request) {

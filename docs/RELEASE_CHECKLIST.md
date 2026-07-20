@@ -405,6 +405,7 @@ Then fix and re-release with same version.
 - Deprecation warnings in previous version
 - Extended testing period
 - Clear communication to users
+- **For v2.0.0 and any later major bump: update `go.mod`'s `module` line to add the `/vN` suffix (e.g. `module github.com/n-ae/nba-api-go/v3`), and update every internal import path in the repo to match.** This is a hard Go modules requirement, not a style choice - without it, `go get github.com/n-ae/nba-api-go@vN.0.0` fails outright with `invalid version: module contains a go.mod file, so module path must match major version (".../vN")`, blocking every new/upgrading consumer even though the tag and code otherwise look fine. `v2.0.0`/`v2.1.0` shipped without this and had to be fixed in `v2.1.1` - see `CHANGELOG.md`'s `[2.1.1]` entry. Verify before tagging with `go get <module>@v<major>.0.0` against a scratch module (see that entry for the exact repro)
 
 **Timeline:** Only when absolutely necessary (avoid if possible)
 
@@ -510,6 +511,7 @@ Consider automating these steps:
 - [ ] Forgetting to push tags to remote
 - [ ] Not verifying Go package availability
 - [ ] Skipping upgrade guide for major versions
+- [ ] **Major version bump without the `go.mod` `/vN` module-path suffix** - the specific way v2.0.0/v2.1.0 failed "Go package availability" above; see the Major Release section's Requirements for the exact fix and verification command
 
 ---
 
@@ -527,6 +529,7 @@ Consider automating these steps:
 - CLAUDE.md (version references)
 - README.md (badges, examples)
 - `cmd/nba-api-server/main.go`'s `const version` (drives `/health`'s reported version and the startup log line) - missed during the v1.3.0 release and caught late during v2.0.0's prep; the generic "any other hardcoded versions" bullet below wasn't enough to catch it, so it's called out by name now
+- **Major version only**: `go.mod`'s `module` line and every internal import path (`/vN` suffix) - missed entirely during v2.0.0, not caught until v2.1.1; see the Major Release section above
 - Any other files with hardcoded versions
 
 **Git Commands:**

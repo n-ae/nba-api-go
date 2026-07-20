@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/n-ae/nba-api-go/pkg/models"
-	"github.com/n-ae/nba-api-go/pkg/stats"
+	"github.com/n-ae/nba-api-go/v2/pkg/models"
+	"github.com/n-ae/nba-api-go/v2/pkg/stats"
 )
 
 // BoxScoreAdvancedV2Request contains parameters for the BoxScoreAdvancedV2 endpoint
