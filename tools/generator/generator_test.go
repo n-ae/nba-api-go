@@ -203,8 +203,9 @@ func TestInferGoType(t *testing.T) {
 }
 
 // TestFieldTypesOverridesKnownWrongInference verifies that fieldtypes.json
-// - the explicit, hand-reviewed dictionary fieldGoType consults before ever
-// falling back to inferGoType - actually corrects every knownWrong case
+// - the explicit, hand-reviewed dictionary resolveFieldGoType consults
+// before ever falling back to inferGoType - actually corrects every
+// knownWrong case
 // documented in TestInferGoType above (plus other confirmed instances of
 // the same bug classes found across the committed metadata: PCT_<STAT>
 // "share of team total" fields mistyped by the FGM/FGA suffix sub-rule,
@@ -256,9 +257,9 @@ func TestFieldTypesOverridesKnownWrongInference(t *testing.T) {
 			if inferGoType(field) == want {
 				t.Fatalf("inferGoType(%q) already returns %q - this case is no longer knownWrong, remove it from the correction map instead of leaving a redundant assertion", field, want)
 			}
-			got := fieldGoType(field)
+			got := resolveFieldGoType("", "", field)
 			if got != want {
-				t.Errorf("fieldGoType(%q) = %q, want %q (fieldtypes.json entry missing or incorrect)", field, got, want)
+				t.Errorf("resolveFieldGoType(%q) = %q, want %q (fieldtypes.json entry missing or incorrect)", field, got, want)
 			}
 		})
 	}
@@ -300,9 +301,9 @@ func TestFieldTypesMatchCommittedConsensus(t *testing.T) {
 			if inferGoType(field) == want {
 				t.Fatalf("inferGoType(%q) already returns %q - this correction is redundant, remove it", field, want)
 			}
-			got := fieldGoType(field)
+			got := resolveFieldGoType("", "", field)
 			if got != want {
-				t.Errorf("fieldGoType(%q) = %q, want %q (fieldtypes.json entry missing or incorrect)", field, got, want)
+				t.Errorf("resolveFieldGoType(%q) = %q, want %q (fieldtypes.json entry missing or incorrect)", field, got, want)
 			}
 		})
 	}
@@ -357,6 +358,106 @@ func TestAllMetadataFieldsHaveExplicitTypes(t *testing.T) {
 		sort.Strings(fields)
 		for _, f := range fields {
 			t.Errorf("field %q referenced by %v has no entry in fieldtypes.json", f, missing[f])
+		}
+	}
+}
+
+// TestFieldTypeOverridesApplyOnlyWithinTheirEndpoint proves
+// fieldtype_overrides.json actually changes resolution where it's
+// declared and leaves the global fieldtypes.json default untouched
+// everywhere else. OREB is the motivating case: fieldtypes.json says
+// float64 (correct for the ~90 per-game-average endpoints that don't
+// override it), but BoxScoreTraditionalV2.PlayerStats overrides it to int
+// (correct for that single-game box score). If this test passed with the
+// override applying globally, every non-box-score endpoint's OREB would
+// silently corrupt back to int.
+func TestFieldTypeOverridesApplyOnlyWithinTheirEndpoint(t *testing.T) {
+	globalDefault := resolveFieldGoType("", "", "OREB")
+	if globalDefault != "float64" {
+		t.Fatalf("resolveFieldGoType(_, _, %q) = %q, want %q (fieldtypes.json's global default) - has fieldtypes.json changed?", "OREB", globalDefault, "float64")
+	}
+
+	overridden := resolveFieldGoType("BoxScoreTraditionalV2", "PlayerStats", "OREB")
+	if overridden != "int" {
+		t.Errorf("resolveFieldGoType(%q, %q, %q) = %q, want %q (fieldtype_overrides.json entry)", "BoxScoreTraditionalV2", "PlayerStats", "OREB", overridden, "int")
+	}
+
+	// Same field, same endpoint, but a result set with no override entry:
+	// must fall through to the global default, not leak the sibling
+	// result set's override.
+	unrelatedResultSet := resolveFieldGoType("BoxScoreTraditionalV2", "SomeOtherResultSetNotInOverrides", "OREB")
+	if unrelatedResultSet != globalDefault {
+		t.Errorf("resolveFieldGoType(%q, %q, %q) = %q, want the global default %q - override leaked to an unlisted result set", "BoxScoreTraditionalV2", "SomeOtherResultSetNotInOverrides", "OREB", unrelatedResultSet, globalDefault)
+	}
+
+	// Same field, an endpoint with no override entries at all: must fall
+	// through to the global default. PlayerDashboardByGeneralSplits is a
+	// real metadata-covered endpoint whose OverallPlayerDashboard result
+	// set contains OREB as a per-game average, not a count.
+	unrelatedEndpoint := resolveFieldGoType("PlayerDashboardByGeneralSplits", "OverallPlayerDashboard", "OREB")
+	if unrelatedEndpoint != globalDefault {
+		t.Errorf("resolveFieldGoType(%q, %q, %q) = %q, want the global default %q - override leaked to an unrelated endpoint", "PlayerDashboardByGeneralSplits", "OverallPlayerDashboard", "OREB", unrelatedEndpoint, globalDefault)
+	}
+}
+
+// TestFieldTypeOverridesReferenceRealMetadata ensures every
+// (endpoint, result set, field) entry in fieldtype_overrides.json
+// actually exists in committed metadata - the endpoint name matches some
+// EndpointMetadata.Name, the result set name matches one of its
+// ResultSets, and the field is in that result set's Fields. Without this,
+// a typo'd or stale override entry (e.g. after a metadata file is
+// renamed or a result set's fields change) would silently do nothing
+// instead of failing loudly.
+func TestFieldTypeOverridesReferenceRealMetadata(t *testing.T) {
+	overrides, err := loadFieldTypeOverrides()
+	if err != nil {
+		t.Fatalf("loadFieldTypeOverrides() failed: %v", err)
+	}
+	if len(overrides) == 0 {
+		t.Fatal("fieldtype_overrides.json is empty - this test would trivially pass without exercising anything")
+	}
+
+	metadataFiles, err := filepath.Glob("metadata/*.json")
+	if err != nil {
+		t.Fatalf("failed to glob metadata files: %v", err)
+	}
+
+	// endpoint -> result set -> set of fields, aggregated across every
+	// metadata file (some endpoints are duplicated verbatim across more
+	// than one committed file).
+	realFields := map[string]map[string]map[string]bool{}
+	for _, mf := range metadataFiles {
+		data, err := os.ReadFile(mf)
+		if err != nil {
+			t.Fatalf("failed to read %s: %v", mf, err)
+		}
+		var endpoints []EndpointMetadata
+		if err := json.Unmarshal(data, &endpoints); err != nil {
+			t.Fatalf("failed to parse %s: %v", mf, err)
+		}
+		for _, ep := range endpoints {
+			for _, rs := range ep.ResultSets {
+				if realFields[ep.Name] == nil {
+					realFields[ep.Name] = map[string]map[string]bool{}
+				}
+				if realFields[ep.Name][rs.Name] == nil {
+					realFields[ep.Name][rs.Name] = map[string]bool{}
+				}
+				for _, field := range rs.Fields {
+					realFields[ep.Name][rs.Name][field] = true
+				}
+			}
+		}
+	}
+
+	for endpointName, resultSets := range overrides {
+		for resultSetName, fields := range resultSets {
+			for field := range fields {
+				if !realFields[endpointName][resultSetName][field] {
+					t.Errorf("fieldtype_overrides.json has %s.%s.%s, but no committed metadata file has a %q endpoint with a %q result set containing field %q",
+						endpointName, resultSetName, field, endpointName, resultSetName, field)
+				}
+			}
 		}
 	}
 }

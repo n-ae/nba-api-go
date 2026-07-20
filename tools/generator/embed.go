@@ -17,3 +17,10 @@ var templatesFS embed.FS
 //
 //go:embed fieldtypes.json
 var fieldTypesFS embed.FS
+
+// fieldTypeOverridesFS embeds fieldtype_overrides.json, the per-endpoint
+// exceptions to fieldtypes.json. See loadFieldTypeOverrides in
+// generator.go for how it's used.
+//
+//go:embed fieldtype_overrides.json
+var fieldTypeOverridesFS embed.FS

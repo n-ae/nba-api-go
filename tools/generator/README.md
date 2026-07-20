@@ -94,6 +94,47 @@ if any field referenced by a committed `metadata/*.json` file has no
 NBA.com response - not by trusting `inferGoType`'s guess - then add it to
 `fieldtypes.json`.
 
+### Per-endpoint overrides
+
+Some field names mean different things in different endpoints. `OREB`
+(offensive rebounds) is `float64` in `fieldtypes.json` because it's a
+per-game average in the vast majority of endpoints that have it - but in a
+handful of box-score/game-log endpoints it's a single-game count, and
+should be `int`. A flat `{"FIELD_NAME": "goType"}` dictionary cannot
+represent both; picking either as the global default silently breaks the
+other case.
+
+`fieldtype_overrides.json` holds these exceptions, keyed by endpoint name,
+then result-set name, then field name:
+
+```json
+{
+  "BoxScoreTraditionalV2": {
+    "PlayerStats": {
+      "OREB": "int"
+    }
+  }
+}
+```
+
+`resolveFieldGoType` in `generator.go` checks this file first, then
+`fieldtypes.json`, then falls back to `inferGoType`. An override only
+applies to the exact `(endpoint, result set, field)` triple it names -
+it does not affect the same field name anywhere else, including other
+result sets within the same endpoint.
+
+`TestFieldTypeOverridesReferenceRealMetadata` fails CI if an override
+entry's endpoint/result-set/field doesn't match anything in committed
+metadata (catches typos and stale entries after a metadata file changes).
+`TestFieldTypeOverridesApplyOnlyWithinTheirEndpoint` proves an override
+doesn't leak beyond the triple it's declared for.
+
+**Adding an override**: only do this when you've confirmed (e.g. by
+comparing committed struct definitions across endpoints, or against live
+responses) that the same field name genuinely needs different types in
+different places - not as a shortcut for a `fieldtypes.json` correction
+that should apply everywhere.
+
 ## Creating Metadata
 
 ### From Python nba_api
