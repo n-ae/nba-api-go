@@ -7,7 +7,7 @@
 // external consumers can import it directly to tune retry/backoff, rate
 // limits, or headers instead of only being able to add middleware
 // alongside these defaults without being able to reconfigure them (see
-// docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md finding
+// docs/archive/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md finding
 // #14). The composable seam itself - Middleware, RoundTripper,
 // RoundTripperFunc, and Chain - is defined in the parent pkg/client
 // package; the names below are aliases for those same types, kept so the

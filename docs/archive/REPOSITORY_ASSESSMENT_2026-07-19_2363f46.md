@@ -1,3 +1,9 @@
+> **Superseded.** This reviewed revision `2363f46`. The current maintainability assessment of record is
+> [`docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-20_8549390.md`](../MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-20_8549390.md),
+> covering revision `8549390` and later. Retained here for history as the same-revision companion to
+> the archived `MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-19_2363f46.md`, which absorbed this
+> document's findings into its own verification ledger.
+
 # Repository Assessment
 
 **Reviewed:** 2026-07-19  

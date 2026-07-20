@@ -92,10 +92,11 @@ func PlayerGameLog(ctx context.Context, client *stats.Client, req PlayerGameLogR
 	}
 
 	response := &PlayerGameLogResponse{}
-	for _, resultSet := range rawResp.ResultSets {
-		if resultSet.Name == "PlayerGameLog" {
-			response.PlayerGameLog = parseGameLogs(resultSet.RowSet)
+	if rs, ok := findResultSet(rawResp.ResultSets, "PlayerGameLog"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(GameLog{})); err != nil {
+			return nil, fmt.Errorf("PlayerGameLog: PlayerGameLog result set: %w", err)
 		}
+		response.PlayerGameLog = parseGameLogs(rs.RowSet)
 	}
 
 	return models.NewResponse(response, 200, "", nil), nil

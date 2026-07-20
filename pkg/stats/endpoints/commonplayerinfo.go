@@ -90,15 +90,23 @@ func CommonPlayerInfo(ctx context.Context, client *stats.Client, req CommonPlaye
 	}
 
 	response := &CommonPlayerInfoResponse{}
-	for _, resultSet := range rawResp.ResultSets {
-		switch resultSet.Name {
-		case "CommonPlayerInfo":
-			response.CommonPlayerInfo = parsePlayerInfo(resultSet.RowSet)
-		case "PlayerHeadlineStats":
-			response.PlayerHeadlineStats = parseHeadlineStats(resultSet.RowSet)
-		case "AvailableSeasons":
-			response.AvailableSeasons = parseAvailableSeasons(resultSet.RowSet)
+	if rs, ok := findResultSet(rawResp.ResultSets, "CommonPlayerInfo"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(PlayerInfo{})); err != nil {
+			return nil, fmt.Errorf("CommonPlayerInfo: CommonPlayerInfo result set: %w", err)
 		}
+		response.CommonPlayerInfo = parsePlayerInfo(rs.RowSet)
+	}
+	if rs, ok := findResultSet(rawResp.ResultSets, "PlayerHeadlineStats"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(HeadlineStats{})); err != nil {
+			return nil, fmt.Errorf("CommonPlayerInfo: PlayerHeadlineStats result set: %w", err)
+		}
+		response.PlayerHeadlineStats = parseHeadlineStats(rs.RowSet)
+	}
+	if rs, ok := findResultSet(rawResp.ResultSets, "AvailableSeasons"); ok {
+		if err := validateHeaders(rs.Headers, jsonTags(AvailableSeason{})); err != nil {
+			return nil, fmt.Errorf("CommonPlayerInfo: AvailableSeasons result set: %w", err)
+		}
+		response.AvailableSeasons = parseAvailableSeasons(rs.RowSet)
 	}
 
 	return models.NewResponse(response, 200, "", nil), nil
