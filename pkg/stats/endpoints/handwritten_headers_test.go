@@ -24,7 +24,11 @@ func newStatsFixtureClient(t *testing.T, body interface{}) *stats.Client {
 		}
 	}))
 	t.Cleanup(server.Close)
-	return stats.NewClient(stats.Config{BaseURL: server.URL})
+	client, err := stats.NewClient(stats.Config{BaseURL: server.URL})
+	if err != nil {
+		t.Fatalf("stats.NewClient() error = %v", err)
+	}
+	return client
 }
 
 func fixtureRow(columns int, values ...interface{}) []interface{} {

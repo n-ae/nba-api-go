@@ -10,7 +10,7 @@ import (
 // support and HTTP/2 negotiation survive) with keep-alives left enabled,
 // not built from a zero-valued struct with DisableKeepAlives set.
 func TestNewClient_DefaultTransport(t *testing.T) {
-	c := NewClient(Config{BaseURL: "http://example.com"})
+	c := mustNewClient(t, Config{BaseURL: "http://example.com"})
 
 	httpClient, ok := c.httpClient.(*http.Client)
 	if !ok {
@@ -45,7 +45,7 @@ func TestNewClient_DefaultTransport(t *testing.T) {
 // need different transport behavior than ADR 003's default.
 func TestNewClient_CustomHTTPClientBypassesDefaultTransport(t *testing.T) {
 	custom := &http.Client{}
-	c := NewClient(Config{BaseURL: "http://example.com", HTTPClient: custom})
+	c := mustNewClient(t, Config{BaseURL: "http://example.com", HTTPClient: custom})
 
 	if c.httpClient != custom {
 		t.Error("expected the caller-supplied HTTPClient to be used as-is")

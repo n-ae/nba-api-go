@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+**Contains a breaking change pending a major-version decision - see the `**Breaking:**` entry and Migration guide below before tagging a release from this branch.** Everything else in this section is non-breaking.
+
+### Added
+- `.github/workflows/apidiff.yml` - a CI job that fails if the module's public API changed incompatibly since the latest tagged release (`golang.org/x/exp/cmd/apidiff`, module-wide comparison). Addresses the "no apidiff/semver-break gate in CI" finding carried in every maintainable-architect-v4 assessment since `2026-07-19`. A red result isn't automatically wrong - this project has shipped deliberate breaking changes before - but it now requires a conscious major-version decision instead of shipping unnoticed. Verified locally against this exact branch's `NewClient` change below before being added (correctly flags exactly the 3 incompatible changes and nothing else). Found by the `2026-07-22` maintainability assessment.
+
+### Changed
+- **Breaking:** `client.NewClient`, `stats.NewClient`, and `live.NewClient` now return `(*Client, error)` instead of `*Client`. Previously an invalid `Config.BaseURL` (a malformed URL) was silently accepted at construction and only surfaced as an error on the first call to `Get` - the "invalid base URL only surfaces on first request" gap carried in every assessment since `a58d3fe`. Construction now fails loudly instead. `stats.NewDefaultClient`/`live.NewDefaultClient` are **unaffected** - their signatures are unchanged (`*Client`, no error) because they always construct against the package's own compile-time-valid `StatsBaseURL`/`LiveBaseURL` constant, which can't fail; they panic internally (an unreachable path, matching the existing `http.DefaultTransport` type-assertion pattern in `pkg/client`) if that invariant is ever violated. Only callers who use `NewClient` directly with an explicit `Config.BaseURL` are affected - see Migration guide below.
+- **Breaking, same commit:** `client.Client`'s unexported `buildURL` method (not part of the public API) simplified from `(string, error)` to `string`, since the only error it could ever return - an invalid base URL - is now caught at `NewClient` time instead.
+- `.github/workflows/live-drift.yml`'s scope narrowed to `LeagueLeaders`/`InternationalBroadcasterSchedule` (commit `1592e7e`). The workflow as tagged in `v2.2.0` ran all six `TestSimpleSmokeTests` subtests; two independent manual runs on the tagged commit (`29865194310`, `29865360637`, ~2 minutes apart) showed `PlayerCareerStats`/`PlayerGameLog` (`stats.nba.com`) hanging to the 30s timeout and `Scoreboard` (`cdn.nba.com`) hitting an immediate Akamai block - all three reproducibly unreachable from GitHub Actions runner IPs, not flaky. Narrowed to the two endpoints confirmed reachable so the weekly signal stays meaningful instead of permanently red. **Decision recorded here rather than left implicit: this is a CI-configuration-only change with no effect on any published module consumer, so it is not being backported into a `v2.2.1` patch tag.** `v2.2.0` as tagged still ships the wider, permanently-red workflow scope; anyone relying on the scheduled check getting a real "no drift detected" signal needs `main`, not the tag. Documented in `tests/integration/README.md`'s "Known live-traffic blocks" section. Found by the `2026-07-22` maintainability assessment.
+- `tests/integration/README.md`'s "Test Categories" section rewritten to describe `TestSimpleSmokeTests`'s six actual subtests instead of four `*_test.go` files (`player_test.go`, `team_test.go`, `league_test.go`, `live_test.go`) that don't exist in the directory - a stale-documentation gap flagged by the `2026-07-22` maintainability assessment and, independently, by an external third-party review of `v2.2.0`.
+- `docs/MAINTENANCE.md`'s "Code Generation Approach" section corrected: `go run tools/generator/main.go` fails (`undefined: NewGenerator`) because `tools/generator` is a separate Go module - the working invocation is `cd tools/generator && go run . -metadata metadata/<file>.json`. Also corrected its example to copy `leaguegamefinder.json` rather than a nonexistent `playercareerstats.json` (`PlayerCareerStats` is hand-written with no metadata file), and folded in the `fieldtypes.json` step the old "Manual Approach" skipped entirely. Found by the `2026-07-22` maintainability assessment.
+- `client.Config.Timeout`'s doc comment now states that a negative value disables timeout enforcement entirely (both the SDK-built client and the per-request context deadline added in `[2.2.0]`), unlike `0` which normalizes to `DefaultTimeout`. No behavior change. Found by the `2026-07-22` maintainability assessment.
+
+### Migration guide
+- Any call to `client.NewClient(cfg)`, `stats.NewClient(cfg)`, or `live.NewClient(cfg)` needs a second return value:
+  ```go
+  // Before
+  c := stats.NewClient(stats.Config{BaseURL: myURL})
+
+  // After
+  c, err := stats.NewClient(stats.Config{BaseURL: myURL})
+  if err != nil {
+      log.Fatal(err) // or handle however your application handles startup config errors
+  }
+  ```
+- Calls to `stats.NewDefaultClient()`/`live.NewDefaultClient()` need **no change**.
+- **This has not been tagged as a release.** Per `CLAUDE.md`'s Versioning/API Stability policy, a breaking change to a stable `pkg/` API requires a major version bump (this would be `v3.0.0`) and, per the `v2.0.0`/`v2.1.0` incident documented in `[2.1.1]` below, a `v3.0.0` tag must not be cut without also updating `go.mod`'s `module` line to `.../v3` and every internal import to match, in the same commit - deliberately not done as part of this change, pending that decision.
+
 ## [2.2.0] - 2026-07-21
 
 **Minor, not patch:** the `Config.Timeout` fix below is a real behavior change for custom-`HTTPClient` callers (see its entry), not a pure bug-for-bug patch, so this bumps the minor version per the Versioning policy in `CLAUDE.md`.

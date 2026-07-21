@@ -122,7 +122,17 @@ func NewServerWithOptions(logger *log.Logger, options ServerOptions) *Server {
 	rateLimiter := NewRateLimiter(100, 200)
 	rateLimiter.CleanupOldLimiters(5 * time.Minute)
 
-	statsClient := stats.NewClient(stats.Config{Timeout: options.NBAAPITimeout})
+	// ServerOptions has no BaseURL field, so stats.NewClient always
+	// constructs against the valid StatsBaseURL constant here - this can't
+	// fail in practice, but propagating the error would require every
+	// caller of NewServer/NewServerWithOptions to handle a startup error
+	// that can't occur; panic instead, matching the "practically
+	// unreachable" pattern already used in pkg/client for exactly this
+	// kind of invariant.
+	statsClient, err := stats.NewClient(stats.Config{Timeout: options.NBAAPITimeout})
+	if err != nil {
+		panic(fmt.Sprintf("nba-api-server: %v", err))
+	}
 
 	return &Server{
 		logger:          logger,

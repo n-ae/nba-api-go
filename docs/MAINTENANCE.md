@@ -132,42 +132,38 @@ INTEGRATION_TESTS=1 go test ./tests/integration/... -v
 **Trigger**: User request or NBA.com adds new endpoint
 **Time**: 30-60 minutes (manual) or 5-10 minutes (generated)
 
-#### Manual Approach (Simple Endpoints)
+All endpoints, simple or complex, go through the code generator - see
+`CLAUDE.md`'s "Adding New Endpoints" section for the full procedure
+(metadata format, `fieldtypes.json` type verification, integration test,
+example, CHANGELOG entry). There is no supported hand-copy path; a struct
+copied from `playercareerstats.go` by hand skips the generator's header
+validation and the `TestAllMetadataFieldsHaveExplicitTypes` CI gate that
+catches unverified field types.
 
 ```bash
-# 1. Create endpoint file
-cp pkg/stats/endpoints/playercareerstats.go pkg/stats/endpoints/newendpoint.go
-
-# 2. Update:
-#    - Type names
-#    - Request struct
-#    - Response struct
-#    - JSON tags
-#    - URL endpoint
-#    - Parameters
-
-# 3. Test
-INTEGRATION_TESTS=1 go test ./tests/integration/... -v
-
-# 4. Add HTTP handler (optional)
-# See cmd/nba-api-server/handlers_*.go for pattern
-```
-
-#### Code Generation Approach (Complex Endpoints)
-
-```bash
-# 1. Create metadata file
+# 1. Create metadata file (PlayerCareerStats is hand-written with no
+#    metadata file to copy - use an existing generated endpoint instead,
+#    e.g. leaguegamefinder.json)
 cd tools/generator/metadata
-cp playercareerstats.json newendpoint.json
+cp leaguegamefinder.json newendpoint.json
 
 # 2. Edit JSON metadata with endpoint details
 
-# 3. Generate
-cd ../..
-go run tools/generator/main.go
+# 3. Generate (tools/generator is a separate Go module - run from inside it,
+#    not `go run tools/generator/main.go` from the repo root, which fails
+#    with "undefined: NewGenerator")
+cd ..
+go run . -metadata metadata/newendpoint.json
+cd -
 
-# 4. Test
+# 4. Add each new field's verified type to tools/generator/fieldtypes.json -
+#    inferGoType's fallback guess is not reliable, see CLAUDE.md
+
+# 5. Test
 go test ./pkg/stats/endpoints/...
+
+# 6. Add HTTP handler (optional)
+# See cmd/nba-api-server/handlers_*.go for pattern
 ```
 
 ---

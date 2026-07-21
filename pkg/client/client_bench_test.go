@@ -15,7 +15,7 @@ func BenchmarkClientGet(b *testing.B) {
 	}))
 	defer server.Close()
 
-	client := NewClient(Config{
+	client := mustNewClient(b, Config{
 		BaseURL: server.URL,
 	})
 
@@ -37,7 +37,7 @@ func BenchmarkClientGetWithParams(b *testing.B) {
 	}))
 	defer server.Close()
 
-	client := NewClient(Config{
+	client := mustNewClient(b, Config{
 		BaseURL: server.URL,
 	})
 
@@ -59,7 +59,7 @@ func BenchmarkClientGetWithParams(b *testing.B) {
 }
 
 func BenchmarkBuildURL(b *testing.B) {
-	client := NewClient(Config{
+	client := mustNewClient(b, Config{
 		BaseURL: "https://api.example.com",
 	})
 
@@ -71,15 +71,12 @@ func BenchmarkBuildURL(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, err := client.buildURL("/test", params)
-		if err != nil {
-			b.Fatal(err)
-		}
+		_ = client.buildURL("/test", params)
 	}
 }
 
 func BenchmarkSortParams(b *testing.B) {
-	client := NewClient(Config{
+	client := mustNewClient(b, Config{
 		BaseURL: "https://api.example.com",
 	})
 

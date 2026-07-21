@@ -17,24 +17,23 @@ INTEGRATION_TESTS=1 go test ./tests/integration/... -v -timeout 5m
 
 ## Test Categories
 
-1. **Player Endpoints** (`player_test.go`)
-   - PlayerCareerStats
-   - PlayerGameLog
-   - CommonPlayerInfo
-   - PlayerProfileV2
+All integration tests currently live as subtests of a single test function,
+`TestSimpleSmokeTests` in `simple_smoke_test.go` - there are no separate
+per-category files yet:
 
-2. **Team Endpoints** (`team_test.go`)
-   - TeamGameLog
-   - TeamInfoCommon
-   - CommonTeamRoster
+- `PlayerCareerStats`
+- `PlayerGameLog`
+- `LeagueLeaders`
+- `Scoreboard`
+- `InternationalBroadcasterSchedule_CurrentSeason`
+- `InternationalBroadcasterSchedule_PreviousSeason`
 
-3. **League Endpoints** (`league_test.go`)
-   - LeagueLeaders
-   - LeagueStandings
-   - LeagueDashPlayerStats
-
-4. **Live Endpoints** (`live_test.go`)
-   - Scoreboard
+That's 5 endpoint implementations (one, `InternationalBroadcasterSchedule`,
+exercised twice with different seasons) out of 141 total. The other 5
+hand-written endpoints (`CommonPlayerInfo`, `TeamGameLog`, `TeamInfoCommon`,
+`PlayerCareerStats`'s siblings) and the 121+ generated endpoints have no
+integration test coverage here - see `CLAUDE.md`'s header for the current
+live-verification status.
 
 ## Test Philosophy
 
