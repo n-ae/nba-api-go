@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.2] - 2026-07-21
+
+**Docs-only release.** No source, generator, or generated-endpoint changes; `pkg/`, `cmd/`, and `tools/generator/` are byte-identical to `v2.1.1` aside from the version constant below.
+
+### Added
+- `docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-21_a58d3fe.md` - the current assessment of record (grade B+, up from B). Independently reverifies two claims from `[2.1.1]`'s changelog against source rather than trusting the prose: `playercareerstats.go` does call `validateHeaders` for all 8 result sets now, and its test coverage did go from 0% to 76.7%-85.7%. Also reproduced live against the real Go module proxy that `v2.0.0`/`v2.1.0` were genuinely unfetchable (`go get` failed exactly as `[2.1.1]` describes) and that `v2.1.1` fixes it. Finds one new issue, not previously documented: `Config.Timeout` (`pkg/client`) is silently ignored whenever a caller supplies a custom `HTTPClient` - `Client.timeout` is set at construction but never read anywhere else in the package, so a caller who sets both reasonably but incorrectly assumes `Timeout` still applies.
+
+### Changed
+- `docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-20_384e5de.md` (the prior assessment of record, grade B) archived to `docs/archive/` with a supersession banner, per this project's own documented docs-consolidation convention.
+- `CLAUDE.md`'s assessment-of-record pointer, grade reference, and "Next assessment" footer updated to point at the new file.
+- `cmd/nba-api-server`'s `version` constant bumped from `"2.1.0"` to `"2.1.2"` - missed during the `v2.1.1` release despite `[2.1.0]`'s note that this constant is meant to "track the actual release version going forward."
+
 ## [2.1.1] - 2026-07-20
 
 ### Fixed
