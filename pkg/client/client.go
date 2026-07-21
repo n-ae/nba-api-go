@@ -21,8 +21,9 @@ const (
 	// (see pkg/stats, pkg/live) that installs the User-Agent NBA.com
 	// expects, via middleware.WithUserAgent. DefaultUserAgent remains
 	// exported for callers who construct client.Client directly and want
-	// a reasonable fallback.
-	DefaultUserAgent = "nba-api-go/1.0"
+	// a reasonable fallback. Major-version-only (not "2.1.2") so it needn't
+	// change on every patch release.
+	DefaultUserAgent = "nba-api-go/2"
 	DefaultTimeout   = 30 * time.Second
 
 	// DefaultMaxResponseBytes bounds how much of a response body Get reads
@@ -48,9 +49,14 @@ type Client struct {
 }
 
 type Config struct {
-	BaseURL     string
-	HTTPClient  HTTPClient
-	Headers     http.Header
+	BaseURL    string
+	HTTPClient HTTPClient
+	Headers    http.Header
+	// Timeout bounds each Get: the SDK-built http.Client uses it, and Get
+	// also imposes it as a per-request context deadline, so it applies
+	// uniformly even when a custom HTTPClient (which the SDK can't
+	// configure) is supplied. A caller-provided ctx with an earlier
+	// deadline still wins. A value of 0 means DefaultTimeout.
 	Timeout     time.Duration
 	Middlewares []Middleware
 	// MaxResponseBytes bounds how much of a response body Get reads into
@@ -136,6 +142,16 @@ func (b *baseRoundTripper) RoundTrip(ctx context.Context, req *http.Request) (*h
 }
 
 func (c *Client) Get(ctx context.Context, endpoint string, params url.Values) (*models.RawResponse, error) {
+	// Impose the configured timeout as a per-request deadline so it applies
+	// even when a custom HTTPClient is used (which the SDK can't configure
+	// with an http.Client.Timeout of its own). context.WithTimeout keeps a
+	// caller's earlier deadline, so this only ever tightens, never extends.
+	if c.timeout > 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, c.timeout)
+		defer cancel()
+	}
+
 	reqURL, err := c.buildURL(endpoint, params)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build URL: %w", err)

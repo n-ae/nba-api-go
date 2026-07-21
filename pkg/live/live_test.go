@@ -90,7 +90,7 @@ func noRetry() middleware.Middleware {
 
 // TestNewClient_DefaultHeadersReachTheWire guards against regressing the
 // User-Agent shadowing bug: the core client used to inject
-// DefaultUserAgent ("nba-api-go/1.0") into every request's headers before
+// DefaultUserAgent ("nba-api-go/2") into every request's headers before
 // the middleware chain ran, and WithUserAgent only sets the header when
 // absent - so the browser-style default this facade installs never won.
 // This asserts the actual bytes received by the server, not just that

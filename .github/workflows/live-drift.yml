@@ -1,0 +1,43 @@
+name: Live drift
+
+# Scheduled live-traffic smoke test against stats.nba.com, kept out of the
+# main CI workflow on purpose: these tests hit an unofficial, undocumented,
+# rate-limiting upstream that can change or 404 without notice, so they must
+# not gate pushes/PRs. Their value is catching upstream schema drift (a
+# result set renamed, a column inserted/reordered) before a consumer does -
+# exactly the class of bug that hid in LeagueLeaders until it was checked
+# live. See the CI workflow's header comment, which anticipates this file.
+on:
+  # Weekly is enough for an API that changes on the order of a season, not a
+  # day, and keeps request volume low so the environment is less likely to be
+  # rate-limited (the same throttling noted in CHANGELOG's [2.1.0]).
+  schedule:
+    - cron: "0 6 * * 1" # Mondays 06:00 UTC
+  # Manual trigger for on-demand checks (e.g. after an NBA.com announcement,
+  # or to reproduce a suspected drift) without waiting for the weekly run.
+  workflow_dispatch:
+
+# A red run here is a signal to triage, NOT an automatic "the SDK is broken":
+# distinguish a transient upstream failure (network error, 429/rate limit,
+# 5xx, an offseason 404) from a real schema/header mismatch by reading the
+# test log before acting. This workflow deliberately does not open issues or
+# notify - it would be noise for every transient NBA.com hiccup. If a failure
+# is real drift, follow docs/MAINTENANCE.md's "When Tests Fail" procedure.
+jobs:
+  live-smoke:
+    runs-on: ubuntu-latest
+    # Bounded so a hung upstream request can't keep a runner busy indefinitely.
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+
+      - name: live smoke tests
+        env:
+          INTEGRATION_TESTS: "1"
+        # -count=1 defeats the test cache so every scheduled run actually
+        # re-hits stats.nba.com rather than replaying a cached pass.
+        run: go test -count=1 -v ./tests/integration/...
