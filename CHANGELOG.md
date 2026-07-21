@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **`client.Config.Timeout` was silently ignored whenever a caller supplied their own `HTTPClient`.** `Client.timeout` was stored at construction but only ever used to set `http.Client.Timeout` on the *SDK-built* client (`HTTPClient == nil`); a caller who passed both a custom `HTTPClient` and a `Timeout` reasonably assumed the timeout applied, but it was dead config. Found by the `2026-07-21` maintainability assessment. `Get` now imposes `Timeout` as a per-request `context` deadline, so it applies uniformly regardless of which `HTTPClient` is used. A caller-provided `ctx` with an earlier deadline still wins (`context.WithTimeout` only tightens, never extends). Covered by `TestClientTimeoutAppliesWithCustomHTTPClient`. Non-breaking for the default-client path (behavior unchanged); custom-`HTTPClient` callers who previously had no SDK-imposed timeout now get the configured one (default `30s`) as a ceiling - raise `Config.Timeout` if a call legitimately needs longer.
+
+### Changed
+- `client.DefaultUserAgent` bumped from `"nba-api-go/1.0"` to `"nba-api-go/2"` - a v2 module reporting `1.0` was misleading. Major-version-only so it needn't change every patch. Note this constant is *not* applied automatically (the `pkg/stats`/`pkg/live` facades install a browser-style User-Agent via `middleware.WithUserAgent`); it's only a fallback for callers constructing `client.Client` directly.
+- Added `.github/workflows/live-drift.yml` - a weekly (plus manual `workflow_dispatch`) scheduled workflow that runs the `INTEGRATION_TESTS=1` smoke suite against live `stats.nba.com`, to catch upstream schema/header drift out-of-band from push/PR CI (which deliberately doesn't hit the network). Addresses the "no scheduled live-drift workflow" gap carried in every recent assessment; the main CI workflow's header comment already anticipated it.
+
 ## [2.1.2] - 2026-07-21
 
 **Docs-only release.** No source, generator, or generated-endpoint changes; `pkg/`, `cmd/`, and `tools/generator/` are byte-identical to `v2.1.1` aside from the version constant below.

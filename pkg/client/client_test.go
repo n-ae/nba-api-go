@@ -2,12 +2,14 @@ package client
 
 import (
 	"context"
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"sync"
 	"testing"
+	"time"
 )
 
 type httpClientFunc func(*http.Request) (*http.Response, error)
@@ -184,5 +186,42 @@ func TestClientHeaderMutationsAreSafeDuringRequests(t *testing.T) {
 	close(errs)
 	for err := range errs {
 		t.Errorf("Get() returned error: %v", err)
+	}
+}
+
+// TestClientTimeoutAppliesWithCustomHTTPClient guards the fix for Config.Timeout
+// being silently ignored whenever a caller supplies their own HTTPClient (which
+// the SDK can't stamp with an http.Client.Timeout). Get now imposes the timeout
+// as a per-request context deadline, so a custom client that respects the
+// request context is still bounded by it.
+func TestClientTimeoutAppliesWithCustomHTTPClient(t *testing.T) {
+	client := NewClient(Config{
+		BaseURL: "https://api.example.com",
+		Timeout: 20 * time.Millisecond,
+		// A custom client with no timeout of its own that only returns once
+		// the request context is done - i.e. it would hang forever if Get
+		// didn't impose a deadline.
+		HTTPClient: httpClientFunc(func(req *http.Request) (*http.Response, error) {
+			<-req.Context().Done()
+			return nil, req.Context().Err()
+		}),
+	})
+
+	done := make(chan error, 1)
+	go func() {
+		_, err := client.Get(context.Background(), "health", nil)
+		done <- err
+	}()
+
+	select {
+	case err := <-done:
+		if err == nil {
+			t.Fatal("Get() returned nil error; expected a deadline-exceeded failure")
+		}
+		if !errors.Is(err, context.DeadlineExceeded) {
+			t.Errorf("Get() error = %v; want it to wrap context.DeadlineExceeded", err)
+		}
+	case <-time.After(2 * time.Second):
+		t.Fatal("Get() did not return within 2s; Config.Timeout was not enforced for the custom HTTPClient")
 	}
 }
