@@ -1,3 +1,10 @@
+> **Superseded.** This assessed revision `a58d3fe` (grade B+). The current assessment of record is
+> [`docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-22_1592e7e.md`](../MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-22_1592e7e.md),
+> covering revision `1592e7e` and later (one commit past tag `v2.2.0`, grade B+, unchanged). Retained here for
+> history; see that document's section 2 ("Verification ledger") for the item-by-item status of every
+> finding below, and its section 4 ("Reconciliation with the external review") for how this cycle's
+> work holds up against an unsolicited third-party review of `v2.2.0`.
+
 # Maintainable-Architect-v4 Assessment: nba-api-go
 
 **Date:** 2026-07-21
