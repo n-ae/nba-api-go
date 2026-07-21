@@ -7,7 +7,7 @@ This file provides guidance to Claude Code when working with the nba-api-go repo
 **nba-api-go** is a production-ready Go SDK and HTTP API server providing type-safe access to 141 NBA Stats API endpoints (all standard endpoints plus international broadcast schedule). The project emphasizes maintainability, minimal dependencies, and solo engineer viability.
 
 **Current Status**: `main` is at the latest tagged release, `v2.1.0` - a reliability and correctness follow-up to `v2.0.0` (see `CHANGELOG.md`'s `[2.1.0]` section for the full list). All 135 metadata-covered SDK endpoints (including `videoevents.go`, regenerated this release via `tools/generator/fieldname_overrides.json`) now have field names/types verified to match generator output. All 6 hand-written endpoints without generator metadata now validate headers in some form (`commonplayerinfo`/`playergamelog`/`teamgamelog`/`playercareerstats` call `validateHeaders` like generated code; `leagueleaders` needed a different, header-name-driven approach - see below). **The header-validation piece introduced in `v2.0.0` is real, deliberate new failure-mode surface, and live verification against real NBA.com responses remains only partially discharged** - see `CHANGELOG.md`'s `[2.0.0]` section for the original risk callout. Live-verifying `leagueleaders.go` against real `stats.nba.com` traffic (part of `v2.1.0`) surfaced and fixed two real bugs (a singular-`resultSet` envelope shape unique to this endpoint, and a `TEAM_ID` column the struct lacked) plus a genuine API quirk (its column set varies by `PerMode`). That's 1 of 142 endpoint files checked against live traffic; the other 5 hand-written endpoints (`commonplayerinfo`, `playergamelog`, `teamgamelog`, `playercareerstats`, `internationalbroadcasterschedule`) and the entire 121+-file generated-endpoint surface remain unverified - `stats.nba.com` began rate-limiting the environment this was done in after a handful of requests, so this is a partial, not complete, discharge of the header-validation risk.
-**Grade**: See `docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-20_384e5de.md` for the current assessment of record - do not hardcode a grade here, it goes stale the moment a new assessment lands and nobody remembers to update this file (see that file's own docs-consolidation section for the fix: archive the superseded assessment in the same commit as the new one).
+**Grade**: See `docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-21_a58d3fe.md` for the current assessment of record - do not hardcode a grade here, it goes stale the moment a new assessment lands and nobody remembers to update this file (see that file's own docs-consolidation section for the fix: archive the superseded assessment in the same commit as the new one).
 **Maintenance Burden**: ~1.6 hours/week for the hand-written core; the generated-endpoint surface currently needs more than that until the verification backlog in the current assessment is cleared - see that document's "Is this too complex for one person?" section.
 
 ## Project Architecture
@@ -334,7 +334,7 @@ The upstream NBA.com API has quirks:
 ### For Maintainers
 
 - `docs/MAINTENANCE.md` - **START HERE** - Operational runbook
-- `docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-20_384e5de.md` - Current maintainability assessment (supersedes prior assessments, which live in `docs/archive/` with supersession banners; this revision has no separate companion repository-review document - its findings are folded into the one file)
+- `docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-21_a58d3fe.md` - Current maintainability assessment (supersedes prior assessments, which live in `docs/archive/` with supersession banners; this revision has no separate companion repository-review document - its findings are folded into the one file)
 - `docs/adr/` - Architecture decision records
 - `CONTRIBUTING.md` - How to contribute
 
@@ -551,4 +551,4 @@ See `CHANGELOG.md` for full version history.
 
 **This file last updated**: 2026-07-20 (v2.1.0 release)
 **Maintainability grade**: tracked in the current assessment (see the header of this file), not duplicated here
-**Next assessment**: the current assessment of record (`docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-20_384e5de.md`, grade B) already reviews `v2.1.0` and the `playercareerstats.go`/contract-fixtures fixes that followed it; next assessment due quarterly unless another release ships first
+**Next assessment**: the current assessment of record (`docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-21_a58d3fe.md`, grade B+) already reviews `v2.1.1` (the `/v2` module-path fix and the `playercareerstats.go` header-validation/coverage fix); next assessment due quarterly unless another release ships first
