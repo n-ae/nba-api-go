@@ -39,7 +39,6 @@ type HTTPClient interface {
 
 type Client struct {
 	baseURL          *url.URL
-	baseURLErr       error
 	httpClient       HTTPClient
 	headersMu        sync.RWMutex
 	headers          http.Header
@@ -67,7 +66,11 @@ type Config struct {
 	MaxResponseBytes int64
 }
 
-func NewClient(config Config) *Client {
+// NewClient validates config and constructs a Client. It returns an error
+// if config.BaseURL doesn't parse, rather than deferring that failure to
+// the first call to Get - a caller who mistypes or misconfigures BaseURL
+// finds out at startup, not under traffic.
+func NewClient(config Config) (*Client, error) {
 	if config.Timeout == 0 {
 		config.Timeout = DefaultTimeout
 	}
@@ -76,7 +79,10 @@ func NewClient(config Config) *Client {
 		config.MaxResponseBytes = DefaultMaxResponseBytes
 	}
 
-	baseURL, baseURLErr := url.Parse(config.BaseURL)
+	baseURL, err := url.Parse(config.BaseURL)
+	if err != nil {
+		return nil, fmt.Errorf("invalid base URL: %w", err)
+	}
 
 	if config.HTTPClient == nil {
 		// Clone http.DefaultTransport rather than building one from a
@@ -126,13 +132,12 @@ func NewClient(config Config) *Client {
 
 	return &Client{
 		baseURL:          baseURL,
-		baseURLErr:       baseURLErr,
 		httpClient:       config.HTTPClient,
 		headers:          headers,
 		timeout:          config.Timeout,
 		transport:        transport,
 		maxResponseBytes: config.MaxResponseBytes,
-	}
+	}, nil
 }
 
 type baseRoundTripper struct {
@@ -155,10 +160,7 @@ func (c *Client) Get(ctx context.Context, endpoint string, params url.Values) (*
 		defer cancel()
 	}
 
-	reqURL, err := c.buildURL(endpoint, params)
-	if err != nil {
-		return nil, fmt.Errorf("failed to build URL: %w", err)
-	}
+	reqURL := c.buildURL(endpoint, params)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, reqURL, nil)
 	if err != nil {
@@ -214,10 +216,7 @@ func (c *Client) GetJSON(ctx context.Context, endpoint string, params url.Values
 	return nil
 }
 
-func (c *Client) buildURL(endpoint string, params url.Values) (string, error) {
-	if c.baseURLErr != nil {
-		return "", fmt.Errorf("invalid base URL: %w", c.baseURLErr)
-	}
+func (c *Client) buildURL(endpoint string, params url.Values) string {
 	baseURL := *c.baseURL
 
 	baseURL.Path = path.Join(baseURL.Path, endpoint)
@@ -227,7 +226,7 @@ func (c *Client) buildURL(endpoint string, params url.Values) (string, error) {
 		baseURL.RawQuery = sortedParams.Encode()
 	}
 
-	return baseURL.String(), nil
+	return baseURL.String()
 }
 
 func (c *Client) sortParams(params url.Values) url.Values {

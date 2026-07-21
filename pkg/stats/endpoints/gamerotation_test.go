@@ -41,7 +41,10 @@ func TestGetGameRotation_ColumnOffsets(t *testing.T) {
 	}))
 	defer server.Close()
 
-	client := stats.NewClient(stats.Config{BaseURL: server.URL})
+	client, err := stats.NewClient(stats.Config{BaseURL: server.URL})
+	if err != nil {
+		t.Fatalf("stats.NewClient() error = %v", err)
+	}
 
 	resp, err := GetGameRotation(context.Background(), client, GameRotationRequest{GameID: "0022300001"})
 	if err != nil {
@@ -96,7 +99,10 @@ func TestGetGameRotation_ColumnOffsets(t *testing.T) {
 }
 
 func TestGetGameRotation_RequiresGameID(t *testing.T) {
-	client := stats.NewClient(stats.Config{})
+	client, err := stats.NewClient(stats.Config{})
+	if err != nil {
+		t.Fatalf("stats.NewClient() error = %v", err)
+	}
 	if _, err := GetGameRotation(context.Background(), client, GameRotationRequest{}); err == nil {
 		t.Error("GetGameRotation() with empty GameID: got nil error, want error")
 	}

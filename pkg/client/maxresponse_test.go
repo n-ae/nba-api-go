@@ -39,7 +39,7 @@ func TestClient_Get_MaxResponseBytes(t *testing.T) {
 			}))
 			defer srv.Close()
 
-			c := NewClient(Config{
+			c := mustNewClient(t, Config{
 				BaseURL:          srv.URL,
 				MaxResponseBytes: limit,
 			})
@@ -67,14 +67,14 @@ func TestClient_Get_MaxResponseBytes(t *testing.T) {
 }
 
 func TestClient_Get_DefaultMaxResponseBytes(t *testing.T) {
-	c := NewClient(Config{BaseURL: "http://example.com"})
+	c := mustNewClient(t, Config{BaseURL: "http://example.com"})
 	if c.maxResponseBytes != DefaultMaxResponseBytes {
 		t.Errorf("expected maxResponseBytes to default to %d, got %d", DefaultMaxResponseBytes, c.maxResponseBytes)
 	}
 }
 
 func TestClientGetOversizedErrorResponsePreservesStatusError(t *testing.T) {
-	client := NewClient(Config{
+	client := mustNewClient(t, Config{
 		BaseURL:          "https://api.example.com",
 		MaxResponseBytes: 10,
 		HTTPClient: httpClientFunc(func(*http.Request) (*http.Response, error) {

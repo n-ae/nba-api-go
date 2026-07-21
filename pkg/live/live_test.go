@@ -23,6 +23,15 @@ func withHeader(key, value string) client.Middleware {
 	}
 }
 
+func mustNewClient(t *testing.T, config Config) *Client {
+	t.Helper()
+	c, err := NewClient(config)
+	if err != nil {
+		t.Fatalf("NewClient() error = %v", err)
+	}
+	return c
+}
+
 func TestNewClient_ForwardsHeaders(t *testing.T) {
 	var gotHeader string
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -32,7 +41,7 @@ func TestNewClient_ForwardsHeaders(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	c := NewClient(Config{
+	c := mustNewClient(t, Config{
 		BaseURL: srv.URL,
 		Headers: http.Header{"X-Test-Header": {"hello"}},
 	})
@@ -61,7 +70,7 @@ func TestNewClient_ForwardsTimeout(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	c := NewClient(Config{
+	c := mustNewClient(t, Config{
 		BaseURL:     srv.URL,
 		Timeout:     time.Second,
 		Middlewares: []middleware.Middleware{noRetry()},
@@ -104,7 +113,7 @@ func TestNewClient_DefaultHeadersReachTheWire(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	c := NewClient(Config{BaseURL: srv.URL})
+	c := mustNewClient(t, Config{BaseURL: srv.URL})
 
 	if _, err := c.client.Get(context.Background(), "test", url.Values{}); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -123,7 +132,7 @@ func TestNewClient_ForwardsMaxResponseBytes(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	c := NewClient(Config{
+	c := mustNewClient(t, Config{
 		BaseURL:          srv.URL,
 		MaxResponseBytes: 10,
 	})
@@ -147,7 +156,7 @@ func TestNewClient_AdditionalMiddlewaresAppendToDefaults(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	c := NewClient(Config{
+	c := mustNewClient(t, Config{
 		BaseURL:               srv.URL,
 		AdditionalMiddlewares: []client.Middleware{withHeader("X-Custom", "added")},
 	})
@@ -180,7 +189,7 @@ func TestNewClient_AdditionalMiddlewaresLayerOnExplicitOverride(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	c := NewClient(Config{
+	c := mustNewClient(t, Config{
 		BaseURL:               srv.URL,
 		Middlewares:           []client.Middleware{withHeader("X-Override", "explicit")},
 		AdditionalMiddlewares: []client.Middleware{withHeader("X-Custom", "added")},

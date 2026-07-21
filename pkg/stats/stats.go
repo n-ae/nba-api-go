@@ -1,6 +1,7 @@
 package stats
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -62,7 +63,9 @@ func DefaultMiddlewares() []client.Middleware {
 	}
 }
 
-func NewClient(config Config) *Client {
+// NewClient validates config and constructs a Client. It returns an error
+// if config.BaseURL doesn't parse - see client.NewClient.
+func NewClient(config Config) (*Client, error) {
 	baseURL := config.BaseURL
 	if baseURL == "" {
 		baseURL = StatsBaseURL
@@ -84,11 +87,23 @@ func NewClient(config Config) *Client {
 		clientConfig.Middlewares = append(clientConfig.Middlewares, config.AdditionalMiddlewares...)
 	}
 
-	return &Client{
-		client: client.NewClient(clientConfig),
+	c, err := client.NewClient(clientConfig)
+	if err != nil {
+		return nil, err
 	}
+
+	return &Client{client: c}, nil
 }
 
+// NewDefaultClient constructs a Client against StatsBaseURL, a
+// compile-time-valid constant, so construction can't fail.
 func NewDefaultClient() *Client {
-	return NewClient(Config{})
+	c, err := NewClient(Config{})
+	if err != nil {
+		// Unreachable: StatsBaseURL is a valid constant and NewDefaultClient
+		// never overrides it, so NewClient's only failure mode (an invalid
+		// BaseURL) can't occur here.
+		panic(fmt.Sprintf("stats: NewDefaultClient: %v", err))
+	}
+	return c
 }

@@ -297,6 +297,7 @@ package too, so you can reconfigure them - not just add alongside them:
 ```go
 import (
     "context"
+    "log"
     "net/http"
     "time"
 
@@ -319,21 +320,27 @@ func withRequestID(id string) client.Middleware {
 // chain (retry, the headers NBA.com's API expects, and a per-host rate
 // limit) without replacing it - no need to call DefaultMiddlewares()
 // yourself.
-statsClient := stats.NewClient(stats.Config{
+statsClient, err := stats.NewClient(stats.Config{
     AdditionalMiddlewares: []client.Middleware{withRequestID("abc123")},
 })
+if err != nil {
+    log.Fatal(err)
+}
 
 // To reconfigure a built-in instead of just adding to it - e.g. a
 // stricter retry budget - set Middlewares explicitly (this REPLACES the
 // default chain, so re-add anything else you still want from it):
 retryConfig := middleware.DefaultRetryConfig()
 retryConfig.MaxRetries = 1
-statsClient = stats.NewClient(stats.Config{
+statsClient, err = stats.NewClient(stats.Config{
     Middlewares: []client.Middleware{
         middleware.WithRetry(retryConfig),
         middleware.WithPerHostRateLimit(3, 5),
     },
 })
+if err != nil {
+    log.Fatal(err)
+}
 ```
 
 `pkg/live` has the equivalent `live.DefaultMiddlewares()` and

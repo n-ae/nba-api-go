@@ -18,6 +18,15 @@ func (f httpClientFunc) Do(req *http.Request) (*http.Response, error) {
 	return f(req)
 }
 
+func mustNewClient(tb testing.TB, config Config) *Client {
+	tb.Helper()
+	c, err := NewClient(config)
+	if err != nil {
+		tb.Fatalf("NewClient() error = %v", err)
+	}
+	return c
+}
+
 func TestClient_Get(t *testing.T) {
 	tests := []struct {
 		name           string
@@ -64,7 +73,7 @@ func TestClient_Get(t *testing.T) {
 			}))
 			defer server.Close()
 
-			client := NewClient(Config{
+			client := mustNewClient(t, Config{
 				BaseURL: server.URL,
 			})
 
@@ -92,7 +101,7 @@ func TestClient_Get(t *testing.T) {
 }
 
 func TestClient_buildURL(t *testing.T) {
-	client := NewClient(Config{
+	client := mustNewClient(t, Config{
 		BaseURL: "https://api.example.com",
 	})
 
@@ -131,11 +140,7 @@ func TestClient_buildURL(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := client.buildURL(tt.endpoint, tt.params)
-			if err != nil {
-				t.Errorf("Client.buildURL() error = %v", err)
-				return
-			}
+			got := client.buildURL(tt.endpoint, tt.params)
 			if got != tt.want {
 				t.Errorf("Client.buildURL() = %v, want %v", got, tt.want)
 			}
@@ -143,15 +148,14 @@ func TestClient_buildURL(t *testing.T) {
 	}
 }
 
-func TestClientBuildURLRejectsInvalidBaseURL(t *testing.T) {
-	client := NewClient(Config{BaseURL: "://invalid"})
-	if _, err := client.buildURL("health", nil); err == nil {
-		t.Fatal("buildURL() succeeded with an invalid base URL")
+func TestNewClientRejectsInvalidBaseURL(t *testing.T) {
+	if _, err := NewClient(Config{BaseURL: "://invalid"}); err == nil {
+		t.Fatal("NewClient() succeeded with an invalid base URL")
 	}
 }
 
 func TestClientHeaderMutationsAreSafeDuringRequests(t *testing.T) {
-	client := NewClient(Config{
+	client := mustNewClient(t, Config{
 		BaseURL: "https://api.example.com",
 		HTTPClient: httpClientFunc(func(*http.Request) (*http.Response, error) {
 			return &http.Response{
@@ -195,7 +199,7 @@ func TestClientHeaderMutationsAreSafeDuringRequests(t *testing.T) {
 // as a per-request context deadline, so a custom client that respects the
 // request context is still bounded by it.
 func TestClientTimeoutAppliesWithCustomHTTPClient(t *testing.T) {
-	client := NewClient(Config{
+	client := mustNewClient(t, Config{
 		BaseURL: "https://api.example.com",
 		Timeout: 20 * time.Millisecond,
 		// A custom client with no timeout of its own that only returns once
