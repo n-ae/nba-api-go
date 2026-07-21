@@ -107,6 +107,13 @@ func NewClient(config Config) (*Client, error) {
 		transport.TLSHandshakeTimeout = 30 * time.Second
 		transport.ResponseHeaderTimeout = 60 * time.Second
 
+		// Deliberately belt-and-suspenders: Get also imposes config.Timeout
+		// as a per-request context deadline (see Get) regardless of which
+		// HTTPClient is in play, so for this SDK-built client the timeout
+		// ends up enforced twice, by two different mechanisms. That's
+		// intentional - it keeps Get's logic uniform across both the
+		// SDK-built and custom-HTTPClient cases instead of special-casing
+		// one of them - not an oversight to be cleaned up.
 		config.HTTPClient = &http.Client{
 			Timeout:   config.Timeout,
 			Transport: transport,
@@ -178,6 +185,11 @@ func (c *Client) Get(ctx context.Context, endpoint string, params url.Values) (*
 
 	resp, err := c.transport.RoundTrip(ctx, req)
 	if err != nil {
+		// A client-side timeout (context.WithTimeout above expiring, or a
+		// caller's own ctx deadline) surfaces here as a wrapped
+		// context.DeadlineExceeded - a different taxonomy from
+		// models.ErrTimeout, which only ever comes from a 408/504 HTTP
+		// status the server actually returned. See ErrTimeout's doc comment.
 		return nil, fmt.Errorf("request failed: %w", err)
 	}
 	//nolint:errcheck

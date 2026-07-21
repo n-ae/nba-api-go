@@ -1,0 +1,97 @@
+name: Release Install Smoke Test
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to verify (e.g. v2.2.0) - defaults to the latest tag when run manually'
+        required: false
+
+# Verifies the module is actually fetchable and usable by an external
+# consumer at the tag just pushed, not just that this repo's own checkout
+# builds - the tag-triggered CI / install smoke test gap carried in every
+# maintainable-architect-v4 assessment. v2.0.0 and v2.1.0 both shipped
+# genuinely unfetchable via `go get` (a module-path mismatch caught by hand,
+# days later, not by CI - see CHANGELOG.md's [2.1.1] section), because
+# nothing here ever did what a real consumer does: `go get` the tagged
+# module into a clean module cache and build against it. This job is that
+# check, automated, running on every tag push instead of relying on a
+# maintainer remembering to do it manually before/after every release.
+jobs:
+  install-smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+
+      - name: Resolve tag under test
+        id: tag
+        run: |
+          tag="${{ github.event.inputs.tag }}"
+          if [ -z "$tag" ]; then
+            tag="${{ github.ref_name }}"
+          fi
+          if [ -z "$tag" ]; then
+            tag="$(git describe --tags --abbrev=0)"
+          fi
+          echo "Verifying tag: $tag"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: go get the tagged module into a scratch module
+        # A fresh module outside this checkout (not this repo's own go.mod)
+        # so nothing here - a replace directive, the local module cache
+        # already having this exact code, GOFLAGS - can mask a real
+        # fetchability problem. This has to look exactly like an external
+        # consumer's first `go get`.
+        run: |
+          mkdir -p /tmp/install-smoke
+          cd /tmp/install-smoke
+          go mod init smoke-test
+          go get "github.com/n-ae/nba-api-go/v2@${{ steps.tag.outputs.tag }}"
+
+      - name: Build and run a program against the fetched module
+        run: |
+          cat > /tmp/install-smoke/main.go <<'EOF'
+          package main
+
+          import (
+                  "fmt"
+
+                  "github.com/n-ae/nba-api-go/v2/pkg/stats"
+                  "github.com/n-ae/nba-api-go/v2/pkg/stats/static"
+          )
+
+          func main() {
+                  // Deliberately no network calls - this only needs to prove
+                  // the module is fetchable, buildable, and its exported API
+                  // is usable exactly as an external consumer would use it.
+                  // stats.NewDefaultClient has no error return on every
+                  // released version to date (see CHANGELOG.md's [Unreleased]
+                  // Migration guide), so this stays stable across the tags
+                  // this workflow will be asked to verify.
+                  client := stats.NewDefaultClient()
+                  if client == nil {
+                          panic("stats.NewDefaultClient() returned nil")
+                  }
+                  players, err := static.SearchPlayers("lebron")
+                  if err != nil {
+                          panic(err)
+                  }
+                  fmt.Printf("install smoke test OK: %d player(s) matched, client constructed\n", len(players))
+          }
+          EOF
+          cd /tmp/install-smoke
+          # go get above only adds the direct requirement; go mod tidy pulls
+          # in the transitive go.sum entries (golang.org/x/text,
+          # golang.org/x/time) a real consumer's own `go mod tidy` would add
+          # on first build - without it, `go build` fails on missing go.sum
+          # entries that have nothing to do with this module's own health.
+          go mod tidy
+          go build -o smoke-test .
+          ./smoke-test

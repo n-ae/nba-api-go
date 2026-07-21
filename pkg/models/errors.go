@@ -7,10 +7,17 @@ import (
 )
 
 var (
-	ErrInvalidResponse  = errors.New("invalid response format")
-	ErrRateLimited      = errors.New("rate limited")
-	ErrNotFound         = errors.New("resource not found")
-	ErrInvalidRequest   = errors.New("invalid request parameters")
+	ErrInvalidResponse = errors.New("invalid response format")
+	ErrRateLimited     = errors.New("rate limited")
+	ErrNotFound        = errors.New("resource not found")
+	ErrInvalidRequest  = errors.New("invalid request parameters")
+	// ErrTimeout means the server responded, but with a timeout-flavored
+	// HTTP status (408/504) - see HTTPStatusToError. It's a distinct
+	// taxonomy from client.Client.Get's own client-side timeout: when
+	// Config.Timeout elapses with no response at all, Get returns a wrapped
+	// context.DeadlineExceeded instead, not ErrTimeout. A caller that wants
+	// to treat "this call timed out" uniformly needs to check both
+	// errors.Is(err, context.DeadlineExceeded) and errors.Is(err, ErrTimeout).
 	ErrTimeout          = errors.New("request timeout")
 	ErrUnauthorized     = errors.New("unauthorized")
 	ErrResponseTooLarge = errors.New("response body exceeds configured maximum size")

@@ -229,3 +229,47 @@ func TestClientTimeoutAppliesWithCustomHTTPClient(t *testing.T) {
 		t.Fatal("Get() did not return within 2s; Config.Timeout was not enforced for the custom HTTPClient")
 	}
 }
+
+// TestClientNegativeTimeoutDisablesContextDeadline guards the documented
+// behavior of a negative Config.Timeout: unlike 0 (normalized to
+// DefaultTimeout), a negative value is left as-is and Get's context-deadline
+// branch (c.timeout > 0) is skipped entirely, so the request context carries
+// no deadline from the client at all.
+func TestClientNegativeTimeoutDisablesContextDeadline(t *testing.T) {
+	var sawDeadline bool
+	client := mustNewClient(t, Config{
+		BaseURL: "https://api.example.com",
+		Timeout: -1,
+		HTTPClient: httpClientFunc(func(req *http.Request) (*http.Response, error) {
+			_, sawDeadline = req.Context().Deadline()
+			return &http.Response{StatusCode: 200, Body: http.NoBody, Header: make(http.Header)}, nil
+		}),
+	})
+
+	if _, err := client.Get(context.Background(), "health", nil); err != nil {
+		t.Fatalf("Get() error = %v", err)
+	}
+	if sawDeadline {
+		t.Error("request context had a deadline; negative Config.Timeout should disable the context-deadline enforcement entirely")
+	}
+}
+
+// TestClientNegativeTimeoutSDKBuiltClient guards the same behavior for the
+// other half of the "uniform" timeout mechanism: when Config.HTTPClient is
+// left nil, the SDK builds its own http.Client and stamps it with
+// config.Timeout directly. A negative value must pass through unmodified
+// (net/http treats <= 0 as "no timeout"), not get normalized like 0 does.
+func TestClientNegativeTimeoutSDKBuiltClient(t *testing.T) {
+	client := mustNewClient(t, Config{
+		BaseURL: "https://api.example.com",
+		Timeout: -1,
+	})
+
+	httpClient, ok := client.httpClient.(*http.Client)
+	if !ok {
+		t.Fatalf("client.httpClient is %T, want *http.Client (SDK-built path)", client.httpClient)
+	}
+	if httpClient.Timeout != -1 {
+		t.Errorf("httpClient.Timeout = %v, want -1 (negative Config.Timeout must not be normalized)", httpClient.Timeout)
+	}
+}
