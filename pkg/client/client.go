@@ -56,7 +56,10 @@ type Config struct {
 	// also imposes it as a per-request context deadline, so it applies
 	// uniformly even when a custom HTTPClient (which the SDK can't
 	// configure) is supplied. A caller-provided ctx with an earlier
-	// deadline still wins. A value of 0 means DefaultTimeout.
+	// deadline still wins. A value of 0 means DefaultTimeout. A negative
+	// value disables timeout enforcement entirely (both the SDK-built
+	// client and the per-request context deadline) - unlike 0, it is not
+	// normalized to DefaultTimeout.
 	Timeout     time.Duration
 	Middlewares []Middleware
 	// MaxResponseBytes bounds how much of a response body Get reads into
