@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-07-21
+
+**Minor, not patch:** the `Config.Timeout` fix below is a real behavior change for custom-`HTTPClient` callers (see its entry), not a pure bug-for-bug patch, so this bumps the minor version per the Versioning policy in `CLAUDE.md`.
+
 ### Fixed
 - **`client.Config.Timeout` was silently ignored whenever a caller supplied their own `HTTPClient`.** `Client.timeout` was stored at construction but only ever used to set `http.Client.Timeout` on the *SDK-built* client (`HTTPClient == nil`); a caller who passed both a custom `HTTPClient` and a `Timeout` reasonably assumed the timeout applied, but it was dead config. Found by the `2026-07-21` maintainability assessment. `Get` now imposes `Timeout` as a per-request `context` deadline, so it applies uniformly regardless of which `HTTPClient` is used. A caller-provided `ctx` with an earlier deadline still wins (`context.WithTimeout` only tightens, never extends). Covered by `TestClientTimeoutAppliesWithCustomHTTPClient`. Non-breaking for the default-client path (behavior unchanged); custom-`HTTPClient` callers who previously had no SDK-imposed timeout now get the configured one (default `30s`) as a ceiling - raise `Config.Timeout` if a call legitimately needs longer.
 
