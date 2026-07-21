@@ -51,6 +51,28 @@ INTEGRATION_TESTS=1 go test ./tests/integration/... -v -timeout 5m
 4. Test with known good IDs (LeBron James: 2544, Nikola Jokic: 203999)
 5. Handle rate limiting gracefully
 
+## Known live-traffic blocks (GitHub Actions runners)
+
+`.github/workflows/live-drift.yml` runs a subset of `TestSimpleSmokeTests`,
+not the full suite. Two independent manual runs on 2026-07-21 (workflow runs
+`29865194310` and `29865360637`, ~2 minutes apart) hit the identical pattern:
+
+- `PlayerCareerStats`/`PlayerGameLog` (`stats.nba.com`) silently hung to the
+  exact 30s client timeout both times - no response, not even a rejection.
+- The live `Scoreboard` test's `cdn.nba.com` call got an instant, byte-identical
+  Akamai "Access Denied" page both times.
+- `LeagueLeaders` (also `stats.nba.com`) and both `InternationalBroadcasterSchedule`
+  calls succeeded both times.
+
+Same failures, same successes, twice in a row - that's a structural block on
+GitHub Actions' shared runner IP ranges for those specific endpoints/hosts,
+not transient rate limiting. Running the full suite from a developer machine
+(a residential/office IP, not a well-known cloud CI range) may not hit the
+same block. If you're debugging a `live-drift.yml` failure, check whether
+it's one of the three known-blocked cases above before assuming SDK/schema
+drift; if NBA.com's blocking behavior changes, revisit the `-run` filter in
+that workflow.
+
 ## Known Test IDs
 
 ```go

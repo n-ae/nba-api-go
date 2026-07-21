@@ -23,6 +23,21 @@ on:
 # test log before acting. This workflow deliberately does not open issues or
 # notify - it would be noise for every transient NBA.com hiccup. If a failure
 # is real drift, follow docs/MAINTENANCE.md's "When Tests Fail" procedure.
+#
+# Scope deliberately narrowed to LeagueLeaders/InternationalBroadcasterSchedule
+# (see the -run pattern below), not the full tests/integration/... smoke
+# suite. Confirmed with two independent manual runs on 2026-07-21 (workflow
+# runs 29865194310 and 29865360637, ~2 minutes apart) that PlayerCareerStats
+# and PlayerGameLog silently hang to the exact 30s client timeout, and the
+# live Scoreboard's cdn.nba.com call gets an instant, identical Akamai
+# "Access Denied" - both patterns repeated byte-for-byte across the two runs,
+# which is a structural GitHub Actions-runner-IP block, not transient
+# throttling. Including them here would make this workflow reliably red on
+# every scheduled run regardless of actual SDK/schema health, defeating its
+# purpose. They're still exercised by the full `INTEGRATION_TESTS=1` suite
+# for local/manual runs, where a developer's residential/office IP may not be
+# blocked - see tests/integration/README.md's "Known live-traffic blocks"
+# section. Re-evaluate this narrowing if NBA.com's blocking behavior changes.
 jobs:
   live-smoke:
     runs-on: ubuntu-latest
@@ -40,4 +55,6 @@ jobs:
           INTEGRATION_TESTS: "1"
         # -count=1 defeats the test cache so every scheduled run actually
         # re-hits stats.nba.com rather than replaying a cached pass.
-        run: go test -count=1 -v ./tests/integration/...
+        # -run scopes to the subtests confirmed reachable from GitHub
+        # Actions runners - see the job-level comment above.
+        run: go test -count=1 -v -run 'TestSimpleSmokeTests/(LeagueLeaders|InternationalBroadcasterSchedule)' ./tests/integration/...
