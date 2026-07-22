@@ -98,8 +98,10 @@ INTEGRATION_TESTS=1 go test ./tests/integration/... -v -run TestSimpleSmokeTests
 # 3. Test
 INTEGRATION_TESTS=1 go test ./tests/integration/... -v
 
-# 4. Update HTTP handler if needed
-# cmd/nba-api-server/handlers_*.go
+# 4. Regenerate the HTTP handler if the request/response shape changed
+# (cmd/nba-api-server/generated_<name>.go is generated from the same
+# metadata - there is no hand-written handlers_*.go anymore)
+cd tools/generator && go run . -endpoint ENDPOINT_NAME && cd -
 ```
 
 **Option B: Response Structure Change**
@@ -162,8 +164,11 @@ cd -
 # 5. Test
 go test ./pkg/stats/endpoints/...
 
-# 6. Add HTTP handler (optional)
-# See cmd/nba-api-server/handlers_*.go for pattern
+# 6. HTTP handler - already generated as a side effect of step 3
+# (cmd/nba-api-server/generated_newendpoint.go); no separate step needed.
+# The dispatch table (generated_dispatch.go) only picks up the new route
+# after a full regeneration:
+cd tools/generator && go run . -all-handlers && cd -
 ```
 
 ---
@@ -303,7 +308,9 @@ ls -lh pkg/stats/static/data/
 # Test with longer delays
 
 # 3. Update rate limit in code
-# internal/middleware/ratelimit.go
+# pkg/client/middleware/ratelimit.go (public package, not internal/) -
+# stats.DefaultMiddlewares()/live.DefaultMiddlewares() set the actual
+# per-host limits via middleware.WithPerHostRateLimit(...)
 
 # 4. Consider caching responses (future enhancement)
 ```
