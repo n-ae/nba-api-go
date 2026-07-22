@@ -5,6 +5,11 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+    # Lets a stale red run (from before a new tag caught up to a merged
+    # const/value-only change - see the "not automatically wrong" note
+    # below) be re-checked on demand without waiting for the next real
+    # push, instead of leaving main's status stuck red between releases.
 
 # Fails if the module's public API changed incompatibly since the latest
 # tagged release, using golang.org/x/exp/cmd/apidiff. Addresses the
