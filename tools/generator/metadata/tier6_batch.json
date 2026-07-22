@@ -287,7 +287,7 @@
   },
   {
     "name": "TeamDashboardByLastNGames",
-    "endpoint": "teamdashboardbylastnGames",
+    "endpoint": "teamdashboardbylastngames",
     "parameters": [
       {
         "name": "TeamID",
@@ -518,7 +518,7 @@
   },
   {
     "name": "PlayerDashboardByLastNGames",
-    "endpoint": "playerdashboardbylastnGames",
+    "endpoint": "playerdashboardbylastngames",
     "parameters": [
       {
         "name": "PlayerID",
@@ -864,7 +864,7 @@
   },
   {
     "name": "CommonPlayerInfoV2",
-    "endpoint": "commonplayerinfoV2",
+    "endpoint": "commonplayerinfov2",
     "parameters": [
       {
         "name": "PlayerID",

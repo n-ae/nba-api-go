@@ -196,7 +196,7 @@ type TeamDashboardByLastNGamesResponse struct {
 	Last20TeamDashboard  []TeamDashboardByLastNGamesLast20TeamDashboard
 }
 
-// GetTeamDashboardByLastNGames retrieves data from the teamdashboardbylastnGames endpoint
+// GetTeamDashboardByLastNGames retrieves data from the teamdashboardbylastngames endpoint
 func GetTeamDashboardByLastNGames(ctx context.Context, client *stats.Client, req TeamDashboardByLastNGamesRequest) (*models.Response[*TeamDashboardByLastNGamesResponse], error) {
 	params := url.Values{}
 	if req.TeamID == "" {
@@ -229,7 +229,7 @@ func GetTeamDashboardByLastNGames(ctx context.Context, client *stats.Client, req
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "teamdashboardbylastnGames", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "teamdashboardbylastngames", params, &rawResp); err != nil {
 		return nil, err
 	}
 

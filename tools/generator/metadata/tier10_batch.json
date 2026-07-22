@@ -1,7 +1,7 @@
 [
   {
     "name": "LeagueHustleStatsTeamLeaders",
-    "endpoint": "leaguehustlestatsTeamleaders",
+    "endpoint": "leaguehustlestatsteamleaders",
     "parameters": [
       {
         "name": "Season",
@@ -348,7 +348,7 @@
   },
   {
     "name": "PlayerTrackingRebounding",
-    "endpoint": "playertrackingebounding",
+    "endpoint": "playertrackingrebounding",
     "parameters": [
       {
         "name": "Season",

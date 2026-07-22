@@ -34,7 +34,7 @@ type TeamNextNGamesResponse struct {
 	NextNGames []TeamNextNGamesNextNGames
 }
 
-// GetTeamNextNGames retrieves data from the teamnextnGames endpoint
+// GetTeamNextNGames retrieves data from the teamnextngames endpoint
 func GetTeamNextNGames(ctx context.Context, client *stats.Client, req TeamNextNGamesRequest) (*models.Response[*TeamNextNGamesResponse], error) {
 	params := url.Values{}
 	if req.TeamID == "" {
@@ -55,7 +55,7 @@ func GetTeamNextNGames(ctx context.Context, client *stats.Client, req TeamNextNG
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "teamnextnGames", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "teamnextngames", params, &rawResp); err != nil {
 		return nil, err
 	}
 

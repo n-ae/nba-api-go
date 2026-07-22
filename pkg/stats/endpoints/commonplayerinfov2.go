@@ -70,7 +70,7 @@ type CommonPlayerInfoV2Response struct {
 	PlayerHeadlineStats []CommonPlayerInfoV2PlayerHeadlineStats
 }
 
-// GetCommonPlayerInfoV2 retrieves data from the commonplayerinfoV2 endpoint
+// GetCommonPlayerInfoV2 retrieves data from the commonplayerinfov2 endpoint
 func GetCommonPlayerInfoV2(ctx context.Context, client *stats.Client, req CommonPlayerInfoV2Request) (*models.Response[*CommonPlayerInfoV2Response], error) {
 	params := url.Values{}
 	if req.PlayerID == "" {
@@ -82,7 +82,7 @@ func GetCommonPlayerInfoV2(ctx context.Context, client *stats.Client, req Common
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "commonplayerinfoV2", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "commonplayerinfov2", params, &rawResp); err != nil {
 		return nil, err
 	}
 
