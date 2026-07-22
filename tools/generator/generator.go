@@ -20,6 +20,16 @@ const (
 	goTypeFloat64 = "float64"
 )
 
+// Recognized special parameter names, as constants so the same literal
+// isn't repeated (and potentially mistyped) across toParamType,
+// toHandlerParamType, and processHandlerMetadata's per-name branches.
+const (
+	paramNameSeason     = "Season"
+	paramNameSeasonType = "SeasonType"
+	paramNameLeagueID   = "LeagueID"
+	paramNamePerMode    = "PerMode"
+)
+
 type Generator struct {
 	outputDir       string
 	serverOutputDir string
@@ -271,13 +281,13 @@ func (g *Generator) loadTemplate(name string) (*template.Template, error) {
 
 func toParamType(paramType string) string {
 	switch paramType {
-	case "Season":
+	case paramNameSeason:
 		return "parameters.Season"
-	case "SeasonType":
+	case paramNameSeasonType:
 		return "parameters.SeasonType"
-	case "LeagueID":
+	case paramNameLeagueID:
 		return "parameters.LeagueID"
-	case "PerMode":
+	case paramNamePerMode:
 		return "parameters.PerMode"
 	default:
 		return goTypeString
@@ -317,13 +327,13 @@ func (g *Generator) processMetadata(metadata EndpointMetadata) EndpointMetadata 
 // can never change what endpoint.tmpl (SDK generation) produces.
 func toHandlerParamType(paramType string) string {
 	switch paramType {
-	case "Season":
+	case paramNameSeason:
 		return "parameters.Season"
-	case "SeasonType":
+	case paramNameSeasonType:
 		return "parameters.SeasonType"
-	case "LeagueID":
+	case paramNameLeagueID:
 		return "parameters.LeagueID"
-	case "PerMode":
+	case paramNamePerMode:
 		return "parameters.PerMode"
 	case "StatCategory":
 		return "parameters.StatCategory"
@@ -355,7 +365,7 @@ func (g *Generator) processHandlerMetadata(metadata EndpointMetadata) EndpointMe
 			p.EffectivePointer = !p.Required
 		}
 		switch p.Name {
-		case "LeagueID", "Season", "SeasonType", "PerMode":
+		case paramNameLeagueID, paramNameSeason, paramNameSeasonType, paramNamePerMode:
 			// Always resolved via the parameters package regardless of
 			// HandlerGoType - see handler.tmpl's per-name branches.
 			needsParametersImport = true
