@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.3] - 2026-07-22
+
+**Patch, not minor**: the `BaseURL` validation change below only tightens rejection of values that were already unusable (userinfo, a query string, and a fragment are all syntactically legal but never sensible in a `BaseURL`) - no caller passing a real, plain `http`/`https` URL sees any behavior change. Everything else is test coverage and documentation. Closes all three remaining findings from the `2026-07-22` (`1b428f6`) maintainability assessment.
+
 ### Added
 - `TestNewClientAcceptsValidBaseURL` - the positive-case counterpart to the existing `BaseURL`-rejection tests, covering a bare host, a host with a path, a port, an IPv4 host, an IPv6 host, and a subdomain with both a port and a path. Every prior `BaseURL` test only asserted rejection, so a validation change that became stricter in some new, unintended way could ship without any test noticing a previously-valid configuration broke. Also asserts `buildURL` preserves each base's host/port/path correctly when joining an endpoint. Found by the `2026-07-22` (`1b428f6`) maintainability assessment. No behavior change.
 
