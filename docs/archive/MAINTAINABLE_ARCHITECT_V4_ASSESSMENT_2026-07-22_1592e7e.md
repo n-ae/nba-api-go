@@ -1,3 +1,12 @@
+> **Superseded.** This assessed revision `1592e7e` (grade B+). The current assessment of record is
+> [`docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-22_180a3db.md`](../MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-22_180a3db.md),
+> covering revision `180a3db` and later (tag `v3.1.0`, grade A-, up from B+). Retained here for
+> history; see that document's section 2 ("Verification ledger") for the item-by-item status of every
+> finding below - in particular, the entire "structural backlog" this file's own section 6 carried
+> forward (the `apidiff` gate, tag-triggered install-smoke CI, the immutable client constructor, and
+> "decide the server's fate") is now closed, and section 1 of the new document explains what new,
+> independently-found gaps replaced it.
+
 # Maintainable-Architect-v4 Assessment: nba-api-go
 
 **Date:** 2026-07-22
