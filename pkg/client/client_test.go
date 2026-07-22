@@ -178,6 +178,46 @@ func TestNewClientRejectsUnusableBaseURL(t *testing.T) {
 	}
 }
 
+// TestNewClientAcceptsValidBaseURL is the positive-case counterpart to
+// TestNewClientRejectsUnusableBaseURL/
+// TestNewClientRejectsBaseURLWithUserinfoQueryOrFragment: every prior
+// BaseURL test in this file only asserts rejection, so a future change
+// that made validation stricter in some new way (e.g. rejecting a bare
+// host with no path, or an IPv6 host) could ship without any test
+// noticing a previously-valid configuration broke. Found by the
+// 2026-07-22 (1b428f6) maintainability assessment. Also asserts buildURL
+// preserves each base's host/port/path correctly when joining an
+// endpoint, not just that construction succeeds.
+func TestNewClientAcceptsValidBaseURL(t *testing.T) {
+	tests := []struct {
+		baseURL  string
+		wantHost string
+		wantURL  string // buildURL("test", nil)
+	}{
+		{"https://example.com", "example.com", "https://example.com/test"},
+		{"https://example.com/stats", "example.com", "https://example.com/stats/test"},
+		{"http://localhost:8080", "localhost:8080", "http://localhost:8080/test"},
+		{"http://127.0.0.1:8080", "127.0.0.1:8080", "http://127.0.0.1:8080/test"},
+		{"http://[::1]:8080", "[::1]:8080", "http://[::1]:8080/test"},
+		{"https://sub.example.com:8443/base/path", "sub.example.com:8443", "https://sub.example.com:8443/base/path/test"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.baseURL, func(t *testing.T) {
+			c, err := NewClient(Config{BaseURL: tt.baseURL})
+			if err != nil {
+				t.Fatalf("NewClient(BaseURL: %q) error = %v, want success", tt.baseURL, err)
+			}
+			if c.baseURL.Host != tt.wantHost {
+				t.Errorf("baseURL.Host = %q, want %q", c.baseURL.Host, tt.wantHost)
+			}
+			if got := c.buildURL("test", nil); got != tt.wantURL {
+				t.Errorf("buildURL(%q) = %q, want %q", tt.baseURL, got, tt.wantURL)
+			}
+		})
+	}
+}
+
 // TestNewClientRejectsBaseURLWithUserinfoQueryOrFragment covers three
 // BaseURL shapes that are syntactically valid absolute http(s) URLs -
 // passing every check TestNewClientRejectsUnusableBaseURL exercises - but
