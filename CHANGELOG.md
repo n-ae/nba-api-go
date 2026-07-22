@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.9] - 2026-07-22
+
+**Patch, CI only - no runtime or test source changes**: hardens the scheduled fuzz workflow's failure handling so a real invariant violation can't be confused with infrastructure failure. No caller-visible behavior changed in this release. Closes both findings from the `2026-07-22` (`0e35c33`) maintainability assessment.
+
 ### Changed
 - **`.github/workflows/fuzz.yml` hardening**: the artifact-upload step is now scoped to the fuzz step's own outcome rather than the job-level `failure()`, which also fired (and could produce a misleading empty artifact) if `checkout`/`setup-go` failed before fuzzing started. The job comment now distinguishes an actual invariant violation (fuzz step failed, corpus artifact present) from an infrastructure failure (no artifact), rather than stating "a red run here means... a real finding" unconditionally. Verified on a real GitHub Actions run after the change. Found by the `2026-07-22` (`0e35c33`) maintainability assessment.
 
