@@ -7,16 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-**Contains a breaking change pending a major-version decision - see the `**Breaking:**` entry and Migration guide below before tagging a release from this branch.** Everything else in this section is non-breaking.
+## [3.0.0] - 2026-07-22
+
+**Major, breaking.** `NewClient`'s signature change (see `**Breaking:**` below) requires a major version bump; per Go's semantic import versioning this also requires the `/v3` module-path suffix - see the Migration guide below. Everything else in this section is non-breaking and would otherwise have shipped as a minor/patch release.
 
 ### Added
 - `.github/workflows/apidiff.yml` - a CI job that fails if the module's public API changed incompatibly since the latest tagged release (`golang.org/x/exp/cmd/apidiff`, module-wide comparison). Addresses the "no apidiff/semver-break gate in CI" finding carried in every maintainable-architect-v4 assessment since `2026-07-19`. A red result isn't automatically wrong - this project has shipped deliberate breaking changes before - but it now requires a conscious major-version decision instead of shipping unnoticed. Verified locally against this exact branch's `NewClient` change below before being added (correctly flags exactly the 3 incompatible changes and nothing else). Found by the `2026-07-22` maintainability assessment.
-- `.github/workflows/release-install-smoke.yml` - a tag-triggered CI job that `go get`s the just-tagged module into a scratch module (outside this checkout) and builds/runs a small program against it, verifying the module is actually fetchable and usable by an external consumer, not just that this repo's own checkout builds. Addresses the "no tag-triggered CI / no external install smoke test" finding carried in every maintainable-architect-v4 assessment - `v2.0.0` and `v2.1.0` both shipped genuinely unfetchable via `go get` (a module-path mismatch caught by hand, days later; see `[2.1.1]` below), which this would have caught automatically on the tag push itself. Rehearsed locally against the real module proxy (`go get github.com/n-ae/nba-api-go/v2@v2.2.0` into a scratch module, `go mod tidy`, build, run) before being added.
-- `TestClientNegativeTimeoutDisablesContextDeadline`/`TestClientNegativeTimeoutSDKBuiltClient` (`pkg/client/client_test.go`) - cover the negative-`Config.Timeout` behavior documented in `[Unreleased]` above (disables enforcement entirely, on both the context-deadline and SDK-built-`http.Client.Timeout` paths) with an actual test, closing the "documented but untested" gap the `2026-07-22` assessment flagged.
+- `.github/workflows/release-install-smoke.yml` - a tag-triggered CI job that `go get`s the just-tagged module into a scratch module (outside this checkout) and builds/runs a small program against it, verifying the module is actually fetchable and usable by an external consumer, not just that this repo's own checkout builds. Addresses the "no tag-triggered CI / no external install smoke test" finding carried in every maintainable-architect-v4 assessment - `v2.0.0` and `v2.1.0` both shipped genuinely unfetchable via `go get` (a module-path mismatch caught by hand, days later; see `[2.1.1]` below), which this would have caught automatically on the tag push itself. Rehearsed locally against the real module proxy (`go get github.com/n-ae/nba-api-go/v2@v2.2.0` into a scratch module, `go mod tidy`, build, run) before being added; its hardcoded `/v2` references were updated to `/v3` in the same change that bumped the module path (below), so it verifies the right thing once `v3.0.0` is actually tagged.
+- `TestClientNegativeTimeoutDisablesContextDeadline`/`TestClientNegativeTimeoutSDKBuiltClient` (`pkg/client/client_test.go`) - cover the negative-`Config.Timeout` behavior documented below (disables enforcement entirely, on both the context-deadline and SDK-built-`http.Client.Timeout` paths) with an actual test, closing the "documented but untested" gap the `2026-07-22` assessment flagged.
 
 ### Changed
 - **Breaking:** `client.NewClient`, `stats.NewClient`, and `live.NewClient` now return `(*Client, error)` instead of `*Client`. Previously an invalid `Config.BaseURL` (a malformed URL) was silently accepted at construction and only surfaced as an error on the first call to `Get` - the "invalid base URL only surfaces on first request" gap carried in every assessment since `a58d3fe`. Construction now fails loudly instead. `stats.NewDefaultClient`/`live.NewDefaultClient` are **unaffected** - their signatures are unchanged (`*Client`, no error) because they always construct against the package's own compile-time-valid `StatsBaseURL`/`LiveBaseURL` constant, which can't fail; they panic internally (an unreachable path, matching the existing `http.DefaultTransport` type-assertion pattern in `pkg/client`) if that invariant is ever violated. Only callers who use `NewClient` directly with an explicit `Config.BaseURL` are affected - see Migration guide below.
 - **Breaking, same commit:** `client.Client`'s unexported `buildURL` method (not part of the public API) simplified from `(string, error)` to `string`, since the only error it could ever return - an invalid base URL - is now caught at `NewClient` time instead.
+- **Breaking:** `go.mod`'s `module` line is now `github.com/n-ae/nba-api-go/v3`, and every internal import across the repo (185 `.go` files) is updated to match - required by Go's semantic import versioning for the major version bump above. See Migration guide below for the exact consumer-facing change and the `v2.0.0`/`v2.1.0` incident this is deliberately avoiding repeating.
+- `tools/generator/templates/endpoint.tmpl` imported `github.com/n-ae/nba-api-go/pkg/...` with no version suffix at all - not `/v2`, despite `go.mod` having required it since `v2.0.0`. A bug independent of this release, discovered while updating this exact line to `/v3`: reproduced live via `go run . -endpoint LeagueGameFinder -dry-run`, which emitted that exact non-compiling import; `TestGenerateFromMetadata_ProducesValidGo` didn't catch it because it only checks generated output parses as syntactically valid Go, not that it compiles. Fixed to `/v3`, verified via the same dry-run command.
 - `.github/workflows/live-drift.yml`'s scope narrowed to `LeagueLeaders`/`InternationalBroadcasterSchedule` (commit `1592e7e`). The workflow as tagged in `v2.2.0` ran all six `TestSimpleSmokeTests` subtests; two independent manual runs on the tagged commit (`29865194310`, `29865360637`, ~2 minutes apart) showed `PlayerCareerStats`/`PlayerGameLog` (`stats.nba.com`) hanging to the 30s timeout and `Scoreboard` (`cdn.nba.com`) hitting an immediate Akamai block - all three reproducibly unreachable from GitHub Actions runner IPs, not flaky. Narrowed to the two endpoints confirmed reachable so the weekly signal stays meaningful instead of permanently red. **Decision recorded here rather than left implicit: this is a CI-configuration-only change with no effect on any published module consumer, so it is not being backported into a `v2.2.1` patch tag.** `v2.2.0` as tagged still ships the wider, permanently-red workflow scope; anyone relying on the scheduled check getting a real "no drift detected" signal needs `main`, not the tag. Documented in `tests/integration/README.md`'s "Known live-traffic blocks" section. Found by the `2026-07-22` maintainability assessment.
 - `tests/integration/README.md`'s "Test Categories" section rewritten to describe `TestSimpleSmokeTests`'s six actual subtests instead of four `*_test.go` files (`player_test.go`, `team_test.go`, `league_test.go`, `live_test.go`) that don't exist in the directory - a stale-documentation gap flagged by the `2026-07-22` maintainability assessment and, independently, by an external third-party review of `v2.2.0`.
 - `docs/MAINTENANCE.md`'s "Code Generation Approach" section corrected: `go run tools/generator/main.go` fails (`undefined: NewGenerator`) because `tools/generator` is a separate Go module - the working invocation is `cd tools/generator && go run . -metadata metadata/<file>.json`. Also corrected its example to copy `leaguegamefinder.json` rather than a nonexistent `playercareerstats.json` (`PlayerCareerStats` is hand-written with no metadata file), and folded in the `fieldtypes.json` step the old "Manual Approach" skipped entirely. Found by the `2026-07-22` maintainability assessment.
@@ -24,8 +28,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `tests/integration/README.md`'s "Known live-traffic blocks" section corrected: the live-verification backlog's blocking of `PlayerCareerStats`/`PlayerGameLog`/`CommonPlayerInfo`/`TeamGameLog` is **not** GitHub-Actions-runner-IP-specific as previously documented - retested 2026-07-22 via raw `curl` (bypassing the SDK) from a residential/business ISP IP and got the identical hard-timeout pattern on the first request for all four, while `LeagueLeaders` kept succeeding from the same IP. No code change; corrects a wrong assumption ("a developer machine ... may not hit the same block") that would have sent the next live-verification attempt down a dead end.
 - `models.ErrTimeout`'s doc comment now states the dual timeout error taxonomy explicitly: it's returned only for a server-reported `408`/`504` HTTP status, while a client-side timeout (`Config.Timeout` elapsing, or a caller's own `ctx` deadline) surfaces from `client.Client.Get` as a wrapped `context.DeadlineExceeded` instead - a caller that wants both needs to check `errors.Is` against each separately. Cross-referenced from the error-wrapping site in `client.go`. No behavior change. Found by the `2026-07-22` maintainability assessment.
 - `client.NewClient`'s SDK-built-client path now has a doc comment acknowledging that `Config.Timeout` is deliberately enforced twice (via `http.Client.Timeout` and, uniformly, via `Get`'s per-request context deadline) rather than leaving the redundancy unexplained. No behavior change. Found by the `2026-07-22` maintainability assessment.
+- This file's own version-comparison links footer was stale by two releases - no `[2.1.2]` or `[2.2.0]` link existed, and `[Unreleased]` still pointed at `compare/v2.1.1...HEAD`. Fixed alongside adding the `[3.0.0]` link this release needs.
 
 ### Migration guide
+- **Import path change, required for every consumer.** `go get github.com/n-ae/nba-api-go/v2` becomes `go get github.com/n-ae/nba-api-go/v3`, and every import updates to match, e.g.:
+  ```go
+  // Before
+  import "github.com/n-ae/nba-api-go/v2/pkg/stats"
+
+  // After
+  import "github.com/n-ae/nba-api-go/v3/pkg/stats"
+  ```
+  This is a hard Go modules requirement for any major version bump past 1, not a style choice - see the `[2.1.1]` entry below for what happens when it's missed (`v2.0.0`/`v2.1.0` were unfetchable via `go get` until fixed).
 - Any call to `client.NewClient(cfg)`, `stats.NewClient(cfg)`, or `live.NewClient(cfg)` needs a second return value:
   ```go
   // Before
@@ -37,8 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
       log.Fatal(err) // or handle however your application handles startup config errors
   }
   ```
-- Calls to `stats.NewDefaultClient()`/`live.NewDefaultClient()` need **no change**.
-- **This has not been tagged as a release.** Per `CLAUDE.md`'s Versioning/API Stability policy, a breaking change to a stable `pkg/` API requires a major version bump (this would be `v3.0.0`) and, per the `v2.0.0`/`v2.1.0` incident documented in `[2.1.1]` below, a `v3.0.0` tag must not be cut without also updating `go.mod`'s `module` line to `.../v3` and every internal import to match, in the same commit - deliberately not done as part of this change, pending that decision.
+- Calls to `stats.NewDefaultClient()`/`live.NewDefaultClient()` need **no import-statement content change beyond the path above** - their call sites are otherwise unaffected.
 
 ## [2.2.0] - 2026-07-21
 
@@ -563,7 +576,10 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to suggest changes or report issues.
 
-[Unreleased]: https://github.com/n-ae/nba-api-go/compare/v2.1.1...HEAD
+[Unreleased]: https://github.com/n-ae/nba-api-go/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/n-ae/nba-api-go/compare/v2.2.0...v3.0.0
+[2.2.0]: https://github.com/n-ae/nba-api-go/compare/v2.1.2...v2.2.0
+[2.1.2]: https://github.com/n-ae/nba-api-go/compare/v2.1.1...v2.1.2
 [2.1.1]: https://github.com/n-ae/nba-api-go/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/n-ae/nba-api-go/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/n-ae/nba-api-go/compare/v1.3.0...v2.0.0
