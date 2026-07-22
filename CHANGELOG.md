@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- `README.md` and `docs/README.md` both still linked to `MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-22_180a3db.md` - the assessment of record moved to `..._9eb3a9a.md` when `v3.1.1` shipped, but (as that same `9eb3a9a` assessment predicted about itself) only `CLAUDE.md`'s pointer was kept current at the time; these two were never updated. Both now point at `..._9eb3a9a.md`.
+
 ## [3.1.2] - 2026-07-22
 
 **Patch, not minor**: the `BaseURL` validation change below only tightens rejection of values that were already unusable (they'd fail on the first `Get` regardless) - no caller passing a real `http`/`https` URL sees any behavior change. Everything else is CI configuration, `tools/generator`'s own test coverage, and documentation. Closes both new findings from the `2026-07-22` (`9eb3a9a`) maintainability assessment, which independently confirmed the same two claims in an unsolicited external review of `v3.1.1`.
