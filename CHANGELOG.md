@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **`.github/workflows/fuzz.yml` hardening**: the artifact-upload step is now scoped to the fuzz step's own outcome rather than the job-level `failure()`, which also fired (and could produce a misleading empty artifact) if `checkout`/`setup-go` failed before fuzzing started. The job comment now distinguishes an actual invariant violation (fuzz step failed, corpus artifact present) from an infrastructure failure (no artifact), rather than stating "a red run here means... a real finding" unconditionally. Verified on a real GitHub Actions run after the change. Found by the `2026-07-22` (`0e35c33`) maintainability assessment.
+
 ## [3.1.8] - 2026-07-22
 
 **Patch, test/CI only - no runtime source changes**: fixes a false-negative gap in the fuzz test protecting `NewClient`'s `BaseURL` error handling, and adds scheduled fuzzing so this class of gap is caught automatically going forward. No caller-visible behavior changed in this release. Closes the one finding from the `2026-07-22` (`8e85a9c`) maintainability assessment.
