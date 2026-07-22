@@ -57,12 +57,24 @@ jobs:
 
       - name: upload failing corpus
         # Scoped to this step's own outcome, not the job's overall
-        # failure() - a checkout or setup-go failure earlier in the job
-        # would also satisfy failure(), but pkg/client/testdata/fuzz/
+        # failure() alone - a checkout or setup-go failure earlier in the
+        # job would also satisfy failure(), but pkg/client/testdata/fuzz/
         # wouldn't contain a new failing case in that scenario, producing
         # a misleading empty/stale artifact. Found by the 2026-07-22
         # (0e35c33) maintainability assessment.
-        if: steps.fuzz.outcome == 'failure'
+        #
+        # failure() is still required here despite the extra
+        # steps.fuzz.outcome check: GitHub Actions implicitly ANDs a
+        # bare `if:` with success() unless the expression contains an
+        # explicit status-check function, so without failure() this
+        # condition was `success() && steps.fuzz.outcome == 'failure'` -
+        # never true, since the fuzz step failing already puts the job
+        # in a failed state by the time this step evaluates. Found by
+        # the 2026-07-22 (e3ee47c) maintainability assessment: the prior
+        # cycle's fix (0e35c33 -> e3ee47c) added the outcome check but
+        # dropped the required failure() override, silently disabling
+        # the entire corpus-upload mechanism it was meant to scope.
+        if: failure() && steps.fuzz.outcome == 'failure'
         uses: actions/upload-artifact@v4
         with:
           name: fuzz-failure-corpus
