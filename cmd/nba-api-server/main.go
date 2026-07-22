@@ -16,7 +16,7 @@ import (
 	"github.com/n-ae/nba-api-go/v3/pkg/stats"
 )
 
-const version = "3.1.3"
+const version = "3.1.4"
 
 var (
 	buildTime = "unknown"
