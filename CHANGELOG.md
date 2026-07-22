@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **`client.NewClient`'s `url.Parse` failure path no longer leaks the raw `BaseURL`.** `v3.1.4` fixed five of `NewClient`'s six `BaseURL`-rejection error paths; the sixth - the initial `url.Parse` failure, wrapped with `%w` - still embedded the complete input via `*url.Error`'s own `Error()` method, so a malformed, credential- or token-bearing `BaseURL` (e.g. one with an invalid percent-escape) still disclosed the secret. Now unwraps to just the parse failure reason, which never contains the input. Found by the `2026-07-22` (`0e400d1`) maintainability assessment, the uncovered remainder of `v3.1.4`'s fix.
+- **`client.NewClient` now rejects a `BaseURL` with a port but no hostname** (e.g. `https://:443`). The prior check (`baseURL.Host == ""`) missed this because `Host` includes an optional port; now checks `baseURL.Hostname() == ""`, which correctly reports empty. Found by the same assessment.
+
+### Added
+- `FuzzNewClientErrorDoesNotEchoInput` - an invariant-based fuzz test asserting that whenever `NewClient` rejects a `BaseURL`, no injected secret marker appears in the returned error, regardless of which internal path rejected it. Added specifically because the prior fix's own regression test enumerated "all five" rejection paths and missed a sixth; an invariant test doesn't depend on a human having first enumerated every way `NewClient` can fail. Run 2M+ times locally with no false negatives; markers are restricted to those containing a digit to avoid a coincidental-English-word false-positive class discovered while writing this test (a fuzzed marker like `"esca"` matching the stdlib's "invalid URL escape" text is not a real leak).
+
 ## [3.1.4] - 2026-07-22
 
 **Patch, security-relevant**: fixes a real secret-disclosure defect in `client.NewClient`'s `BaseURL` rejection errors - no caller passing a valid, non-secret-bearing `BaseURL` sees any behavior change; a caller who was passing a credential- or token-bearing `BaseURL` and logging `NewClient`'s error no longer has that secret echoed into the log. Closes the one finding from the `2026-07-22` (`b3c605d`) maintainability assessment.

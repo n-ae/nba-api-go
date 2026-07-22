@@ -157,12 +157,16 @@ func TestNewClientRejectsInvalidBaseURL(t *testing.T) {
 
 // TestNewClientRejectsUnusableBaseURL covers BaseURL values url.Parse
 // itself accepts without error - a relative reference, an opaque string
-// with no host, and the empty string - which the plain url.Parse check
-// alone let through uncaught. Found by the 2026-07-22 (9eb3a9a)
-// maintainability assessment: NewClient checked only url.Parse's error,
-// never IsAbs()/Scheme/Host, so a mistyped BaseURL like "not-a-url" would
-// construct a Client successfully and only fail confusingly on the first
-// Get.
+// with no host, the empty string, and a host with a port but no hostname
+// - which the plain url.Parse check alone let through uncaught. Found by
+// the 2026-07-22 (9eb3a9a) maintainability assessment: NewClient checked
+// only url.Parse's error, never IsAbs()/Scheme/Host, so a mistyped
+// BaseURL like "not-a-url" would construct a Client successfully and
+// only fail confusingly on the first Get. "https://:443" is a later
+// addition (2026-07-22, 0e400d1 assessment): url.URL.Host includes an
+// optional port, so this input has a non-empty Host (":443") that passed
+// the original Host == "" check even though Hostname() - the actual
+// destination - is empty.
 func TestNewClientRejectsUnusableBaseURL(t *testing.T) {
 	for _, baseURL := range []string{
 		"",
@@ -170,6 +174,7 @@ func TestNewClientRejectsUnusableBaseURL(t *testing.T) {
 		"example.com",       // no scheme - url.Parse treats this as a relative path, not a host
 		"//example.com",     // protocol-relative - still no scheme
 		"ftp://example.com", // parses fine, but not a scheme this client can use
+		"https://:443",      // Host is ":443" (non-empty) but Hostname() is ""
 	} {
 		t.Run(baseURL, func(t *testing.T) {
 			if _, err := NewClient(Config{BaseURL: baseURL}); err == nil {
@@ -241,16 +246,21 @@ func TestNewClientRejectsBaseURLWithUserinfoQueryOrFragment(t *testing.T) {
 
 // TestNewClientRejectionErrorsDoNotLeakBaseURL covers every path in
 // NewClient that can reject a BaseURL potentially carrying a credential
-// or token: userinfo, a query string, and - the pre-existing instance of
-// the same defect, present since v3.1.2's original scheme check, not
-// introduced by v3.1.3's userinfo/query/fragment checks - an invalid
-// scheme on an otherwise credential-bearing URL. Found by the 2026-07-22
-// (b3c605d) maintainability assessment: every rejection error used to
-// interpolate the complete, unredacted config.BaseURL, so a caller
-// passing "https://admin:secret@host" got back an error containing the
-// literal string "admin:secret" - disclosing exactly the credential the
-// check exists to keep out of use, in whatever logs or error trackers
-// capture NewClient's error.
+// or token: userinfo, a query string, an invalid scheme on an otherwise
+// credential-bearing URL (the pre-existing instance of the same defect,
+// present since v3.1.2's original scheme check, not introduced by
+// v3.1.3's userinfo/query/fragment checks), and a url.Parse failure on a
+// credential- or token-bearing URL with an invalid percent-escape (the
+// uncovered sixth path this table originally missed - url.Parse's own
+// error embeds the complete input via %w, a defect this table itself
+// exists to catch but didn't cover until now). Found by the 2026-07-22
+// (b3c605d and 0e400d1) maintainability assessments: every rejection
+// error used to interpolate the complete, unredacted config.BaseURL (or,
+// for the parse-failure path, url.Parse's own rendered error), so a
+// caller passing "https://admin:secret@host" got back an error
+// containing the literal string "admin:secret" - disclosing exactly the
+// credential the check exists to keep out of use, in whatever logs or
+// error trackers capture NewClient's error.
 func TestNewClientRejectionErrorsDoNotLeakBaseURL(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -261,6 +271,8 @@ func TestNewClientRejectionErrorsDoNotLeakBaseURL(t *testing.T) {
 		{"query", "https://example.com?api_key=hunter2", []string{"api_key", "hunter2"}},
 		{"fragment", "https://example.com#hunter2", []string{"hunter2"}},
 		{"invalid scheme with userinfo", "ftp://admin:hunter2@example.com", []string{"admin", "hunter2"}},
+		{"parse failure with userinfo", "https://admin:hunter2@example.com/%zz", []string{"admin", "hunter2"}},
+		{"parse failure with query token", "https://example.com/%zz?token=hunter2", []string{"token", "hunter2"}},
 	}
 
 	for _, tt := range tests {
@@ -276,6 +288,60 @@ func TestNewClientRejectionErrorsDoNotLeakBaseURL(t *testing.T) {
 			}
 		})
 	}
+}
+
+// FuzzNewClientErrorDoesNotEchoInput is the structural counterpart to
+// TestNewClientRejectionErrorsDoNotLeakBaseURL: rather than relying on a
+// hand-enumerated list of NewClient's rejection paths to be complete -
+// exactly the technique that missed the url.Parse failure path (now
+// covered above) until the 2026-07-22 (0e400d1) maintainability
+// assessment found it via an external review - this asserts the
+// underlying invariant directly, for whatever return path NewClient
+// actually takes: if construction fails, a marker planted in the BaseURL
+// never appears in the returned error.
+//
+// Markers are restricted to at least 4 characters and containing a
+// digit: NewClient's own error text is hand-written English prose with
+// no digits anywhere in it (confirmed by reading every message in
+// NewClient), so a marker without this constraint can - and, verified
+// directly during development of this test, does - spuriously "leak" by
+// coincidentally matching a substring of a real word (e.g. a fuzzed
+// marker "esca" against the stdlib's "invalid URL escape" text is not a
+// leak of anything). Requiring a digit is also a more realistic shape
+// for a secret than arbitrary English-letter fuzzing: API keys and
+// tokens are essentially never purely alphabetic.
+func FuzzNewClientErrorDoesNotEchoInput(f *testing.F) {
+	for _, seed := range []string{
+		"hunter2",
+		"sk_live_abcdef0123456789",
+		"a1%zzbadescape2",
+		"秘密トークン0123",
+		"a marker 42 with spaces",
+	} {
+		f.Add(seed)
+	}
+
+	templates := []string{
+		"https://MARKER@example.com",       // userinfo
+		"https://example.com?token=MARKER", // query string
+		"https://MARKER@example.com/%zz",   // forces the url.Parse failure path, with a credential present
+	}
+
+	f.Fuzz(func(t *testing.T, marker string) {
+		if len(marker) < 4 || !strings.ContainsAny(marker, "0123456789") {
+			t.Skip()
+		}
+		for _, tmpl := range templates {
+			baseURL := strings.ReplaceAll(tmpl, "MARKER", marker)
+			_, err := NewClient(Config{BaseURL: baseURL})
+			if err == nil {
+				continue // a BaseURL this marker happens to make valid isn't this test's concern
+			}
+			if strings.Contains(err.Error(), marker) {
+				t.Fatalf("NewClient(BaseURL: %q) error = %q leaks marker %q", baseURL, err.Error(), marker)
+			}
+		}
+	})
 }
 
 func TestClientHeaderMutationsAreSafeDuringRequests(t *testing.T) {

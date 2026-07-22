@@ -81,7 +81,19 @@ func NewClient(config Config) (*Client, error) {
 
 	baseURL, err := url.Parse(config.BaseURL)
 	if err != nil {
-		return nil, fmt.Errorf("invalid base URL: %w", err)
+		// Don't wrap err directly: *url.Error's Error() method embeds the
+		// complete original input ("parse \"<url>\": <reason>"), so %w
+		// here would leak a credential- or token-bearing config.BaseURL
+		// through a malformed-URL error exactly like the checks below -
+		// found by the 2026-07-22 (0e400d1) maintainability assessment,
+		// the uncovered remainder of the b3c605d finding those checks
+		// already guard against. Unwrap to just the parse failure reason,
+		// which doesn't contain the input.
+		reason := err
+		if urlErr, ok := err.(*url.Error); ok {
+			reason = urlErr.Err
+		}
+		return nil, fmt.Errorf("invalid base URL: %w", reason)
 	}
 	// url.Parse alone accepts far more than a usable base URL - relative
 	// references, opaque strings, and "" all parse without error. Require
@@ -101,7 +113,12 @@ func NewClient(config Config) (*Client, error) {
 	if baseURL.Scheme != "http" && baseURL.Scheme != "https" {
 		return nil, fmt.Errorf("invalid base URL: scheme must be http or https, got %q", baseURL.Scheme)
 	}
-	if baseURL.Host == "" {
+	// baseURL.Host (not baseURL.Hostname()) includes an optional port, so
+	// a host-less BaseURL like "https://:443" has a non-empty Host
+	// (":443") but no real destination - baseURL.Hostname() strips the
+	// port and correctly reports "". Found by the 2026-07-22 (0e400d1)
+	// maintainability assessment.
+	if baseURL.Hostname() == "" {
 		return nil, fmt.Errorf("invalid base URL: missing host")
 	}
 	// Userinfo, a query string, and a fragment are all syntactically legal
