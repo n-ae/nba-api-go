@@ -1,0 +1,67 @@
+package endpoints
+
+import (
+	"context"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
+	"github.com/n-ae/nba-api-go/v3/pkg/stats"
+{{- if .RequiredParamsNeedParametersImport}}
+	"github.com/n-ae/nba-api-go/v3/pkg/stats/parameters"
+{{- end}}
+)
+
+// TestGet{{.Name}}_Generated is generated from tools/generator/metadata;
+// see tools/generator/templates/endpoint_test.tmpl. Verifies real response
+// parsing (header validation + positional row decoding) against a
+// synthesized fixture matching this endpoint's actual result-set column
+// names - not just request construction, which TestGeneratedHandlers
+// (cmd/nba-api-server) already exercises indirectly for every endpoint.
+// Do not hand-edit - regenerate via `cd tools/generator && go run . -endpoint {{.Name}}` instead.
+func TestGet{{.Name}}_Generated(t *testing.T) {
+	const responseBody = `{"resultSets": [
+{{- range $i, $rs := .ResultSets}}
+{{- if $i}},{{end}}
+		{"name": "{{$rs.Name}}", "headers": [
+{{- range $j, $f := $rs.FieldTypes}}{{if $j}}, {{end}}"{{$f.JSONTag}}"{{end -}}
+		], "rowSet": [[
+{{- range $j, $f := $rs.FieldTypes}}{{if $j}}, {{end}}
+{{- if eq $f.GoType "string"}}"test"
+{{- else if eq $f.GoType "int"}}1
+{{- else}}1.5
+{{- end}}
+{{- end -}}
+		]]}
+{{- end}}
+	]}`
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(responseBody))
+	}))
+	defer server.Close()
+
+	client, err := stats.NewClient(stats.Config{BaseURL: server.URL})
+	if err != nil {
+		t.Fatalf("stats.NewClient: %v", err)
+	}
+
+	req := {{.Name}}Request{
+{{- range .Parameters}}
+{{- if .Required}}
+		{{.Name}}: {{if eq .Type "string"}}"1"{{else if eq .Type "parameters.Season"}}parameters.Season("2023-24"){{else if eq .Type "parameters.SeasonType"}}parameters.SeasonType("Regular Season"){{else if eq .Type "parameters.LeagueID"}}parameters.LeagueID("00"){{else if eq .Type "parameters.PerMode"}}parameters.PerMode("PerGame"){{else}}"1"{{end}},
+{{- end}}
+{{- end}}
+	}
+
+	resp, err := Get{{.Name}}(context.Background(), client, req)
+	if err != nil {
+		t.Fatalf("Get{{.Name}}: %v", err)
+	}
+{{range .ResultSets}}
+	if len(resp.Data.{{.Name}}) == 0 {
+		t.Errorf("expected {{.Name}} to be populated from the synthesized fixture, got empty")
+	}
+{{- end}}
+}
