@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.2] - 2026-07-22
+
+**Patch, not minor**: the `BaseURL` validation change below only tightens rejection of values that were already unusable (they'd fail on the first `Get` regardless) - no caller passing a real `http`/`https` URL sees any behavior change. Everything else is CI configuration, `tools/generator`'s own test coverage, and documentation. Closes both new findings from the `2026-07-22` (`9eb3a9a`) maintainability assessment, which independently confirmed the same two claims in an unsolicited external review of `v3.1.1`.
+
 ### Added
 - `.github/workflows/apidiff.yml` gains a `workflow_dispatch` trigger, matching `release-install-smoke.yml`. This job compares `main` against the *latest tag*, so a PR that merges an accepted, documented exception (e.g. `[3.1.1]`'s `DefaultUserAgent` const-value bump) shows red until a new tag catches up - previously that red status stayed on `main`'s check history with no way to re-verify it had resolved short of waiting for the next real push. Confirmed locally: comparing `main` against `v3.1.1` (which already includes that change) now produces zero diff.
 - **Every generated endpoint SDK test now asserts the outbound request path**, and `tools/generator` gained a new metadata-wide test, `TestEndpointPathMatchesNameConvention` - two related but structurally different findings from the `2026-07-22` (`9eb3a9a`) maintainability assessment, which independently verified an unsolicited external review's claim that "no test asserts an SDK endpoint's outbound URL path."
@@ -624,7 +628,8 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to suggest changes or report issues.
 
-[Unreleased]: https://github.com/n-ae/nba-api-go/compare/v3.1.1...HEAD
+[Unreleased]: https://github.com/n-ae/nba-api-go/compare/v3.1.2...HEAD
+[3.1.2]: https://github.com/n-ae/nba-api-go/compare/v3.1.1...v3.1.2
 [3.1.1]: https://github.com/n-ae/nba-api-go/compare/v3.1.0...v3.1.1
 [3.1.0]: https://github.com/n-ae/nba-api-go/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/n-ae/nba-api-go/compare/v2.2.0...v3.0.0
