@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **`client.NewClient`'s `url.Parse` failure path now returns a fixed, input-free message, closing the `BaseURL` secret-disclosure defect class for good.** `v3.1.5`'s fix unwrapped `*url.Error` to what its own comment called an "input-free" reason - that claim was false. `net/url` builds several of its own error reasons (an invalid port, a malformed IPv6 host) directly from the input, so a credential- or token-bearing `BaseURL` like `https://example.com:sk_live_123/path` still disclosed the secret via the unwrapped reason. This is the third consecutive cycle this defect class recurred (`v3.1.3`'s explicit checks, `v3.1.4`'s wrapped outer error, `v3.1.5`'s unwrapped inner reason); fixed this time by not rendering any parser-derived text at all - any `url.Parse` failure now returns `invalid base URL: malformed`, regardless of why parsing failed, closing every current and future variant of this defect in `net/url`'s error construction, not just the ones found so far. Found by the `2026-07-22` (`f4801ef`) maintainability assessment.
+
+### Added
+- `TestNewClientRejectionErrorsDoNotLeakBaseURL` gained two cases for the exact inputs this cycle found (invalid port, malformed IPv6 host), and `FuzzNewClientErrorDoesNotEchoInput` gained port- and host-position templates. Confirmed both new test cases fail against the pre-fix code and pass against the fix; fuzzed 2M+ executions with the expanded template set with no false negatives.
+
 ## [3.1.5] - 2026-07-22
 
 **Patch, security-relevant**: closes the remainder of `v3.1.4`'s `BaseURL` secret-disclosure fix - no caller passing a valid, non-secret-bearing `BaseURL` sees any behavior change; a caller who was passing a credential- or token-bearing `BaseURL` that failed to parse no longer has that secret echoed into `NewClient`'s error. Also closes a low-severity validation gap (`https://:443` no longer constructs successfully). Closes both findings from the `2026-07-22` (`0e400d1`) maintainability assessment.

@@ -249,18 +249,24 @@ func TestNewClientRejectsBaseURLWithUserinfoQueryOrFragment(t *testing.T) {
 // or token: userinfo, a query string, an invalid scheme on an otherwise
 // credential-bearing URL (the pre-existing instance of the same defect,
 // present since v3.1.2's original scheme check, not introduced by
-// v3.1.3's userinfo/query/fragment checks), and a url.Parse failure on a
-// credential- or token-bearing URL with an invalid percent-escape (the
-// uncovered sixth path this table originally missed - url.Parse's own
-// error embeds the complete input via %w, a defect this table itself
-// exists to catch but didn't cover until now). Found by the 2026-07-22
-// (b3c605d and 0e400d1) maintainability assessments: every rejection
-// error used to interpolate the complete, unredacted config.BaseURL (or,
-// for the parse-failure path, url.Parse's own rendered error), so a
-// caller passing "https://admin:secret@host" got back an error
-// containing the literal string "admin:secret" - disclosing exactly the
-// credential the check exists to keep out of use, in whatever logs or
-// error trackers capture NewClient's error.
+// v3.1.3's userinfo/query/fragment checks), and several shapes of
+// url.Parse failure - an invalid percent-escape, an invalid port, and a
+// malformed IPv6 host. The url.Parse-failure cases are the uncovered
+// path this table originally missed (v3.1.4's fix wrapped url.Parse's
+// own %w-formatted error, which embeds the complete input), and then,
+// after v3.1.5 unwrapped to what its own comment incorrectly called an
+// "input-free" reason, the third instance of the same defect class: the
+// invalid-port and malformed-IPv6-host cases below leaked via that
+// unwrapped reason too, since net/url builds those specific reasons
+// directly from the input. Found by the 2026-07-22 (b3c605d, 0e400d1,
+// and f4801ef) maintainability assessments across three consecutive
+// cycles; fixed for good by returning a fixed, input-free message for
+// every url.Parse failure rather than trying to find a "safe" layer of
+// the parser's own error to render - see NewClient's comment. A caller
+// passing "https://admin:secret@host" got back an error containing the
+// literal string "admin:secret" in earlier versions - disclosing exactly
+// the credential the check exists to keep out of use, in whatever logs
+// or error trackers capture NewClient's error.
 func TestNewClientRejectionErrorsDoNotLeakBaseURL(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -273,6 +279,8 @@ func TestNewClientRejectionErrorsDoNotLeakBaseURL(t *testing.T) {
 		{"invalid scheme with userinfo", "ftp://admin:hunter2@example.com", []string{"admin", "hunter2"}},
 		{"parse failure with userinfo", "https://admin:hunter2@example.com/%zz", []string{"admin", "hunter2"}},
 		{"parse failure with query token", "https://example.com/%zz?token=hunter2", []string{"token", "hunter2"}},
+		{"parse failure with secret in invalid port", "https://example.com:sk_live_123/path", []string{"sk_live_123"}},
+		{"parse failure with secret in malformed IPv6 host", "https://[::1sk_live_123]:443/path", []string{"sk_live_123"}},
 	}
 
 	for _, tt := range tests {
@@ -293,12 +301,25 @@ func TestNewClientRejectionErrorsDoNotLeakBaseURL(t *testing.T) {
 // FuzzNewClientErrorDoesNotEchoInput is the structural counterpart to
 // TestNewClientRejectionErrorsDoNotLeakBaseURL: rather than relying on a
 // hand-enumerated list of NewClient's rejection paths to be complete -
-// exactly the technique that missed the url.Parse failure path (now
-// covered above) until the 2026-07-22 (0e400d1) maintainability
-// assessment found it via an external review - this asserts the
-// underlying invariant directly, for whatever return path NewClient
-// actually takes: if construction fails, a marker planted in the BaseURL
-// never appears in the returned error.
+// exactly the technique that missed the url.Parse failure path until the
+// 2026-07-22 (0e400d1) maintainability assessment found it via an
+// external review - this asserts the underlying invariant directly, for
+// whatever return path NewClient actually takes: if construction fails,
+// a marker planted in the BaseURL never appears in the returned error.
+//
+// Caveat on what this test actually covers, added after the 2026-07-22
+// (f4801ef) maintainability assessment found the invariant held for
+// these five template positions but not for a marker placed in the port
+// or in a malformed IPv6 host - two url.Parse failure shapes none of the
+// original three templates exercised. NewClient's url.Parse-failure
+// branch no longer depends on this test (or any enumeration) to hold the
+// invariant: it now returns a fixed, input-free message regardless of
+// input, so no future parser-error shape can reopen this defect class
+// through that branch. The templates below (including the two added for
+// port and host) exist as regression evidence for the specific inputs
+// found across three cycles, not as the thing guaranteeing the
+// invariant - that guarantee now comes from NewClient's implementation,
+// not from this test enumerating every parser failure mode.
 //
 // Markers are restricted to at least 4 characters and containing a
 // digit: NewClient's own error text is hand-written English prose with
@@ -325,6 +346,8 @@ func FuzzNewClientErrorDoesNotEchoInput(f *testing.F) {
 		"https://MARKER@example.com",       // userinfo
 		"https://example.com?token=MARKER", // query string
 		"https://MARKER@example.com/%zz",   // forces the url.Parse failure path, with a credential present
+		"https://example.com:MARKER/path",  // forces an invalid-port url.Parse failure, marker in the port
+		"https://[::1MARKER]:443/path",     // forces a malformed-IPv6-host url.Parse failure, marker in the host
 	}
 
 	f.Fuzz(func(t *testing.T, marker string) {
