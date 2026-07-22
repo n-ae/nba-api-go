@@ -4,11 +4,15 @@ This tool generates Go endpoint code from metadata about NBA.com API endpoints.
 
 ## Overview
 
-The code generator helps automate the creation of endpoint wrappers for the 139+ stats API endpoints. It generates:
+The code generator helps automate the creation of endpoint wrappers for all 141 stats API endpoints. From one metadata file, it generates:
 - Request structs with typed parameters
 - Response structs for result sets
 - Endpoint functions with validation
 - Parsing functions for data conversion
+- The endpoint's `cmd/nba-api-server` HTTP handler (`generated_<name>.go`) and its entry in the route dispatch table (`generated_dispatch.go`)
+- A response-parsing test (`generated_<name>_test.go` under `pkg/stats/endpoints/`), synthesized from the endpoint's own result-set field names/types
+
+Handler and test generation happen automatically alongside SDK generation for any `-endpoint`/`-metadata` run - there's no separate step to remember. See "Options" below for `-all-handlers`, which regenerates every handler and the dispatch table in one pass (needed after adding a brand-new endpoint, so its route actually gets wired in).
 
 ## Usage
 
@@ -33,9 +37,11 @@ go run . -endpoint TeamInfoCommon -dry-run
 
 ### Options
 
-- `-endpoint <name>` - Generate a single endpoint
-- `-metadata <file>` - Generate from metadata JSON file
-- `-output <dir>` - Output directory (default: `<repo-root>/pkg/stats/endpoints`, resolved from this file's own location so it's correct regardless of the working directory you run `go run .` from)
+- `-endpoint <name>` - Generate a single endpoint's SDK code, HTTP handler, and parsing test
+- `-metadata <file>` - Generate from metadata JSON file (same three outputs, for every entry in the file)
+- `-output <dir>` - Output directory for SDK code (default: `<repo-root>/pkg/stats/endpoints`, resolved from this file's own location so it's correct regardless of the working directory you run `go run .` from)
+- `-server-output <dir>` - Output directory for generated HTTP handler files (default: `<repo-root>/cmd/nba-api-server`, resolved the same way as `-output`)
+- `-all-handlers` - Regenerate every endpoint's HTTP handler plus the dispatch table (`cmd/nba-api-server/generated_dispatch.go`) from every `metadata/*.json` file - run this after adding a new endpoint's metadata so its route is actually wired into the server
 - `-dry-run` - Print generated code without writing files
 
 ## Metadata Format
@@ -254,37 +260,38 @@ For complex endpoints, manually create metadata:
 ## Template Customization
 
 Edit templates in `templates/` directory:
-- `endpoint.tmpl` - Main endpoint template
-- `request.tmpl` - Request struct template (future)
-- `response.tmpl` - Response struct template (future)
-- `example.tmpl` - Example code template (future)
+- `endpoint.tmpl` - SDK request/response structs, endpoint function, and parsing logic
+- `handler.tmpl` - The endpoint's `cmd/nba-api-server` HTTP handler
+- `dispatch.tmpl` - The server's route dispatch table (`generated_dispatch.go`), rendered once against every endpoint's metadata combined
+- `endpoint_test.tmpl` - The endpoint's response-parsing test, with a fixture synthesized from its own result-set field names/types
 
 ## Development Workflow
 
-1. **Extract metadata** from Python nba_api
+1. **Get metadata** - extract from Python nba_api (see "Creating Metadata" above) or write by hand
 2. **Review metadata** for accuracy
 3. **Generate code** with `-dry-run` first
 4. **Verify output** looks correct
-5. **Generate files** without dry-run
-6. **Add parsing logic** for result sets
-7. **Add tests** for the endpoint
-8. **Create example** usage code
+5. **Generate files** without dry-run - this produces the SDK code, the HTTP handler, and a parsing test in one pass
+6. **Run `-all-handlers`** so the new route is wired into the dispatch table
+7. **Add each new field's verified type** to `fieldtypes.json` if `inferGoType` had to fall back (see "Field Types" above) - `TestAllMetadataFieldsHaveExplicitTypes` fails CI otherwise
+8. **Create example** usage code under `examples/`
 
 ## Roadmap
 
-### Current (v0.1)
+### Done
 - [x] Basic template structure
 - [x] Single endpoint generation
 - [x] Metadata-driven generation
 - [x] Command-line interface
+- [x] Automatic parsing function generation
+- [x] Result set struct generation
+- [x] Batch generation for all 141 endpoints (`-metadata`/`-all-handlers`)
+- [x] HTTP handler generation (`cmd/nba-api-server`), including the route dispatch table
+- [x] Response-parsing test generation (`generated_<name>_test.go`)
 
 ### Future Enhancements
-- [ ] Automatic parsing function generation
-- [ ] Result set struct generation
-- [ ] Test skeleton generation
 - [ ] Example code generation
-- [ ] Integration with Python analyzer
-- [ ] Batch generation for all 139 endpoints
+- [ ] Integration with Python analyzer (see "Creating Metadata" above for the current manual extraction script)
 - [ ] Documentation generation
 
 ## Examples
@@ -308,23 +315,40 @@ go run . -metadata endpoints.json
 ### Custom Output Directory
 
 ```bash
-go run . -endpoint PlayerStats -output /tmp/generated
+go run . -endpoint PlayerStats -output /tmp/generated -server-output /tmp/generated-handlers
+```
+
+### Regenerate All Handlers + Dispatch Table
+
+```bash
+# After adding a new endpoint's metadata, wire its route into the server:
+go run . -all-handlers
 ```
 
 ## Architecture
 
 ```
 tools/generator/
-├── main.go              # CLI entry point
-├── generator.go         # Core generator logic
-├── analyzer.go          # Python endpoint analyzer (future)
+├── main.go                        # CLI entry point
+├── generator.go                   # Core generator logic (SDK, handler, and test generation)
+├── fieldtypes.json                # Field name -> Go type dictionary (see "Field Types" above)
+├── fieldtype_overrides.json       # Per-(endpoint, result set, field) type exceptions
+├── fieldname_overrides.json       # Per-(endpoint, result set, field) Go-identifier exceptions
 ├── templates/
-│   ├── endpoint.tmpl    # Endpoint function template
-│   ├── request.tmpl     # Request struct template (future)
-│   └── response.tmpl    # Response struct template (future)
+│   ├── endpoint.tmpl              # SDK request/response structs + endpoint function
+│   ├── handler.tmpl               # cmd/nba-api-server HTTP handler
+│   ├── dispatch.tmpl              # cmd/nba-api-server route dispatch table
+│   └── endpoint_test.tmpl         # Generated response-parsing test
 ├── metadata/
-│   └── endpoints.json   # Endpoint metadata database
-└── README.md            # This file
+│   └── *.json                     # Endpoint metadata, one entry per endpoint (batched or per-file)
+└── README.md                      # This file
+
+# Generation targets (outside this directory), for any endpoint with
+# metadata - the 6 hand-written endpoints have none, so they're untouched:
+#   pkg/stats/endpoints/<name>.go                 - SDK code
+#   pkg/stats/endpoints/generated_<name>_test.go  - parsing test
+#   cmd/nba-api-server/generated_<name>.go        - HTTP handler
+#   cmd/nba-api-server/generated_dispatch.go      - route dispatch table (-all-handlers only)
 ```
 
 ## Contributing
@@ -337,11 +361,10 @@ When adding new templates or features:
 
 ## Notes
 
-- Generated code is a **starting point**, not production-ready
-- Always review and customize generated code
-- Add proper error handling and validation
-- Write tests for generated endpoints
-- Update documentation
+- **Generated files are not safe to hand-edit and later regenerate over** - a future regeneration from updated metadata will silently discard hand edits. If a generated file needs to differ from what the generator would currently produce, fix it via the metadata/templates/overrides, not by editing the generated `.go` file directly. (The `gamerotation`/`leaguedashplayerstats`/`videoevents` endpoints are permanently hand-excluded from regeneration for exactly this reason - see `CHANGELOG.md`'s `[2.0.0]` section.)
+- Verify field types against a live (or recorded) NBA.com response before adding them to `fieldtypes.json` - don't trust `inferGoType`'s fallback guess
+- Run `go test ./pkg/stats/endpoints/... ./cmd/nba-api-server/...` after regenerating to confirm the generated parsing test and handler test still pass
+- Update this README when the generator's own capabilities change (templates, flags, generation targets) - out of date documentation here is exactly the kind of drift `TestAllMetadataFieldsHaveExplicitTypes` and friends can't catch
 
 ## See Also
 
