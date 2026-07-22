@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **`client.NewClient`'s `BaseURL` validation errors no longer echo the raw, unredacted `config.BaseURL`.** Every rejection path (invalid scheme, missing host, userinfo, query string, fragment) previously interpolated the complete input string via `%q`, so a caller passing `https://admin:secret@host` or `https://host?token=secret` - exactly the shapes the userinfo/query checks exist to reject - got back an error containing the literal credential or token. Found by the `2026-07-22` (`b3c605d`) maintainability assessment, itself following a lead from an external review of `v3.1.3`; independently verified to predate `v3.1.3` (the scheme/host checks have had the same defect since `v3.1.2`). `TestNewClientRejectionErrorsDoNotLeakBaseURL` covers all five rejection paths, asserting the returned error never contains an injected secret.
+
 ## [3.1.3] - 2026-07-22
 
 **Patch, not minor**: the `BaseURL` validation change below only tightens rejection of values that were already unusable (userinfo, a query string, and a fragment are all syntactically legal but never sensible in a `BaseURL`) - no caller passing a real, plain `http`/`https` URL sees any behavior change. Everything else is test coverage and documentation. Closes all three remaining findings from the `2026-07-22` (`1b428f6`) maintainability assessment.

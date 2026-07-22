@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -233,6 +234,45 @@ func TestNewClientRejectsBaseURLWithUserinfoQueryOrFragment(t *testing.T) {
 		t.Run(baseURL, func(t *testing.T) {
 			if _, err := NewClient(Config{BaseURL: baseURL}); err == nil {
 				t.Fatalf("NewClient(BaseURL: %q) succeeded, want an error", baseURL)
+			}
+		})
+	}
+}
+
+// TestNewClientRejectionErrorsDoNotLeakBaseURL covers every path in
+// NewClient that can reject a BaseURL potentially carrying a credential
+// or token: userinfo, a query string, and - the pre-existing instance of
+// the same defect, present since v3.1.2's original scheme check, not
+// introduced by v3.1.3's userinfo/query/fragment checks - an invalid
+// scheme on an otherwise credential-bearing URL. Found by the 2026-07-22
+// (b3c605d) maintainability assessment: every rejection error used to
+// interpolate the complete, unredacted config.BaseURL, so a caller
+// passing "https://admin:secret@host" got back an error containing the
+// literal string "admin:secret" - disclosing exactly the credential the
+// check exists to keep out of use, in whatever logs or error trackers
+// capture NewClient's error.
+func TestNewClientRejectionErrorsDoNotLeakBaseURL(t *testing.T) {
+	tests := []struct {
+		name    string
+		baseURL string
+		secrets []string
+	}{
+		{"userinfo", "https://admin:hunter2@example.com", []string{"admin", "hunter2"}},
+		{"query", "https://example.com?api_key=hunter2", []string{"api_key", "hunter2"}},
+		{"fragment", "https://example.com#hunter2", []string{"hunter2"}},
+		{"invalid scheme with userinfo", "ftp://admin:hunter2@example.com", []string{"admin", "hunter2"}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := NewClient(Config{BaseURL: tt.baseURL})
+			if err == nil {
+				t.Fatalf("NewClient(BaseURL: %q) succeeded, want an error", tt.baseURL)
+			}
+			for _, secret := range tt.secrets {
+				if strings.Contains(err.Error(), secret) {
+					t.Errorf("NewClient(BaseURL: %q) error = %q leaks secret %q", tt.baseURL, err.Error(), secret)
+				}
 			}
 		})
 	}

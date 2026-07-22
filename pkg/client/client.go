@@ -88,11 +88,21 @@ func NewClient(config Config) (*Client, error) {
 	// an absolute http(s) URL with a host, so a caller who passes
 	// "not-a-url" or "" finds out at construction, not as a confusing
 	// failure on the first Get.
+	//
+	// None of the checks below echo config.BaseURL into the returned
+	// error. A rejected BaseURL may legitimately contain a credential or
+	// token (that's exactly what the userinfo/query checks reject), and
+	// NewClient's error is routinely surfaced in startup logs, error
+	// trackers, and CI output - printing the raw input back would leak
+	// the very secret the check exists to keep out of use. Found by the
+	// 2026-07-22 (b3c605d) maintainability assessment, which also noted
+	// this predates these two new checks: the scheme/host checks below
+	// had the same defect since v3.1.2.
 	if baseURL.Scheme != "http" && baseURL.Scheme != "https" {
-		return nil, fmt.Errorf("invalid base URL %q: scheme must be http or https", config.BaseURL)
+		return nil, fmt.Errorf("invalid base URL: scheme must be http or https, got %q", baseURL.Scheme)
 	}
 	if baseURL.Host == "" {
-		return nil, fmt.Errorf("invalid base URL %q: missing host", config.BaseURL)
+		return nil, fmt.Errorf("invalid base URL: missing host")
 	}
 	// Userinfo, a query string, and a fragment are all syntactically legal
 	// in a BaseURL but never a sensible way to configure one: userinfo
@@ -106,13 +116,13 @@ func NewClient(config Config) (*Client, error) {
 	// means a caller finds out immediately, not via a confusing runtime
 	// symptom (a leaked credential, a silently-dropped fragment).
 	if baseURL.User != nil {
-		return nil, fmt.Errorf("invalid base URL %q: must not contain userinfo (e.g. \"user:pass@\") - configure authentication separately", config.BaseURL)
+		return nil, fmt.Errorf("invalid base URL: must not contain userinfo (e.g. \"user:pass@\") - configure authentication separately")
 	}
 	if baseURL.RawQuery != "" {
-		return nil, fmt.Errorf("invalid base URL %q: must not contain a query string", config.BaseURL)
+		return nil, fmt.Errorf("invalid base URL: must not contain a query string")
 	}
 	if baseURL.Fragment != "" {
-		return nil, fmt.Errorf("invalid base URL %q: must not contain a fragment", config.BaseURL)
+		return nil, fmt.Errorf("invalid base URL: must not contain a fragment")
 	}
 
 	if config.HTTPClient == nil {
