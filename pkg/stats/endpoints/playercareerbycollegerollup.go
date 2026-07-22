@@ -36,7 +36,7 @@ type PlayerCareerByCollegeRollupResponse struct {
 	CollegeStats []PlayerCareerByCollegeRollupCollegeStats
 }
 
-// GetPlayerCareerByCollegeRollup retrieves data from the playercareerbyrollegerollup endpoint
+// GetPlayerCareerByCollegeRollup retrieves data from the playercareerbycollegerollup endpoint
 func GetPlayerCareerByCollegeRollup(ctx context.Context, client *stats.Client, req PlayerCareerByCollegeRollupRequest) (*models.Response[*PlayerCareerByCollegeRollupResponse], error) {
 	params := url.Values{}
 	if req.LeagueID != nil {
@@ -47,7 +47,7 @@ func GetPlayerCareerByCollegeRollup(ctx context.Context, client *stats.Client, r
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "playercareerbyrollegerollup", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "playercareerbycollegerollup", params, &rawResp); err != nil {
 		return nil, err
 	}
 

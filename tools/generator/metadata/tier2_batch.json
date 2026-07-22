@@ -765,7 +765,7 @@
   },
   {
     "name": "LeagueHustleStatsPlayer",
-    "endpoint": "leaguehustlestatsp layer",
+    "endpoint": "leaguehustlestatsplayer",
     "parameters": [
       {
         "name": "Season",
@@ -827,7 +827,7 @@
   },
   {
     "name": "LeagueHustleStatsTeam",
-    "endpoint": "leaguehustlestats team",
+    "endpoint": "leaguehustlestatsteam",
     "parameters": [
       {
         "name": "Season",

@@ -322,7 +322,7 @@
   },
   {
     "name": "PlayerNextNGames",
-    "endpoint": "playernextnGames",
+    "endpoint": "playernextngames",
     "parameters": [
       {
         "name": "PlayerID",
@@ -371,7 +371,7 @@
   },
   {
     "name": "TeamNextNGames",
-    "endpoint": "teamnextnGames",
+    "endpoint": "teamnextngames",
     "parameters": [
       {
         "name": "TeamID",
@@ -456,7 +456,7 @@
   },
   {
     "name": "PlayerCareerByCollegeRollup",
-    "endpoint": "playercareerbyrollegerollup",
+    "endpoint": "playercareerbycollegerollup",
     "parameters": [
       {
         "name": "LeagueID",

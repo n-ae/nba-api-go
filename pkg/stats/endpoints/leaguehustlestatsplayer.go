@@ -52,7 +52,7 @@ type LeagueHustleStatsPlayerResponse struct {
 	HustleStatsPlayer []LeagueHustleStatsPlayerHustleStatsPlayer
 }
 
-// GetLeagueHustleStatsPlayer retrieves data from the leaguehustlestatsp layer endpoint
+// GetLeagueHustleStatsPlayer retrieves data from the leaguehustlestatsplayer endpoint
 func GetLeagueHustleStatsPlayer(ctx context.Context, client *stats.Client, req LeagueHustleStatsPlayerRequest) (*models.Response[*LeagueHustleStatsPlayerResponse], error) {
 	params := url.Values{}
 	if req.Season != nil {
@@ -69,7 +69,7 @@ func GetLeagueHustleStatsPlayer(ctx context.Context, client *stats.Client, req L
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "leaguehustlestatsp layer", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "leaguehustlestatsplayer", params, &rawResp); err != nil {
 		return nil, err
 	}
 

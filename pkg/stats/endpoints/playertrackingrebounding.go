@@ -46,7 +46,7 @@ type PlayerTrackingReboundingResponse struct {
 	PlayerTrackingRebounding []PlayerTrackingReboundingPlayerTrackingRebounding
 }
 
-// GetPlayerTrackingRebounding retrieves data from the playertrackingebounding endpoint
+// GetPlayerTrackingRebounding retrieves data from the playertrackingrebounding endpoint
 func GetPlayerTrackingRebounding(ctx context.Context, client *stats.Client, req PlayerTrackingReboundingRequest) (*models.Response[*PlayerTrackingReboundingResponse], error) {
 	params := url.Values{}
 	if req.Season != nil {
@@ -63,7 +63,7 @@ func GetPlayerTrackingRebounding(ctx context.Context, client *stats.Client, req 
 	}
 
 	var rawResp rawStatsResponse
-	if err := client.GetJSON(ctx, "playertrackingebounding", params, &rawResp); err != nil {
+	if err := client.GetJSON(ctx, "playertrackingrebounding", params, &rawResp); err != nil {
 		return nil, err
 	}
 
