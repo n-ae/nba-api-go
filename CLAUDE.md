@@ -138,6 +138,22 @@ endpoint name, parameters, result-set field names) into Go source via
 names come from reading the live API response yourself (or an existing
 Python `nba_api` endpoint definition) and writing the metadata by hand.
 
+Since 2026-07-22 the generator also emits `cmd/nba-api-server`'s HTTP
+handlers (`templates/handler.tmpl`, one per endpoint) and its route
+dispatch table (`templates/dispatch.tmpl`, `generated_dispatch.go`) from
+the same metadata - not just `pkg/stats/endpoints`'s SDK code. This closed
+the "decide the server's fate" gap this repo's assessments carried for
+5+ cycles: the server's 142 HTTP handlers were previously entirely
+hand-written at effectively 0% real test coverage. `-endpoint`/`-metadata`
+generate a handler alongside SDK code automatically; `-all-handlers`
+regenerates every handler plus the dispatch table in one pass. The 6
+endpoints with intentionally hand-written SDK code (see below) still get
+a generated handler via minimal, handler-only metadata entries in
+`tools/generator/metadata/handwritten_handlers.json` (`"handler_only":
+true`, which `generateEndpoint` refuses so it can never overwrite
+hand-written SDK code) - all 142 HTTP routes are generated, even though
+only 135 SDK endpoint files are.
+
 Field **types** now come from `tools/generator/fieldtypes.json` - an
 explicit, hand-reviewed `{"FIELD_NAME": "goType"}` dictionary, the
 "explicit per-field type metadata" item from the v2.0.0 plan in the
@@ -228,7 +244,7 @@ When NBA.com adds a new endpoint:
 
 1. Inspect the live response (or the equivalent Python `nba_api` endpoint) to get the endpoint path, parameters, and result-set field names.
 2. Write a metadata JSON file under `tools/generator/metadata/` (see `tools/generator/README.md` for the format).
-3. Generate code: `cd tools/generator && go run . -metadata metadata/newendpoint.json`.
+3. Generate code: `cd tools/generator && go run . -metadata metadata/newendpoint.json` - this now generates the SDK endpoint file **and** its HTTP handler (`cmd/nba-api-server/generated_<name>.go`) in the same run; run `go run . -all-handlers` afterward to regenerate the dispatch table so the new route is actually reachable.
 4. Add each new field name's verified type to `tools/generator/fieldtypes.json` - don't trust `inferGoType`'s fallback guess (see "How It Works" above); `TestAllMetadataFieldsHaveExplicitTypes` fails CI until you do.
 5. Add integration test in `tests/integration/`.
 6. Add example in `examples/`.

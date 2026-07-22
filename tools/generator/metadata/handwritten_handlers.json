@@ -1,0 +1,78 @@
+[
+  {
+    "name": "CommonPlayerInfo",
+    "endpoint": "commonplayerinfo",
+    "handler_only": true,
+    "sdk_function": "CommonPlayerInfo",
+    "parameters": [
+      {"name": "PlayerID", "type": "string", "required": true},
+      {"name": "LeagueID", "type": "LeagueID", "required": false, "pointer": false}
+    ]
+  },
+  {
+    "name": "PlayerGameLog",
+    "endpoint": "playergamelog",
+    "handler_only": true,
+    "sdk_function": "PlayerGameLog",
+    "parameters": [
+      {"name": "PlayerID", "type": "string", "required": true},
+      {"name": "Season", "type": "Season", "required": false, "pointer": false},
+      {"name": "SeasonType", "type": "SeasonType", "required": false, "pointer": false},
+      {"name": "DateFrom", "type": "string", "required": false, "pointer": false},
+      {"name": "DateTo", "type": "string", "required": false, "pointer": false},
+      {"name": "LeagueID", "type": "LeagueID", "required": false, "pointer": false}
+    ]
+  },
+  {
+    "name": "TeamGameLog",
+    "endpoint": "teamgamelog",
+    "handler_only": true,
+    "sdk_function": "GetTeamGameLog",
+    "parameters": [
+      {"name": "TeamID", "type": "string", "required": true},
+      {"name": "Season", "type": "Season", "required": false, "pointer": false},
+      {"name": "SeasonType", "type": "SeasonType", "required": false, "pointer": false},
+      {"name": "DateFrom", "type": "string", "required": false, "pointer": false},
+      {"name": "DateTo", "type": "string", "required": false, "pointer": false}
+    ]
+  },
+  {
+    "name": "PlayerCareerStats",
+    "endpoint": "playercareerstats",
+    "handler_only": true,
+    "sdk_function": "PlayerCareerStats",
+    "parameters": [
+      {"name": "PlayerID", "type": "string", "required": true},
+      {"name": "PerMode", "type": "PerMode", "required": false, "pointer": false},
+      {"name": "LeagueID", "type": "LeagueID", "required": false, "pointer": false}
+    ]
+  },
+  {
+    "name": "LeagueLeaders",
+    "endpoint": "leagueleaders",
+    "handler_only": true,
+    "sdk_function": "LeagueLeaders",
+    "parameters": [
+      {"name": "Season", "type": "Season", "required": false, "pointer": false},
+      {"name": "SeasonType", "type": "SeasonType", "required": false, "pointer": false},
+      {"name": "PerMode", "type": "PerMode", "required": false, "pointer": false},
+      {"name": "StatCategory", "type": "StatCategory", "required": false, "pointer": false},
+      {"name": "ActiveFlag", "type": "string", "required": false, "pointer": false},
+      {"name": "LeagueID", "type": "LeagueID", "required": false, "pointer": false}
+    ]
+  },
+  {
+    "name": "InternationalBroadcasterSchedule",
+    "endpoint": "internationalbroadcasterschedule",
+    "handler_only": true,
+    "sdk_function": "GetInternationalBroadcasterSchedule",
+    "response_wrapped": false,
+    "parameters": [
+      {"name": "LeagueID", "type": "LeagueID", "required": false, "pointer": false},
+      {"name": "Season", "type": "string", "required": true},
+      {"name": "RegionID", "type": "string", "required": false, "pointer": true},
+      {"name": "Date", "type": "string", "required": false, "pointer": true},
+      {"name": "EST", "type": "string", "required": false, "pointer": true}
+    ]
+  }
+]

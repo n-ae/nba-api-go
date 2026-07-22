@@ -20,15 +20,27 @@ const (
 	goTypeFloat64 = "float64"
 )
 
+// Recognized special parameter names, as constants so the same literal
+// isn't repeated (and potentially mistyped) across toParamType,
+// toHandlerParamType, and processHandlerMetadata's per-name branches.
+const (
+	paramNameSeason     = "Season"
+	paramNameSeasonType = "SeasonType"
+	paramNameLeagueID   = "LeagueID"
+	paramNamePerMode    = "PerMode"
+)
+
 type Generator struct {
-	outputDir string
-	templates map[string]*template.Template
+	outputDir       string
+	serverOutputDir string
+	templates       map[string]*template.Template
 }
 
-func NewGenerator(outputDir string) *Generator {
+func NewGenerator(outputDir, serverOutputDir string) *Generator {
 	return &Generator{
-		outputDir: outputDir,
-		templates: make(map[string]*template.Template),
+		outputDir:       outputDir,
+		serverOutputDir: serverOutputDir,
+		templates:       make(map[string]*template.Template),
 	}
 }
 
@@ -39,6 +51,49 @@ type EndpointMetadata struct {
 	ResultSets        []ResultSetMetadata `json:"result_sets"`
 	HasParameterTypes bool                `json:"-"`
 	HasRequiredParams bool                `json:"-"`
+
+	// HandlerOnly marks a metadata entry that exists solely to drive HTTP
+	// handler generation (see generateHandler), for an endpoint whose SDK
+	// code is intentionally hand-written - pkg/stats/endpoints has no
+	// generated file for it (see CLAUDE.md's Code Generation System
+	// section for which 6 endpoints these are and why). generateEndpoint
+	// refuses such an entry outright; GenerateFromMetadata/
+	// GenerateSingleEndpoint skip the SDK-generation call for it entirely
+	// rather than relying on that refusal - both exist so a future
+	// `-endpoint X` invocation can never silently overwrite a
+	// hand-written SDK file with a generated stub.
+	HandlerOnly bool `json:"handler_only"`
+
+	// SDKFunction overrides the SDK function name the generated handler
+	// calls. Every SDK-generated endpoint's function is named "Get"+Name
+	// by convention (see endpoint.tmpl); the 6 hand-written endpoints
+	// don't uniformly follow this (CommonPlayerInfo, PlayerGameLog,
+	// PlayerCareerStats, LeagueLeaders have no "Get" prefix). Empty means
+	// "use Get"+Name" - see EffectiveSDKFunction.
+	SDKFunction string `json:"sdk_function"`
+
+	// ResponseWrapped states whether the SDK function returns
+	// (*models.Response[*XResponse], error) (true, the default - the
+	// generated handler unwraps .Data) or a bare (*XResponse, error)
+	// (false - the generated handler uses the return value directly).
+	// Every SDK-generated endpoint and 5 of the 6 hand-written ones use
+	// the wrapped convention; GetInternationalBroadcasterSchedule is the
+	// sole exception. A *bool (not bool) because JSON's absent-key
+	// default (false) would otherwise be indistinguishable from an
+	// explicit "false" - see EffectiveResponseWrapped for the resolved,
+	// template-safe value (text/template's `if` on a non-nil *bool is
+	// always truthy regardless of the pointee, so the template never
+	// reads this field directly).
+	ResponseWrapped *bool `json:"response_wrapped"`
+
+	// EffectiveSDKFunction, EffectiveResponseWrapped, NameLower, and
+	// NeedsParametersImport are all computed by processHandlerMetadata
+	// and only ever read by templates/handler.tmpl and
+	// templates/dispatch.tmpl - never set directly from JSON.
+	EffectiveSDKFunction     string `json:"-"`
+	EffectiveResponseWrapped bool   `json:"-"`
+	NameLower                string `json:"-"`
+	NeedsParametersImport    bool   `json:"-"`
 }
 
 type ParameterMetadata struct {
@@ -46,6 +101,28 @@ type ParameterMetadata struct {
 	Type     string `json:"type"`
 	Required bool   `json:"required"`
 	Default  string `json:"default"`
+
+	// Pointer overrides whether this parameter's field in the target Go
+	// struct is a pointer type, for handler generation only. nil means
+	// "infer from Required" (pointer iff !Required), matching the SDK
+	// generator's own toParamType/endpoint.tmpl convention - true for
+	// every SDK-generated Request struct. Only needed as an explicit
+	// override for handler_only entries, whose hand-written Request
+	// structs don't uniformly follow that convention (e.g.
+	// CommonPlayerInfoRequest.LeagueID is a plain value despite being
+	// optional from the HTTP caller's perspective). See
+	// EffectivePointer for the resolved value templates read.
+	Pointer *bool `json:"pointer"`
+
+	// HandlerGoType and EffectivePointer are computed by
+	// processHandlerMetadata and only ever read by templates/handler.tmpl.
+	// HandlerGoType is a superset of toParamType's output (also
+	// recognizes StatCategory, needed by LeagueLeaders's hand-written
+	// metadata but never produced by SDK generation) - kept separate from
+	// the SDK-generation Type/toParamType path deliberately, so extending
+	// it can't change what the SDK template (endpoint.tmpl) produces.
+	HandlerGoType    string `json:"-"`
+	EffectivePointer bool   `json:"-"`
 }
 
 type ResultSetMetadata struct {
@@ -72,9 +149,21 @@ func (g *Generator) GenerateFromMetadata(metadataFile string, dryRun bool) error
 	}
 
 	for _, endpoint := range endpoints {
+		// processHandlerMetadata must run before processMetadata: the
+		// latter mutates ParameterMetadata.Type in place via toParamType
+		// (Parameters is a slice, so the mutation is visible through any
+		// other copy of the same EndpointMetadata sharing its backing
+		// array), and processHandlerMetadata needs the original,
+		// unconverted type name.
+		handlerMeta := g.processHandlerMetadata(endpoint)
 		endpoint = g.processMetadata(endpoint)
-		if err := g.generateEndpoint(endpoint, dryRun); err != nil {
-			return fmt.Errorf("failed to generate %s: %w", endpoint.Name, err)
+		if !endpoint.HandlerOnly {
+			if err := g.generateEndpoint(endpoint, dryRun); err != nil {
+				return fmt.Errorf("failed to generate %s: %w", endpoint.Name, err)
+			}
+		}
+		if err := g.generateHandler(handlerMeta, dryRun); err != nil {
+			return fmt.Errorf("failed to generate handler for %s: %w", endpoint.Name, err)
 		}
 		if !dryRun {
 			fmt.Printf("✓ Generated %s\n", endpoint.Name)
@@ -100,8 +189,18 @@ func (g *Generator) GenerateSingleEndpoint(name, metadataDir string, dryRun bool
 	if err != nil {
 		return err
 	}
+	// See GenerateFromMetadata's identical ordering comment: handler
+	// processing must see metadata's original, unconverted parameter
+	// types, before processMetadata mutates them in place for SDK
+	// generation.
+	handlerMeta := g.processHandlerMetadata(metadata)
 	metadata = g.processMetadata(metadata)
-	return g.generateEndpoint(metadata, dryRun)
+	if !metadata.HandlerOnly {
+		if err := g.generateEndpoint(metadata, dryRun); err != nil {
+			return err
+		}
+	}
+	return g.generateHandler(handlerMeta, dryRun)
 }
 
 // findEndpointMetadata searches every metadata/*.json file under
@@ -138,6 +237,10 @@ func findEndpointMetadata(metadataDir, name string) (EndpointMetadata, error) {
 }
 
 func (g *Generator) generateEndpoint(metadata EndpointMetadata, dryRun bool) (err error) {
+	if metadata.HandlerOnly {
+		return fmt.Errorf("%s is marked handler_only in its metadata - it has intentionally hand-written SDK code (see CLAUDE.md's Code Generation System section), so generating its SDK file would silently overwrite hand-written code; generate its HTTP handler instead (GenerateHandler/-endpoint already do this automatically for handler_only entries)", metadata.Name)
+	}
+
 	tmpl, err := g.loadTemplate("endpoint")
 	if err != nil {
 		return err
@@ -178,13 +281,13 @@ func (g *Generator) loadTemplate(name string) (*template.Template, error) {
 
 func toParamType(paramType string) string {
 	switch paramType {
-	case "Season":
+	case paramNameSeason:
 		return "parameters.Season"
-	case "SeasonType":
+	case paramNameSeasonType:
 		return "parameters.SeasonType"
-	case "LeagueID":
+	case paramNameLeagueID:
 		return "parameters.LeagueID"
-	case "PerMode":
+	case paramNamePerMode:
 		return "parameters.PerMode"
 	default:
 		return goTypeString
@@ -213,6 +316,191 @@ func (g *Generator) processMetadata(metadata EndpointMetadata) EndpointMetadata 
 	}
 
 	return metadata
+}
+
+// toHandlerParamType is templates/handler.tmpl's type-resolution
+// counterpart to toParamType - a superset recognizing StatCategory in
+// addition to Season/SeasonType/LeagueID/PerMode, needed by
+// LeagueLeaders's hand-written metadata but never produced by SDK
+// generation. Deliberately a separate function, not an extension of
+// toParamType itself, so extending handler-generation's recognized types
+// can never change what endpoint.tmpl (SDK generation) produces.
+func toHandlerParamType(paramType string) string {
+	switch paramType {
+	case paramNameSeason:
+		return "parameters.Season"
+	case paramNameSeasonType:
+		return "parameters.SeasonType"
+	case paramNameLeagueID:
+		return "parameters.LeagueID"
+	case paramNamePerMode:
+		return "parameters.PerMode"
+	case "StatCategory":
+		return "parameters.StatCategory"
+	default:
+		return goTypeString
+	}
+}
+
+// processHandlerMetadata resolves the fields templates/handler.tmpl and
+// templates/dispatch.tmpl need. Deep-copies Parameters so its result never
+// depends on call order relative to processMetadata (which mutates
+// ParameterMetadata.Type in place for the same entry) even if that
+// invariant slips later - callers still must call this before
+// processMetadata regardless, since a copy taken after processMetadata
+// already mutated the shared backing array would copy the wrong (SDK,
+// not raw) type name.
+func (g *Generator) processHandlerMetadata(metadata EndpointMetadata) EndpointMetadata {
+	params := make([]ParameterMetadata, len(metadata.Parameters))
+	copy(params, metadata.Parameters)
+	metadata.Parameters = params
+
+	needsParametersImport := false
+	for i := range metadata.Parameters {
+		p := &metadata.Parameters[i]
+		p.HandlerGoType = toHandlerParamType(p.Type)
+		if p.Pointer != nil {
+			p.EffectivePointer = *p.Pointer
+		} else {
+			p.EffectivePointer = !p.Required
+		}
+		switch p.Name {
+		case paramNameLeagueID, paramNameSeason, paramNameSeasonType, paramNamePerMode:
+			// Always resolved via the parameters package regardless of
+			// HandlerGoType - see handler.tmpl's per-name branches.
+			needsParametersImport = true
+		default:
+			if p.HandlerGoType != goTypeString {
+				needsParametersImport = true
+			}
+		}
+	}
+	metadata.NeedsParametersImport = needsParametersImport
+	metadata.NameLower = strings.ToLower(metadata.Name)
+
+	if metadata.SDKFunction != "" {
+		metadata.EffectiveSDKFunction = metadata.SDKFunction
+	} else {
+		metadata.EffectiveSDKFunction = "Get" + metadata.Name
+	}
+
+	if metadata.ResponseWrapped != nil {
+		metadata.EffectiveResponseWrapped = *metadata.ResponseWrapped
+	} else {
+		metadata.EffectiveResponseWrapped = true
+	}
+
+	return metadata
+}
+
+// generateHandler renders templates/handler.tmpl for metadata and writes
+// <serverOutputDir>/generated_<lowercase name>.go (or prints to stdout in
+// dry-run mode). Unlike generateEndpoint, this never refuses a
+// HandlerOnly entry - every metadata entry, hand-written-SDK or
+// generated-SDK, gets a generated HTTP handler; that's the entire purpose
+// of handler_only entries existing.
+func (g *Generator) generateHandler(metadata EndpointMetadata, dryRun bool) (err error) {
+	tmpl, err := g.loadTemplate("handler")
+	if err != nil {
+		return err
+	}
+
+	filename := filepath.Join(g.serverOutputDir, "generated_"+metadata.NameLower+".go")
+
+	if dryRun {
+		return tmpl.Execute(os.Stdout, metadata)
+	}
+
+	f, err := os.Create(filename)
+	if err != nil {
+		return fmt.Errorf("failed to create file: %w", err)
+	}
+	defer func() {
+		if cerr := f.Close(); cerr != nil && err == nil {
+			err = fmt.Errorf("failed to close %s: %w", filename, cerr)
+		}
+	}()
+
+	return tmpl.Execute(f, metadata)
+}
+
+// GenerateDispatchTable globs every metadata/*.json file under metadataDir
+// (the same directory findEndpointMetadata searches), generates a handler
+// for every entry found (idempotent - regenerating an already-generated
+// handler just overwrites it identically), and renders
+// templates/dispatch.tmpl once against the full, combined set - the
+// generated_dispatch.go map that replaces StatsHandler.ServeHTTP's
+// previously hand-maintained switch statement. Unlike GenerateFromMetadata
+// (one file) or GenerateSingleEndpoint (one entry), this is deliberately
+// whole-corpus: the dispatch table has to be complete in one file, not
+// assembled incrementally across separate generator invocations.
+func (g *Generator) GenerateDispatchTable(metadataDir string, dryRun bool) error {
+	files, err := filepath.Glob(filepath.Join(metadataDir, "*.json"))
+	if err != nil {
+		return fmt.Errorf("failed to glob metadata directory %s: %w", metadataDir, err)
+	}
+	if len(files) == 0 {
+		return fmt.Errorf("no metadata/*.json files found under %s", metadataDir)
+	}
+
+	// Several endpoints (BoxScoreSummaryV2, LeagueGameFinder,
+	// ShotChartDetail, TeamYearByYearStats, PlayerDashboardByGeneralSplits,
+	// LeagueDashPtStats, LeagueDashLineups, TeamGameLogs,
+	// TeamDashboardByGeneralSplits, BoxScoreTraditionalV2, PlayByPlayV2, at
+	// least) have metadata entries in more than one *.json file - harmless
+	// for SDK/handler generation (both are per-name, so a duplicate just
+	// overwrites the same output file identically), but fatal for a map
+	// literal, which cannot have a duplicate key. seen deduplicates by
+	// Name, keeping whichever file's entry is encountered first.
+	seen := make(map[string]bool)
+	var all []EndpointMetadata
+	for _, f := range files {
+		data, err := os.ReadFile(f)
+		if err != nil {
+			return fmt.Errorf("failed to read metadata file %s: %w", f, err)
+		}
+		var endpoints []EndpointMetadata
+		if err := json.Unmarshal(data, &endpoints); err != nil {
+			return fmt.Errorf("failed to parse metadata file %s: %w", f, err)
+		}
+		for _, endpoint := range endpoints {
+			if seen[endpoint.Name] {
+				continue
+			}
+			seen[endpoint.Name] = true
+			handlerMeta := g.processHandlerMetadata(endpoint)
+			if err := g.generateHandler(handlerMeta, dryRun); err != nil {
+				return fmt.Errorf("failed to generate handler for %s (from %s): %w", endpoint.Name, f, err)
+			}
+			all = append(all, handlerMeta)
+		}
+	}
+
+	tmpl, err := g.loadTemplate("dispatch")
+	if err != nil {
+		return err
+	}
+
+	if dryRun {
+		return tmpl.Execute(os.Stdout, all)
+	}
+
+	filename := filepath.Join(g.serverOutputDir, "generated_dispatch.go")
+	f, err := os.Create(filename)
+	if err != nil {
+		return fmt.Errorf("failed to create file: %w", err)
+	}
+	defer func() {
+		if cerr := f.Close(); cerr != nil && err == nil {
+			err = fmt.Errorf("failed to close %s: %w", filename, cerr)
+		}
+	}()
+
+	if err := tmpl.Execute(f, all); err != nil {
+		return err
+	}
+	fmt.Printf("✓ Generated dispatch table (%d entries)\n", len(all))
+	return nil
 }
 
 var (

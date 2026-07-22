@@ -1,0 +1,74 @@
+package main
+
+import (
+	"net/http"
+
+	"github.com/n-ae/nba-api-go/v3/pkg/stats/endpoints"
+{{- if .NeedsParametersImport}}
+	"github.com/n-ae/nba-api-go/v3/pkg/stats/parameters"
+{{- end}}
+)
+
+// handle{{.Name}} is generated from tools/generator/metadata; see
+// tools/generator/templates/handler.tmpl. Do not hand-edit - regenerate via
+// `cd tools/generator && go run . -endpoint {{.Name}}` (or -all-handlers to
+// regenerate every handler plus the dispatch table) instead.
+func (h *StatsHandler) handle{{.Name}}(w http.ResponseWriter, r *http.Request) {
+{{- range .Parameters}}
+{{- if eq .Name "LeagueID"}}
+	v{{.Name}} := {{if .EffectivePointer}}leagueIDPtr(parameters.LeagueIDNBA){{else}}parameters.LeagueIDNBA{{end}}
+{{- else if .Required}}
+{{- if eq .HandlerGoType "string"}}
+	v{{.Name}} := r.URL.Query().Get("{{.Name}}")
+{{- else}}
+	v{{.Name}} := {{.HandlerGoType}}(r.URL.Query().Get("{{.Name}}"))
+{{- end}}
+	if v{{.Name}} == "" {
+		writeError(w, http.StatusBadRequest, "missing_parameter", "{{.Name}} is required")
+		return
+	}
+{{- else if eq .Name "Season"}}
+	v{{.Name}} := {{if .EffectivePointer}}seasonPtr(parameters.Season(getSeasonOrDefault(r))){{else}}parameters.Season(getSeasonOrDefault(r)){{end}}
+{{- else if eq .Name "SeasonType"}}
+	v{{.Name}} := {{if .EffectivePointer}}seasonTypePtr(parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season"))){{else}}parameters.SeasonType(getQueryOrDefault(r, "SeasonType", "Regular Season")){{end}}
+{{- else if eq .Name "PerMode"}}
+	v{{.Name}} := {{if .EffectivePointer}}perModePtr(parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame"))){{else}}parameters.PerMode(getQueryOrDefault(r, "PerMode", "PerGame")){{end}}
+{{- else if .EffectivePointer}}
+	var v{{.Name}} *{{.HandlerGoType}}
+	if raw := r.URL.Query().Get("{{.Name}}"); raw != "" {
+{{- if eq .HandlerGoType "string"}}
+		v{{.Name}} = stringPtr(raw)
+{{- else}}
+		typed{{.Name}} := {{.HandlerGoType}}(raw)
+		v{{.Name}} = &typed{{.Name}}
+{{- end}}
+	}
+{{- else if .Default}}
+{{- if eq .HandlerGoType "string"}}
+	v{{.Name}} := getQueryOrDefault(r, "{{.Name}}", "{{.Default}}")
+{{- else}}
+	v{{.Name}} := {{.HandlerGoType}}(getQueryOrDefault(r, "{{.Name}}", "{{.Default}}"))
+{{- end}}
+{{- else}}
+{{- if eq .HandlerGoType "string"}}
+	v{{.Name}} := r.URL.Query().Get("{{.Name}}")
+{{- else}}
+	v{{.Name}} := {{.HandlerGoType}}(r.URL.Query().Get("{{.Name}}"))
+{{- end}}
+{{- end}}
+{{- end}}
+
+	req := endpoints.{{.Name}}Request{
+{{- range .Parameters}}
+		{{.Name}}: v{{.Name}},
+{{- end}}
+	}
+
+	resp, err := endpoints.{{.EffectiveSDKFunction}}(r.Context(), h.client, req)
+	if err != nil {
+		writeEndpointError(w, err)
+		return
+	}
+
+	writeSuccess(w, {{if .EffectiveResponseWrapped}}resp.Data{{else}}resp{{end}})
+}
