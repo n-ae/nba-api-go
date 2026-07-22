@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `.github/workflows/apidiff.yml` gains a `workflow_dispatch` trigger, matching `release-install-smoke.yml`. This job compares `main` against the *latest tag*, so a PR that merges an accepted, documented exception (e.g. `[3.1.1]`'s `DefaultUserAgent` const-value bump) shows red until a new tag catches up - previously that red status stayed on `main`'s check history with no way to re-verify it had resolved short of waiting for the next real push. Confirmed locally: comparing `main` against `v3.1.1` (which already includes that change) now produces zero diff.
+
 ## [3.1.1] - 2026-07-22
 
 **Patch, not minor**: unlike `[3.1.0]`'s HTTP-API behavior changes or `[2.2.0]`'s `Config.Timeout` fix, nothing in this release changes observable runtime behavior for any consumer - `DefaultUserAgent`'s value bump is explicitly documented as never applied automatically to any request (see its `### Changed` entry below), and everything else is documentation and `tools/generator`'s own internal test coverage. Closes the remaining five findings from the `2026-07-22` (`180a3db`) maintainability assessment's Immediate/Next buckets - the assessment that reviewed the `[3.1.0]` release itself.
