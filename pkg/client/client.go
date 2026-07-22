@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -81,19 +82,25 @@ func NewClient(config Config) (*Client, error) {
 
 	baseURL, err := url.Parse(config.BaseURL)
 	if err != nil {
-		// Don't wrap err directly: *url.Error's Error() method embeds the
-		// complete original input ("parse \"<url>\": <reason>"), so %w
-		// here would leak a credential- or token-bearing config.BaseURL
-		// through a malformed-URL error exactly like the checks below -
-		// found by the 2026-07-22 (0e400d1) maintainability assessment,
-		// the uncovered remainder of the b3c605d finding those checks
-		// already guard against. Unwrap to just the parse failure reason,
-		// which doesn't contain the input.
-		reason := err
-		if urlErr, ok := err.(*url.Error); ok {
-			reason = urlErr.Err
-		}
-		return nil, fmt.Errorf("invalid base URL: %w", reason)
+		// Return a fixed, input-free message - don't wrap or format err,
+		// or any part of it, into the result. A prior version of this
+		// check unwrapped *url.Error to what its own comment called an
+		// "input-free" reason (urlErr.Err); that was false. net/url
+		// constructs several of its own error reasons directly from
+		// substrings of the input (e.g. an invalid port, a malformed
+		// IPv6 host: "invalid port %q after host", "unexpected
+		// character... at %q"), and there is no unwrap depth documented
+		// or guaranteed to be free of it. A rejected BaseURL may
+		// legitimately contain a credential or token, and NewClient's
+		// error is routinely surfaced in startup logs, error trackers,
+		// and CI output - so rendering any parser-derived text risks
+		// leaking it. Found by the 2026-07-22 (f4801ef) maintainability
+		// assessment, the third consecutive cycle this exact defect
+		// class recurred (v3.1.3's explicit checks, v3.1.4's wrapped
+		// outer error, this the unwrapped inner reason); fixed here by
+		// not depending on net/url's error internals being safe at any
+		// layer, rather than finding a fourth "safe" layer to unwrap to.
+		return nil, errors.New("invalid base URL: malformed")
 	}
 	// url.Parse alone accepts far more than a usable base URL - relative
 	// references, opaque strings, and "" all parse without error. Require
