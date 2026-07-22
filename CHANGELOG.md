@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.1] - 2026-07-22
+
+**Patch, not minor**: unlike `[3.1.0]`'s HTTP-API behavior changes or `[2.2.0]`'s `Config.Timeout` fix, nothing in this release changes observable runtime behavior for any consumer - `DefaultUserAgent`'s value bump is explicitly documented as never applied automatically to any request (see its `### Changed` entry below), and everything else is documentation and `tools/generator`'s own internal test coverage. Closes the remaining five findings from the `2026-07-22` (`180a3db`) maintainability assessment's Immediate/Next buckets - the assessment that reviewed the `[3.1.0]` release itself.
+
 ### Added
 - **Direct unit tests for `generateHandler`/`GenerateDispatchTable`/`processHandlerMetadata`** in `tools/generator`'s own test suite - the "generator's own test suite has no direct coverage of handler/dispatch generation" finding (#15) from the `2026-07-22` (`180a3db`) maintainability assessment. Previously these were only exercised indirectly (a syntactic-validity check across every committed metadata file, plus the root module's cross-package tests on already-committed generated output), so a semantic bug in `handler.tmpl`/`dispatch.tmpl` would have surfaced only on the next `-all-handlers` regeneration, not before. New tests: `TestProcessHandlerMetadata`/`TestProcessHandlerMetadataExplicitOverrides` (per-parameter `HandlerGoType`/`EffectivePointer` resolution, the `SDKFunction`/`ResponseWrapped`/`Pointer` override paths, and the deep-copy invariant documented on `processHandlerMetadata` itself), `TestGenerateHandler` (a handler renders, parses as valid Go, and contains the expected required-parameter validation), and `TestGenerateDispatchTable`/`TestGenerateDispatchTableRequiresMetadataFiles` (the documented first-file-wins dedup behavior for a `Name` appearing in more than one metadata file, using a fixture metadata directory rather than trusting the real 141-endpoint one to exercise this path by accident).
 
@@ -611,7 +615,8 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to suggest changes or report issues.
 
-[Unreleased]: https://github.com/n-ae/nba-api-go/compare/v3.1.0...HEAD
+[Unreleased]: https://github.com/n-ae/nba-api-go/compare/v3.1.1...HEAD
+[3.1.1]: https://github.com/n-ae/nba-api-go/compare/v3.1.0...v3.1.1
 [3.1.0]: https://github.com/n-ae/nba-api-go/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/n-ae/nba-api-go/compare/v2.2.0...v3.0.0
 [2.2.0]: https://github.com/n-ae/nba-api-go/compare/v2.1.2...v2.2.0
