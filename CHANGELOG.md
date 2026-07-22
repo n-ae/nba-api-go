@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **`FuzzNewClientErrorDoesNotEchoInput`'s scheme-position template now asserts against the value actually inserted into the URL**, not the original fuzzed marker. The scheme template normalizes the marker (`validSchemeMarker`) before inserting it, since URI scheme syntax excludes most characters a fuzzed marker can contain, but the assertion still checked the unnormalized marker - so it only caught a regression by coincidence, for markers that happened to already be valid scheme syntax, and missed realistic secret shapes (e.g. `sk_live_...`, which strips to `skliveabcdef...` under normalization). Found by the `2026-07-22` (`8e85a9c`) maintainability assessment; confirmed to be a test-tooling gap only, not a runtime vulnerability - `TestNewClientErrorMessagesAreFixed` and a direct regression case both independently caught the same reintroduced regression correctly.
+
+### Added
+- **A scheduled `Fuzz` CI workflow** (`.github/workflows/fuzz.yml`) runs `FuzzNewClientErrorDoesNotEchoInput` with coverage-guided mutation for 60s daily, uploading any failing input as a build artifact. Ordinary `go test ./...` only replays the fuzz target's seed corpus, not ongoing mutation; this was recommended across three consecutive maintainability-assessment cycles before being added now rather than carried forward a fourth time.
+
 ## [3.1.7] - 2026-07-22
 
 **Patch, security-relevant**: closes the last known instance of `BaseURL` values being echoed into `NewClient`'s errors - no caller passing a valid `BaseURL` sees any behavior change; a caller who was passing an unsupported, token-shaped scheme no longer has it echoed into `NewClient`'s error. Also adds a regression test that inventories every rejection message `NewClient` can return, so this class of gap can't reappear silently in the future. Closes the one finding from the `2026-07-22` (`eb62a41`) maintainability assessment.
