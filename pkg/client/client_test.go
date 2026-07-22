@@ -154,6 +154,30 @@ func TestNewClientRejectsInvalidBaseURL(t *testing.T) {
 	}
 }
 
+// TestNewClientRejectsUnusableBaseURL covers BaseURL values url.Parse
+// itself accepts without error - a relative reference, an opaque string
+// with no host, and the empty string - which the plain url.Parse check
+// alone let through uncaught. Found by the 2026-07-22 (9eb3a9a)
+// maintainability assessment: NewClient checked only url.Parse's error,
+// never IsAbs()/Scheme/Host, so a mistyped BaseURL like "not-a-url" would
+// construct a Client successfully and only fail confusingly on the first
+// Get.
+func TestNewClientRejectsUnusableBaseURL(t *testing.T) {
+	for _, baseURL := range []string{
+		"",
+		"not-a-url",
+		"example.com",       // no scheme - url.Parse treats this as a relative path, not a host
+		"//example.com",     // protocol-relative - still no scheme
+		"ftp://example.com", // parses fine, but not a scheme this client can use
+	} {
+		t.Run(baseURL, func(t *testing.T) {
+			if _, err := NewClient(Config{BaseURL: baseURL}); err == nil {
+				t.Fatalf("NewClient(BaseURL: %q) succeeded, want an error", baseURL)
+			}
+		})
+	}
+}
+
 func TestClientHeaderMutationsAreSafeDuringRequests(t *testing.T) {
 	client := mustNewClient(t, Config{
 		BaseURL: "https://api.example.com",

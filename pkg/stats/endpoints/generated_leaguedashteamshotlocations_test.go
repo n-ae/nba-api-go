@@ -14,14 +14,21 @@ import (
 // parsing (header validation + positional row decoding) against a
 // synthesized fixture matching this endpoint's actual result-set column
 // names - not just request construction, which TestGeneratedHandlers
-// (cmd/nba-api-server) already exercises indirectly for every endpoint.
+// (cmd/nba-api-server) already exercises indirectly for every endpoint -
+// and asserts the outbound request path matches this endpoint's own
+// metadata exactly, the class of bug ten endpoints shipped with before a
+// live-reachability sweep caught it (see CHANGELOG.md's [3.1.0] section).
 // Do not hand-edit - regenerate via `cd tools/generator && go run . -endpoint LeagueDashTeamShotLocations` instead.
 func TestGetLeagueDashTeamShotLocations_Generated(t *testing.T) {
 	const responseBody = `{"resultSets": [
 		{"name": "ShotLocations", "headers": ["TEAM_ID", "TEAM_NAME", "TEAM_ABBREVIATION", "GP", "W", "L", "W_PCT", "FGM_RA", "FGA_RA", "FG_PCT_RA", "FGM_IN_PAINT", "FGA_IN_PAINT", "FG_PCT_IN_PAINT", "FGM_MID_RANGE", "FGA_MID_RANGE", "FG_PCT_MID_RANGE", "FGM_LEFT_CORNER_3", "FGA_LEFT_CORNER_3", "FG_PCT_LEFT_CORNER_3", "FGM_RIGHT_CORNER_3", "FGA_RIGHT_CORNER_3", "FG_PCT_RIGHT_CORNER_3", "FGM_ABOVE_BREAK_3", "FGA_ABOVE_BREAK_3", "FG_PCT_ABOVE_BREAK_3", "FGM_BACKCOURT", "FGA_BACKCOURT", "FG_PCT_BACKCOURT"], "rowSet": [[1, "test", "test", 1, "test", "test", 1.5, 1, 1, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5]]}
 	]}`
 
+	const wantPath = "/leaguedashteamshotlocations"
+	var gotPath string
+
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotPath = r.URL.Path
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(responseBody))
 	}))
@@ -37,6 +44,10 @@ func TestGetLeagueDashTeamShotLocations_Generated(t *testing.T) {
 	resp, err := GetLeagueDashTeamShotLocations(context.Background(), client, req)
 	if err != nil {
 		t.Fatalf("GetLeagueDashTeamShotLocations: %v", err)
+	}
+
+	if gotPath != wantPath {
+		t.Errorf("GetLeagueDashTeamShotLocations requested path %q, want %q (endpoint metadata says %q)", gotPath, wantPath, "leaguedashteamshotlocations")
 	}
 
 	if len(resp.Data.ShotLocations) == 0 {

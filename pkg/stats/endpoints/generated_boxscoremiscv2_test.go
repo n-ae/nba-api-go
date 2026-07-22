@@ -14,7 +14,10 @@ import (
 // parsing (header validation + positional row decoding) against a
 // synthesized fixture matching this endpoint's actual result-set column
 // names - not just request construction, which TestGeneratedHandlers
-// (cmd/nba-api-server) already exercises indirectly for every endpoint.
+// (cmd/nba-api-server) already exercises indirectly for every endpoint -
+// and asserts the outbound request path matches this endpoint's own
+// metadata exactly, the class of bug ten endpoints shipped with before a
+// live-reachability sweep caught it (see CHANGELOG.md's [3.1.0] section).
 // Do not hand-edit - regenerate via `cd tools/generator && go run . -endpoint BoxScoreMiscV2` instead.
 func TestGetBoxScoreMiscV2_Generated(t *testing.T) {
 	const responseBody = `{"resultSets": [
@@ -22,7 +25,11 @@ func TestGetBoxScoreMiscV2_Generated(t *testing.T) {
 		{"name": "TeamStats", "headers": ["GAME_ID", "TEAM_ID", "TEAM_NAME", "TEAM_ABBREVIATION", "TEAM_CITY", "MIN", "PTS_OFF_TOV", "PTS_2ND_CHANCE", "PTS_FB", "PTS_PAINT", "OPP_PTS_OFF_TOV", "OPP_PTS_2ND_CHANCE", "OPP_PTS_FB", "OPP_PTS_PAINT", "BLK", "BLKA", "PF", "PFD"], "rowSet": [["test", 1, "test", "test", "test", 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1, 1.5, 1.5]]}
 	]}`
 
+	const wantPath = "/boxscoremiscv2"
+	var gotPath string
+
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotPath = r.URL.Path
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(responseBody))
 	}))
@@ -40,6 +47,10 @@ func TestGetBoxScoreMiscV2_Generated(t *testing.T) {
 	resp, err := GetBoxScoreMiscV2(context.Background(), client, req)
 	if err != nil {
 		t.Fatalf("GetBoxScoreMiscV2: %v", err)
+	}
+
+	if gotPath != wantPath {
+		t.Errorf("GetBoxScoreMiscV2 requested path %q, want %q (endpoint metadata says %q)", gotPath, wantPath, "boxscoremiscv2")
 	}
 
 	if len(resp.Data.PlayerStats) == 0 {

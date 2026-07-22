@@ -14,14 +14,21 @@ import (
 // parsing (header validation + positional row decoding) against a
 // synthesized fixture matching this endpoint's actual result-set column
 // names - not just request construction, which TestGeneratedHandlers
-// (cmd/nba-api-server) already exercises indirectly for every endpoint.
+// (cmd/nba-api-server) already exercises indirectly for every endpoint -
+// and asserts the outbound request path matches this endpoint's own
+// metadata exactly, the class of bug ten endpoints shipped with before a
+// live-reachability sweep caught it (see CHANGELOG.md's [3.1.0] section).
 // Do not hand-edit - regenerate via `cd tools/generator && go run . -endpoint LeagueHustleStatsPlayer` instead.
 func TestGetLeagueHustleStatsPlayer_Generated(t *testing.T) {
 	const responseBody = `{"resultSets": [
 		{"name": "HustleStatsPlayer", "headers": ["PLAYER_ID", "PLAYER_NAME", "TEAM_ID", "TEAM_ABBREVIATION", "AGE", "GP", "W", "L", "W_PCT", "MIN", "CONTESTED_SHOTS", "CONTESTED_SHOTS_2PT", "CONTESTED_SHOTS_3PT", "DEFLECTIONS", "CHARGES_DRAWN", "SCREEN_ASSISTS", "SCREEN_AST_PTS", "OFF_LOOSE_BALLS_RECOVERED", "DEF_LOOSE_BALLS_RECOVERED", "LOOSE_BALLS_RECOVERED", "OFF_BOXOUTS", "DEF_BOXOUTS", "BOX_OUT_PLAYER_TEAM_REBS", "BOX_OUT_PLAYER_REBS", "BOX_OUTS"], "rowSet": [[1, "test", 1, "test", 1, 1, "test", "test", 1.5, 1.5, "test", "test", "test", "test", "test", "test", 1.5, "test", "test", "test", "test", "test", 1.5, 1.5, "test"]]}
 	]}`
 
+	const wantPath = "/leaguehustlestatsplayer"
+	var gotPath string
+
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotPath = r.URL.Path
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(responseBody))
 	}))
@@ -37,6 +44,10 @@ func TestGetLeagueHustleStatsPlayer_Generated(t *testing.T) {
 	resp, err := GetLeagueHustleStatsPlayer(context.Background(), client, req)
 	if err != nil {
 		t.Fatalf("GetLeagueHustleStatsPlayer: %v", err)
+	}
+
+	if gotPath != wantPath {
+		t.Errorf("GetLeagueHustleStatsPlayer requested path %q, want %q (endpoint metadata says %q)", gotPath, wantPath, "leaguehustlestatsplayer")
 	}
 
 	if len(resp.Data.HustleStatsPlayer) == 0 {

@@ -15,7 +15,10 @@ import (
 // parsing (header validation + positional row decoding) against a
 // synthesized fixture matching this endpoint's actual result-set column
 // names - not just request construction, which TestGeneratedHandlers
-// (cmd/nba-api-server) already exercises indirectly for every endpoint.
+// (cmd/nba-api-server) already exercises indirectly for every endpoint -
+// and asserts the outbound request path matches this endpoint's own
+// metadata exactly, the class of bug ten endpoints shipped with before a
+// live-reachability sweep caught it (see CHANGELOG.md's [3.1.0] section).
 // Do not hand-edit - regenerate via `cd tools/generator && go run . -endpoint PlayoffPicture` instead.
 func TestGetPlayoffPicture_Generated(t *testing.T) {
 	const responseBody = `{"resultSets": [
@@ -23,7 +26,11 @@ func TestGetPlayoffPicture_Generated(t *testing.T) {
 		{"name": "WestConfPlayoffPicture", "headers": ["TEAM_ID", "LEAGUE_ID", "SEASON_ID", "CONFERENCE", "RANK", "TEAM", "WINS", "LOSSES", "WIN_PCT", "GAMES_BACK", "CLINCHED", "ELIMINATED_FROM_PLAYOFFS", "CAN_WIN_CONF", "CAN_WIN_DIV"], "rowSet": [[1, "test", "test", "test", 1, "test", "test", "test", 1.5, "test", "test", 1.5, "test", "test"]]}
 	]}`
 
+	const wantPath = "/playoffpicture"
+	var gotPath string
+
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotPath = r.URL.Path
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(responseBody))
 	}))
@@ -41,6 +48,10 @@ func TestGetPlayoffPicture_Generated(t *testing.T) {
 	resp, err := GetPlayoffPicture(context.Background(), client, req)
 	if err != nil {
 		t.Fatalf("GetPlayoffPicture: %v", err)
+	}
+
+	if gotPath != wantPath {
+		t.Errorf("GetPlayoffPicture requested path %q, want %q (endpoint metadata says %q)", gotPath, wantPath, "playoffpicture")
 	}
 
 	if len(resp.Data.EastConfPlayoffPicture) == 0 {

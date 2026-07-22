@@ -14,7 +14,10 @@ import (
 // parsing (header validation + positional row decoding) against a
 // synthesized fixture matching this endpoint's actual result-set column
 // names - not just request construction, which TestGeneratedHandlers
-// (cmd/nba-api-server) already exercises indirectly for every endpoint.
+// (cmd/nba-api-server) already exercises indirectly for every endpoint -
+// and asserts the outbound request path matches this endpoint's own
+// metadata exactly, the class of bug ten endpoints shipped with before a
+// live-reachability sweep caught it (see CHANGELOG.md's [3.1.0] section).
 // Do not hand-edit - regenerate via `cd tools/generator && go run . -endpoint PlayerVsPlayer` instead.
 func TestGetPlayerVsPlayer_Generated(t *testing.T) {
 	const responseBody = `{"resultSets": [
@@ -25,7 +28,11 @@ func TestGetPlayerVsPlayer_Generated(t *testing.T) {
 		{"name": "ShotDistanceOffCourt", "headers": ["PLAYER_ID", "PLAYER_NAME", "SORT_ORDER", "VS_PLAYER_ID", "VS_PLAYER_NAME", "SHOT_DIST_RANGE", "FGA", "FGM", "FG_PCT"], "rowSet": [[1, "test", "test", 1, "test", "test", 1, 1, 1.5]]}
 	]}`
 
+	const wantPath = "/playervsplayer"
+	var gotPath string
+
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotPath = r.URL.Path
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(responseBody))
 	}))
@@ -44,6 +51,10 @@ func TestGetPlayerVsPlayer_Generated(t *testing.T) {
 	resp, err := GetPlayerVsPlayer(context.Background(), client, req)
 	if err != nil {
 		t.Fatalf("GetPlayerVsPlayer: %v", err)
+	}
+
+	if gotPath != wantPath {
+		t.Errorf("GetPlayerVsPlayer requested path %q, want %q (endpoint metadata says %q)", gotPath, wantPath, "playervsplayer")
 	}
 
 	if len(resp.Data.Overall) == 0 {

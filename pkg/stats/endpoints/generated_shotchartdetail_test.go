@@ -15,7 +15,10 @@ import (
 // parsing (header validation + positional row decoding) against a
 // synthesized fixture matching this endpoint's actual result-set column
 // names - not just request construction, which TestGeneratedHandlers
-// (cmd/nba-api-server) already exercises indirectly for every endpoint.
+// (cmd/nba-api-server) already exercises indirectly for every endpoint -
+// and asserts the outbound request path matches this endpoint's own
+// metadata exactly, the class of bug ten endpoints shipped with before a
+// live-reachability sweep caught it (see CHANGELOG.md's [3.1.0] section).
 // Do not hand-edit - regenerate via `cd tools/generator && go run . -endpoint ShotChartDetail` instead.
 func TestGetShotChartDetail_Generated(t *testing.T) {
 	const responseBody = `{"resultSets": [
@@ -23,7 +26,11 @@ func TestGetShotChartDetail_Generated(t *testing.T) {
 		{"name": "LeagueAverages", "headers": ["GRID_TYPE", "SHOT_ZONE_BASIC", "SHOT_ZONE_AREA", "SHOT_ZONE_RANGE", "FGA", "FGM", "FG_PCT"], "rowSet": [["test", "test", "test", "test", 1, 1, 1.5]]}
 	]}`
 
+	const wantPath = "/shotchartdetail"
+	var gotPath string
+
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotPath = r.URL.Path
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(responseBody))
 	}))
@@ -42,6 +49,10 @@ func TestGetShotChartDetail_Generated(t *testing.T) {
 	resp, err := GetShotChartDetail(context.Background(), client, req)
 	if err != nil {
 		t.Fatalf("GetShotChartDetail: %v", err)
+	}
+
+	if gotPath != wantPath {
+		t.Errorf("GetShotChartDetail requested path %q, want %q (endpoint metadata says %q)", gotPath, wantPath, "shotchartdetail")
 	}
 
 	if len(resp.Data.Shot_Chart_Detail) == 0 {

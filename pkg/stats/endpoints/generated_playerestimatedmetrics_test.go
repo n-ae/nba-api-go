@@ -14,14 +14,21 @@ import (
 // parsing (header validation + positional row decoding) against a
 // synthesized fixture matching this endpoint's actual result-set column
 // names - not just request construction, which TestGeneratedHandlers
-// (cmd/nba-api-server) already exercises indirectly for every endpoint.
+// (cmd/nba-api-server) already exercises indirectly for every endpoint -
+// and asserts the outbound request path matches this endpoint's own
+// metadata exactly, the class of bug ten endpoints shipped with before a
+// live-reachability sweep caught it (see CHANGELOG.md's [3.1.0] section).
 // Do not hand-edit - regenerate via `cd tools/generator && go run . -endpoint PlayerEstimatedMetrics` instead.
 func TestGetPlayerEstimatedMetrics_Generated(t *testing.T) {
 	const responseBody = `{"resultSets": [
 		{"name": "PlayerEstimatedMetrics", "headers": ["PLAYER_ID", "PLAYER_NAME", "GP", "W", "L", "W_PCT", "MIN", "E_OFF_RATING", "E_DEF_RATING", "E_NET_RATING", "E_AST_RATIO", "E_OREB_PCT", "E_DREB_PCT", "E_REB_PCT", "E_TOV_PCT", "E_USG_PCT", "E_PACE", "GP_RANK", "W_RANK", "L_RANK", "W_PCT_RANK", "MIN_RANK", "E_OFF_RATING_RANK", "E_DEF_RATING_RANK", "E_NET_RATING_RANK", "E_AST_RATIO_RANK", "E_OREB_PCT_RANK", "E_DREB_PCT_RANK", "E_REB_PCT_RANK", "E_TOV_PCT_RANK", "E_USG_PCT_RANK", "E_PACE_RANK"], "rowSet": [[1, "test", 1, "test", "test", 1.5, 1.5, "test", "test", "test", 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, "test", 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5]]}
 	]}`
 
+	const wantPath = "/playerestimatedmetrics"
+	var gotPath string
+
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotPath = r.URL.Path
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(responseBody))
 	}))
@@ -37,6 +44,10 @@ func TestGetPlayerEstimatedMetrics_Generated(t *testing.T) {
 	resp, err := GetPlayerEstimatedMetrics(context.Background(), client, req)
 	if err != nil {
 		t.Fatalf("GetPlayerEstimatedMetrics: %v", err)
+	}
+
+	if gotPath != wantPath {
+		t.Errorf("GetPlayerEstimatedMetrics requested path %q, want %q (endpoint metadata says %q)", gotPath, wantPath, "playerestimatedmetrics")
 	}
 
 	if len(resp.Data.PlayerEstimatedMetrics) == 0 {
