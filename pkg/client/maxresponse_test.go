@@ -9,7 +9,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/n-ae/nba-api-go/v2/pkg/models"
+	"github.com/n-ae/nba-api-go/v3/pkg/models"
 )
 
 func TestClient_Get_MaxResponseBytes(t *testing.T) {

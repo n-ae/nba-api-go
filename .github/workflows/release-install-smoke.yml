@@ -53,7 +53,7 @@ jobs:
           mkdir -p /tmp/install-smoke
           cd /tmp/install-smoke
           go mod init smoke-test
-          go get "github.com/n-ae/nba-api-go/v2@${{ steps.tag.outputs.tag }}"
+          go get "github.com/n-ae/nba-api-go/v3@${{ steps.tag.outputs.tag }}"
 
       - name: Build and run a program against the fetched module
         run: |
@@ -63,8 +63,8 @@ jobs:
           import (
                   "fmt"
 
-                  "github.com/n-ae/nba-api-go/v2/pkg/stats"
-                  "github.com/n-ae/nba-api-go/v2/pkg/stats/static"
+                  "github.com/n-ae/nba-api-go/v3/pkg/stats"
+                  "github.com/n-ae/nba-api-go/v3/pkg/stats/static"
           )
 
           func main() {

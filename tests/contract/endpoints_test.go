@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/n-ae/nba-api-go/v2/pkg/stats"
-	"github.com/n-ae/nba-api-go/v2/pkg/stats/endpoints"
-	"github.com/n-ae/nba-api-go/v2/pkg/stats/parameters"
+	"github.com/n-ae/nba-api-go/v3/pkg/stats"
+	"github.com/n-ae/nba-api-go/v3/pkg/stats/endpoints"
+	"github.com/n-ae/nba-api-go/v3/pkg/stats/parameters"
 )
 
 const (

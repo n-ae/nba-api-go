@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/n-ae/nba-api-go/v2/pkg/models"
+	"github.com/n-ae/nba-api-go/v3/pkg/models"
 )
 
 const (

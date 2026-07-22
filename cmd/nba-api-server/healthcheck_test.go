@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/n-ae/nba-api-go/v2/pkg/stats"
+	"github.com/n-ae/nba-api-go/v3/pkg/stats"
 )
 
 func TestNewHealthChecker_InitialStatusIsUnknown(t *testing.T) {

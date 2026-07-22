@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 
-	"github.com/n-ae/nba-api-go/v2/pkg/stats/endpoints"
+	"github.com/n-ae/nba-api-go/v3/pkg/stats/endpoints"
 )
 
 func (h *StatsHandler) handleBoxScoreSummaryV2(w http.ResponseWriter, r *http.Request) {

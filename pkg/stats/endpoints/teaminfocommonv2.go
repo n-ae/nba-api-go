@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/n-ae/nba-api-go/v2/pkg/models"
-	"github.com/n-ae/nba-api-go/v2/pkg/stats"
-	"github.com/n-ae/nba-api-go/v2/pkg/stats/parameters"
+	"github.com/n-ae/nba-api-go/v3/pkg/models"
+	"github.com/n-ae/nba-api-go/v3/pkg/stats"
+	"github.com/n-ae/nba-api-go/v3/pkg/stats/parameters"
 )
 
 // TeamInfoCommonV2Request contains parameters for the TeamInfoCommonV2 endpoint

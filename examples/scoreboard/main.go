@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/n-ae/nba-api-go/v2/pkg/live"
-	"github.com/n-ae/nba-api-go/v2/pkg/live/endpoints"
+	"github.com/n-ae/nba-api-go/v3/pkg/live"
+	"github.com/n-ae/nba-api-go/v3/pkg/live/endpoints"
 )
 
 func main() {

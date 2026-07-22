@@ -1,4 +1,4 @@
-module github.com/n-ae/nba-api-go/v2
+module github.com/n-ae/nba-api-go/v3
 
 go 1.26.5
 
