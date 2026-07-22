@@ -14,14 +14,21 @@ import (
 // parsing (header validation + positional row decoding) against a
 // synthesized fixture matching this endpoint's actual result-set column
 // names - not just request construction, which TestGeneratedHandlers
-// (cmd/nba-api-server) already exercises indirectly for every endpoint.
+// (cmd/nba-api-server) already exercises indirectly for every endpoint -
+// and asserts the outbound request path matches this endpoint's own
+// metadata exactly, the class of bug ten endpoints shipped with before a
+// live-reachability sweep caught it (see CHANGELOG.md's [3.1.0] section).
 // Do not hand-edit - regenerate via `cd tools/generator && go run . -endpoint LeagueHustleStatsTeamLeaders` instead.
 func TestGetLeagueHustleStatsTeamLeaders_Generated(t *testing.T) {
 	const responseBody = `{"resultSets": [
 		{"name": "HustleStatsTeamLeaders", "headers": ["TEAM_ID", "TEAM_NAME", "GP", "MIN", "SCREEN_ASSISTS", "SCREEN_AST_PTS", "OFF_LOOSE_BALLS_RECOVERED", "DEF_LOOSE_BALLS_RECOVERED", "LOOSE_BALLS_RECOVERED", "OFF_BOXOUTS", "DEF_BOXOUTS", "BOX_OUTS", "CONTESTED_SHOTS", "CONTESTED_SHOTS_2PT", "CONTESTED_SHOTS_3PT", "CHARGES_DRAWN", "DEFLECTIONS"], "rowSet": [[1, "test", 1, 1.5, "test", 1.5, "test", "test", "test", "test", "test", "test", "test", "test", "test", "test", "test"]]}
 	]}`
 
+	const wantPath = "/leaguehustlestatsteamleaders"
+	var gotPath string
+
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotPath = r.URL.Path
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(responseBody))
 	}))
@@ -37,6 +44,10 @@ func TestGetLeagueHustleStatsTeamLeaders_Generated(t *testing.T) {
 	resp, err := GetLeagueHustleStatsTeamLeaders(context.Background(), client, req)
 	if err != nil {
 		t.Fatalf("GetLeagueHustleStatsTeamLeaders: %v", err)
+	}
+
+	if gotPath != wantPath {
+		t.Errorf("GetLeagueHustleStatsTeamLeaders requested path %q, want %q (endpoint metadata says %q)", gotPath, wantPath, "leaguehustlestatsteamleaders")
 	}
 
 	if len(resp.Data.HustleStatsTeamLeaders) == 0 {

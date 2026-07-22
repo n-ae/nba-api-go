@@ -14,14 +14,21 @@ import (
 // parsing (header validation + positional row decoding) against a
 // synthesized fixture matching this endpoint's actual result-set column
 // names - not just request construction, which TestGeneratedHandlers
-// (cmd/nba-api-server) already exercises indirectly for every endpoint.
+// (cmd/nba-api-server) already exercises indirectly for every endpoint -
+// and asserts the outbound request path matches this endpoint's own
+// metadata exactly, the class of bug ten endpoints shipped with before a
+// live-reachability sweep caught it (see CHANGELOG.md's [3.1.0] section).
 // Do not hand-edit - regenerate via `cd tools/generator && go run . -endpoint HomepageLeaders` instead.
 func TestGetHomepageLeaders_Generated(t *testing.T) {
 	const responseBody = `{"resultSets": [
 		{"name": "HomepageLeaders", "headers": ["PLAYER_ID", "RANK", "PLAYER", "TEAM_ID", "TEAM", "GP", "MIN", "FGM", "FGA", "FG_PCT", "FG3M", "FG3A", "FG3_PCT", "FTM", "FTA", "FT_PCT", "OREB", "DREB", "REB", "AST", "STL", "BLK", "TOV", "PTS", "EFF"], "rowSet": [[1, 1, "test", 1, "test", 1, 1.5, 1, 1, 1.5, 1, 1, 1.5, 1, 1, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, "test"]]}
 	]}`
 
+	const wantPath = "/homepageleaders"
+	var gotPath string
+
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotPath = r.URL.Path
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(responseBody))
 	}))
@@ -37,6 +44,10 @@ func TestGetHomepageLeaders_Generated(t *testing.T) {
 	resp, err := GetHomepageLeaders(context.Background(), client, req)
 	if err != nil {
 		t.Fatalf("GetHomepageLeaders: %v", err)
+	}
+
+	if gotPath != wantPath {
+		t.Errorf("GetHomepageLeaders requested path %q, want %q (endpoint metadata says %q)", gotPath, wantPath, "homepageleaders")
 	}
 
 	if len(resp.Data.HomepageLeaders) == 0 {

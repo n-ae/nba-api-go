@@ -15,7 +15,10 @@ import (
 // parsing (header validation + positional row decoding) against a
 // synthesized fixture matching this endpoint's actual result-set column
 // names - not just request construction, which TestGeneratedHandlers
-// (cmd/nba-api-server) already exercises indirectly for every endpoint.
+// (cmd/nba-api-server) already exercises indirectly for every endpoint -
+// and asserts the outbound request path matches this endpoint's own
+// metadata exactly, the class of bug ten endpoints shipped with before a
+// live-reachability sweep caught it (see CHANGELOG.md's [3.1.0] section).
 // Do not hand-edit - regenerate via `cd tools/generator && go run . -endpoint PlayerDashboardByGeneralSplits` instead.
 func TestGetPlayerDashboardByGeneralSplits_Generated(t *testing.T) {
 	const responseBody = `{"resultSets": [
@@ -26,7 +29,11 @@ func TestGetPlayerDashboardByGeneralSplits_Generated(t *testing.T) {
 		{"name": "PrePostAllStarPlayerDashboard", "headers": ["GROUP_SET", "GROUP_VALUE", "GP", "W", "L", "W_PCT", "MIN", "FGM", "FGA", "FG_PCT", "FG3M", "FG3A", "FG3_PCT", "FTM", "FTA", "FT_PCT", "OREB", "DREB", "REB", "AST", "TOV", "STL", "BLK", "BLKA", "PF", "PFD", "PTS", "PLUS_MINUS", "NBA_FANTASY_PTS", "DD2", "TD3", "GP_RANK", "W_RANK", "L_RANK", "W_PCT_RANK", "MIN_RANK", "FGM_RANK", "FGA_RANK", "FG_PCT_RANK", "FG3M_RANK", "FG3A_RANK", "FG3_PCT_RANK", "FTM_RANK", "FTA_RANK", "FT_PCT_RANK", "OREB_RANK", "DREB_RANK", "REB_RANK", "AST_RANK", "TOV_RANK", "STL_RANK", "BLK_RANK", "BLKA_RANK", "PF_RANK", "PFD_RANK", "PTS_RANK", "PLUS_MINUS_RANK", "NBA_FANTASY_PTS_RANK", "DD2_RANK", "TD3_RANK"], "rowSet": [["test", "test", 1, "test", "test", 1.5, 1.5, 1, 1, 1.5, 1, 1, 1.5, 1, 1, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5]]}
 	]}`
 
+	const wantPath = "/playerdashboardbygeneralsplits"
+	var gotPath string
+
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotPath = r.URL.Path
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(responseBody))
 	}))
@@ -46,6 +53,10 @@ func TestGetPlayerDashboardByGeneralSplits_Generated(t *testing.T) {
 	resp, err := GetPlayerDashboardByGeneralSplits(context.Background(), client, req)
 	if err != nil {
 		t.Fatalf("GetPlayerDashboardByGeneralSplits: %v", err)
+	}
+
+	if gotPath != wantPath {
+		t.Errorf("GetPlayerDashboardByGeneralSplits requested path %q, want %q (endpoint metadata says %q)", gotPath, wantPath, "playerdashboardbygeneralsplits")
 	}
 
 	if len(resp.Data.OverallPlayerDashboard) == 0 {

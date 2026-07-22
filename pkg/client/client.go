@@ -83,6 +83,17 @@ func NewClient(config Config) (*Client, error) {
 	if err != nil {
 		return nil, fmt.Errorf("invalid base URL: %w", err)
 	}
+	// url.Parse alone accepts far more than a usable base URL - relative
+	// references, opaque strings, and "" all parse without error. Require
+	// an absolute http(s) URL with a host, so a caller who passes
+	// "not-a-url" or "" finds out at construction, not as a confusing
+	// failure on the first Get.
+	if baseURL.Scheme != "http" && baseURL.Scheme != "https" {
+		return nil, fmt.Errorf("invalid base URL %q: scheme must be http or https", config.BaseURL)
+	}
+	if baseURL.Host == "" {
+		return nil, fmt.Errorf("invalid base URL %q: missing host", config.BaseURL)
+	}
 
 	if config.HTTPClient == nil {
 		// Clone http.DefaultTransport rather than building one from a

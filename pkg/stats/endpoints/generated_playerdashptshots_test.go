@@ -14,7 +14,10 @@ import (
 // parsing (header validation + positional row decoding) against a
 // synthesized fixture matching this endpoint's actual result-set column
 // names - not just request construction, which TestGeneratedHandlers
-// (cmd/nba-api-server) already exercises indirectly for every endpoint.
+// (cmd/nba-api-server) already exercises indirectly for every endpoint -
+// and asserts the outbound request path matches this endpoint's own
+// metadata exactly, the class of bug ten endpoints shipped with before a
+// live-reachability sweep caught it (see CHANGELOG.md's [3.1.0] section).
 // Do not hand-edit - regenerate via `cd tools/generator && go run . -endpoint PlayerDashPtShots` instead.
 func TestGetPlayerDashPtShots_Generated(t *testing.T) {
 	const responseBody = `{"resultSets": [
@@ -26,7 +29,11 @@ func TestGetPlayerDashPtShots_Generated(t *testing.T) {
 		{"name": "TouchTimeShooting", "headers": ["PLAYER_ID", "PLAYER_NAME_LAST_FIRST", "TOUCH_TIME_RANGE", "FGA_FREQUENCY", "FGM", "FGA", "FG_PCT", "EFG_PCT", "FG2A_FREQUENCY", "FG2M", "FG2A", "FG2_PCT", "FG3A_FREQUENCY", "FG3M", "FG3A", "FG3_PCT"], "rowSet": [[1, "test", "test", 1.5, 1, 1, 1.5, 1.5, "test", "test", "test", 1.5, 1.5, 1, 1, 1.5]]}
 	]}`
 
+	const wantPath = "/playerdashptshots"
+	var gotPath string
+
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotPath = r.URL.Path
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(responseBody))
 	}))
@@ -44,6 +51,10 @@ func TestGetPlayerDashPtShots_Generated(t *testing.T) {
 	resp, err := GetPlayerDashPtShots(context.Background(), client, req)
 	if err != nil {
 		t.Fatalf("GetPlayerDashPtShots: %v", err)
+	}
+
+	if gotPath != wantPath {
+		t.Errorf("GetPlayerDashPtShots requested path %q, want %q (endpoint metadata says %q)", gotPath, wantPath, "playerdashptshots")
 	}
 
 	if len(resp.Data.OverallShooting) == 0 {

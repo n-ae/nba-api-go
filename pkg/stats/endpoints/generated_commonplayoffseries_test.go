@@ -15,14 +15,21 @@ import (
 // parsing (header validation + positional row decoding) against a
 // synthesized fixture matching this endpoint's actual result-set column
 // names - not just request construction, which TestGeneratedHandlers
-// (cmd/nba-api-server) already exercises indirectly for every endpoint.
+// (cmd/nba-api-server) already exercises indirectly for every endpoint -
+// and asserts the outbound request path matches this endpoint's own
+// metadata exactly, the class of bug ten endpoints shipped with before a
+// live-reachability sweep caught it (see CHANGELOG.md's [3.1.0] section).
 // Do not hand-edit - regenerate via `cd tools/generator && go run . -endpoint CommonPlayoffSeries` instead.
 func TestGetCommonPlayoffSeries_Generated(t *testing.T) {
 	const responseBody = `{"resultSets": [
 		{"name": "PlayoffSeries", "headers": ["GAME_ID", "HOME_TEAM_ID", "VISITOR_TEAM_ID", "SERIES_ID", "GAME_NUM"], "rowSet": [["test", 1, 1, "test", "test"]]}
 	]}`
 
+	const wantPath = "/commonplayoffseries"
+	var gotPath string
+
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotPath = r.URL.Path
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(responseBody))
 	}))
@@ -40,6 +47,10 @@ func TestGetCommonPlayoffSeries_Generated(t *testing.T) {
 	resp, err := GetCommonPlayoffSeries(context.Background(), client, req)
 	if err != nil {
 		t.Fatalf("GetCommonPlayoffSeries: %v", err)
+	}
+
+	if gotPath != wantPath {
+		t.Errorf("GetCommonPlayoffSeries requested path %q, want %q (endpoint metadata says %q)", gotPath, wantPath, "commonplayoffseries")
 	}
 
 	if len(resp.Data.PlayoffSeries) == 0 {

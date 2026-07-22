@@ -14,14 +14,21 @@ import (
 // parsing (header validation + positional row decoding) against a
 // synthesized fixture matching this endpoint's actual result-set column
 // names - not just request construction, which TestGeneratedHandlers
-// (cmd/nba-api-server) already exercises indirectly for every endpoint.
+// (cmd/nba-api-server) already exercises indirectly for every endpoint -
+// and asserts the outbound request path matches this endpoint's own
+// metadata exactly, the class of bug ten endpoints shipped with before a
+// live-reachability sweep caught it (see CHANGELOG.md's [3.1.0] section).
 // Do not hand-edit - regenerate via `cd tools/generator && go run . -endpoint ShootingEfficiency` instead.
 func TestGetShootingEfficiency_Generated(t *testing.T) {
 	const responseBody = `{"resultSets": [
 		{"name": "ShootingEfficiency", "headers": ["PLAYER_ID", "PLAYER_NAME", "TEAM_ID", "TEAM_ABBREVIATION", "GP", "MIN", "PTS", "FG_PCT", "FG2_PCT", "FG3_PCT", "EFG_PCT", "FT_PCT", "TS_PCT"], "rowSet": [[1, "test", 1, "test", 1, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5]]}
 	]}`
 
+	const wantPath = "/shootingefficiency"
+	var gotPath string
+
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotPath = r.URL.Path
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(responseBody))
 	}))
@@ -37,6 +44,10 @@ func TestGetShootingEfficiency_Generated(t *testing.T) {
 	resp, err := GetShootingEfficiency(context.Background(), client, req)
 	if err != nil {
 		t.Fatalf("GetShootingEfficiency: %v", err)
+	}
+
+	if gotPath != wantPath {
+		t.Errorf("GetShootingEfficiency requested path %q, want %q (endpoint metadata says %q)", gotPath, wantPath, "shootingefficiency")
 	}
 
 	if len(resp.Data.ShootingEfficiency) == 0 {

@@ -862,6 +862,68 @@ func TestTeamInfoCommonFieldsMatchCodebaseMajority(t *testing.T) {
 	}
 }
 
+// TestEndpointPathMatchesNameConvention is the automated form of the
+// manual self-consistency check that originally found the 10 malformed
+// endpoint paths documented in CHANGELOG.md's [3.1.0] section (embedded
+// spaces, stray capitals, straightforward typos) - every metadata entry's
+// "endpoint" field should equal its "name" field lowercased, the
+// exceptionless convention this codebase uses everywhere but one
+// documented case. This reads metadata directly, independent of
+// generated output - unlike each endpoint's generated
+// TestGet<Name>_Generated, whose path assertion only proves generated
+// code matches its own metadata (it can't catch a typo already present
+// in the metadata itself, since both sides of that assertion derive from
+// the same source). This test can catch exactly that: a metadata typo,
+// before it ever reaches generated code.
+func TestEndpointPathMatchesNameConvention(t *testing.T) {
+	// TeamYearOverYearSplits is the sole documented exception: its own
+	// doc comment in pkg/stats/endpoints/teamyearoveryearsplits.go states
+	// this is deliberate - a shorter Go-friendly type name for a real,
+	// differently-named NBA.com endpoint
+	// (teamdashboardbyyearoveryearsplits). Do not add further exceptions
+	// here without an equivalent doc comment on the affected endpoint
+	// file explaining why the convention doesn't apply.
+	exceptions := map[string]string{
+		"TeamYearOverYearSplits": "teamdashboardbyyearoveryearsplits",
+	}
+
+	metadataFiles, err := filepath.Glob("metadata/*.json")
+	if err != nil {
+		t.Fatalf("failed to glob metadata files: %v", err)
+	}
+	if len(metadataFiles) == 0 {
+		t.Fatal("no metadata files found under metadata/ - this test would trivially pass without exercising anything")
+	}
+
+	checked := 0
+	for _, mf := range metadataFiles {
+		data, err := os.ReadFile(mf)
+		if err != nil {
+			t.Fatalf("failed to read %s: %v", mf, err)
+		}
+		var endpoints []EndpointMetadata
+		if err := json.Unmarshal(data, &endpoints); err != nil {
+			t.Fatalf("failed to parse %s: %v", mf, err)
+		}
+		for _, ep := range endpoints {
+			if ep.HandlerOnly {
+				continue // hand-written SDK entry, exists only to drive handler generation - no URL path of its own here
+			}
+			checked++
+			want := strings.ToLower(ep.Name)
+			if exception, ok := exceptions[ep.Name]; ok {
+				want = exception
+			}
+			if ep.Endpoint != want {
+				t.Errorf("%s (%s): endpoint = %q, want %q - doesn't match the lowercase(name) convention and isn't a documented exception", ep.Name, mf, ep.Endpoint, want)
+			}
+		}
+	}
+	if checked == 0 {
+		t.Fatal("no non-handler-only metadata entries found - this test would trivially pass without exercising anything")
+	}
+}
+
 // TestAllMetadataFieldsHaveExplicitTypes ensures every field name
 // referenced by a committed metadata/*.json file has an explicit entry in
 // fieldtypes.json, so generation never silently falls back to inferGoType

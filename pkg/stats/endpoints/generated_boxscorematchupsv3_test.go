@@ -14,7 +14,10 @@ import (
 // parsing (header validation + positional row decoding) against a
 // synthesized fixture matching this endpoint's actual result-set column
 // names - not just request construction, which TestGeneratedHandlers
-// (cmd/nba-api-server) already exercises indirectly for every endpoint.
+// (cmd/nba-api-server) already exercises indirectly for every endpoint -
+// and asserts the outbound request path matches this endpoint's own
+// metadata exactly, the class of bug ten endpoints shipped with before a
+// live-reachability sweep caught it (see CHANGELOG.md's [3.1.0] section).
 // Do not hand-edit - regenerate via `cd tools/generator && go run . -endpoint BoxScoreMatchupsV3` instead.
 func TestGetBoxScoreMatchupsV3_Generated(t *testing.T) {
 	const responseBody = `{"resultSets": [
@@ -22,7 +25,11 @@ func TestGetBoxScoreMatchupsV3_Generated(t *testing.T) {
 		{"name": "AwayTeamPlayerMatchups", "headers": ["GAME_ID", "PERSON_ID", "PLAYER_NAME", "TEAM_ID", "TEAM_ABBREVIATION", "MATCHUP_MIN_PTS", "PARTIAL_POSS", "PLAYER_PTS", "TEAM_PTS", "MATCHUP_AST", "MATCHUP_TOV", "MATCHUP_BLK", "MATCHUP_FGM", "MATCHUP_FGA", "MATCHUP_FG_PCT", "MATCHUP_FG3M", "MATCHUP_FG3A", "MATCHUP_FG3_PCT", "HELP_BLK", "HELP_FGM", "HELP_FGA", "HELP_FG_PCT", "SHOOTER_PLAYER_ID", "SHOOTER_PLAYER_NAME", "DEFENDER_PLAYER_ID", "DEFENDER_PLAYER_NAME", "SFL"], "rowSet": [["test", "test", "test", 1, "test", "test", "test", 1.5, 1.5, "test", "test", "test", "test", "test", 1.5, "test", "test", 1.5, 1.5, 1, 1, 1.5, 1, "test", 1, "test", "test"]]}
 	]}`
 
+	const wantPath = "/boxscorematchupsv3"
+	var gotPath string
+
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotPath = r.URL.Path
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(responseBody))
 	}))
@@ -40,6 +47,10 @@ func TestGetBoxScoreMatchupsV3_Generated(t *testing.T) {
 	resp, err := GetBoxScoreMatchupsV3(context.Background(), client, req)
 	if err != nil {
 		t.Fatalf("GetBoxScoreMatchupsV3: %v", err)
+	}
+
+	if gotPath != wantPath {
+		t.Errorf("GetBoxScoreMatchupsV3 requested path %q, want %q (endpoint metadata says %q)", gotPath, wantPath, "boxscorematchupsv3")
 	}
 
 	if len(resp.Data.HomeTeamPlayerMatchups) == 0 {
