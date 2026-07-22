@@ -249,24 +249,32 @@ func TestNewClientRejectsBaseURLWithUserinfoQueryOrFragment(t *testing.T) {
 // or token: userinfo, a query string, an invalid scheme on an otherwise
 // credential-bearing URL (the pre-existing instance of the same defect,
 // present since v3.1.2's original scheme check, not introduced by
-// v3.1.3's userinfo/query/fragment checks), and several shapes of
-// url.Parse failure - an invalid percent-escape, an invalid port, and a
-// malformed IPv6 host. The url.Parse-failure cases are the uncovered
-// path this table originally missed (v3.1.4's fix wrapped url.Parse's
-// own %w-formatted error, which embeds the complete input), and then,
-// after v3.1.5 unwrapped to what its own comment incorrectly called an
-// "input-free" reason, the third instance of the same defect class: the
-// invalid-port and malformed-IPv6-host cases below leaked via that
-// unwrapped reason too, since net/url builds those specific reasons
-// directly from the input. Found by the 2026-07-22 (b3c605d, 0e400d1,
-// and f4801ef) maintainability assessments across three consecutive
-// cycles; fixed for good by returning a fixed, input-free message for
-// every url.Parse failure rather than trying to find a "safe" layer of
-// the parser's own error to render - see NewClient's comment. A caller
-// passing "https://admin:secret@host" got back an error containing the
-// literal string "admin:secret" in earlier versions - disclosing exactly
-// the credential the check exists to keep out of use, in whatever logs
-// or error trackers capture NewClient's error.
+// v3.1.3's userinfo/query/fragment checks), a token-shaped scheme value
+// itself (a distinct, adjacent instance found later - see below), and
+// several shapes of url.Parse failure - an invalid percent-escape, an
+// invalid port, and a malformed IPv6 host. The url.Parse-failure cases
+// are the uncovered path this table originally missed (v3.1.4's fix
+// wrapped url.Parse's own %w-formatted error, which embeds the complete
+// input), and then, after v3.1.5 unwrapped to what its own comment
+// incorrectly called an "input-free" reason, the third instance of the
+// same defect class: the invalid-port and malformed-IPv6-host cases
+// below leaked via that unwrapped reason too, since net/url builds those
+// specific reasons directly from the input. Found by the 2026-07-22
+// (b3c605d, 0e400d1, and f4801ef) maintainability assessments across
+// three consecutive cycles; fixed for good by returning a fixed,
+// input-free message for every url.Parse failure rather than trying to
+// find a "safe" layer of the parser's own error to render - see
+// NewClient's comment. The scheme-value case is a separate, adjacent
+// finding (2026-07-22, eb62a41 maintainability assessment): the
+// unsupported-scheme check, untouched since v3.1.2 and outside the
+// url.Parse-failure branch entirely, echoed baseURL.Scheme on the
+// assumption a scheme isn't secret-bearing - an assumption never checked
+// against URI scheme grammar (RFC 3986: a letter, then letters, digits,
+// '+', '-', '.'), which is permissive enough to hold a token shape. A
+// caller passing "https://admin:secret@host" got back an error
+// containing the literal string "admin:secret" in earlier versions -
+// disclosing exactly the credential the check exists to keep out of use,
+// in whatever logs or error trackers capture NewClient's error.
 func TestNewClientRejectionErrorsDoNotLeakBaseURL(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -277,6 +285,7 @@ func TestNewClientRejectionErrorsDoNotLeakBaseURL(t *testing.T) {
 		{"query", "https://example.com?api_key=hunter2", []string{"api_key", "hunter2"}},
 		{"fragment", "https://example.com#hunter2", []string{"hunter2"}},
 		{"invalid scheme with userinfo", "ftp://admin:hunter2@example.com", []string{"admin", "hunter2"}},
+		{"secret-shaped scheme value", "sklive123hunter2://example.com", []string{"sklive123hunter2"}},
 		{"parse failure with userinfo", "https://admin:hunter2@example.com/%zz", []string{"admin", "hunter2"}},
 		{"parse failure with query token", "https://example.com/%zz?token=hunter2", []string{"token", "hunter2"}},
 		{"parse failure with secret in invalid port", "https://example.com:sk_live_123/path", []string{"sk_live_123"}},
@@ -298,6 +307,29 @@ func TestNewClientRejectionErrorsDoNotLeakBaseURL(t *testing.T) {
 	}
 }
 
+// validSchemeMarker transforms marker into a syntactically valid URI
+// scheme (RFC 3986: a letter, then any mix of letters, digits, '+', '-',
+// '.'). Unlike the other fuzz template positions, an arbitrary marker
+// can't be dropped into the scheme position unmodified - most fuzzed
+// strings would make url.Parse itself fail (or parse as something other
+// than a scheme) before NewClient's scheme check ever runs, so the
+// scheme template would rarely reach the branch it's meant to exercise.
+func validSchemeMarker(marker string) string {
+	var b strings.Builder
+	for _, r := range marker {
+		switch {
+		case r >= 'a' && r <= 'z', r >= 'A' && r <= 'Z',
+			r >= '0' && r <= '9', r == '+', r == '-', r == '.':
+			b.WriteRune(r)
+		}
+	}
+	s := b.String()
+	if s == "" || (s[0] < 'a' || s[0] > 'z') && (s[0] < 'A' || s[0] > 'Z') {
+		s = "a" + s
+	}
+	return s
+}
+
 // FuzzNewClientErrorDoesNotEchoInput is the structural counterpart to
 // TestNewClientRejectionErrorsDoNotLeakBaseURL: rather than relying on a
 // hand-enumerated list of NewClient's rejection paths to be complete -
@@ -315,11 +347,13 @@ func TestNewClientRejectionErrorsDoNotLeakBaseURL(t *testing.T) {
 // branch no longer depends on this test (or any enumeration) to hold the
 // invariant: it now returns a fixed, input-free message regardless of
 // input, so no future parser-error shape can reopen this defect class
-// through that branch. The templates below (including the two added for
-// port and host) exist as regression evidence for the specific inputs
-// found across three cycles, not as the thing guaranteeing the
-// invariant - that guarantee now comes from NewClient's implementation,
-// not from this test enumerating every parser failure mode.
+// through that branch. Likewise, the 2026-07-22 (eb62a41) assessment
+// found the scheme check echoed baseURL.Scheme; that's fixed the same
+// way and no longer depends on the scheme template below either. The
+// templates below exist as regression evidence for the specific inputs
+// found across cycles, not as the thing guaranteeing the invariant -
+// that guarantee now comes from NewClient's implementation returning
+// fixed messages, not from this test enumerating every failure mode.
 //
 // Markers are restricted to at least 4 characters and containing a
 // digit: NewClient's own error text is hand-written English prose with
@@ -348,6 +382,7 @@ func FuzzNewClientErrorDoesNotEchoInput(f *testing.F) {
 		"https://MARKER@example.com/%zz",   // forces the url.Parse failure path, with a credential present
 		"https://example.com:MARKER/path",  // forces an invalid-port url.Parse failure, marker in the port
 		"https://[::1MARKER]:443/path",     // forces a malformed-IPv6-host url.Parse failure, marker in the host
+		"SCHEME://example.com",             // marker (normalized) in the scheme position
 	}
 
 	f.Fuzz(func(t *testing.T, marker string) {
@@ -356,6 +391,7 @@ func FuzzNewClientErrorDoesNotEchoInput(f *testing.F) {
 		}
 		for _, tmpl := range templates {
 			baseURL := strings.ReplaceAll(tmpl, "MARKER", marker)
+			baseURL = strings.ReplaceAll(baseURL, "SCHEME", validSchemeMarker(marker))
 			_, err := NewClient(Config{BaseURL: baseURL})
 			if err == nil {
 				continue // a BaseURL this marker happens to make valid isn't this test's concern
@@ -365,6 +401,49 @@ func FuzzNewClientErrorDoesNotEchoInput(f *testing.F) {
 			}
 		}
 	})
+}
+
+// TestNewClientErrorMessagesAreFixed inventories every distinct
+// rejection an invalid BaseURL can produce and asserts each one is a
+// fixed string, byte-for-byte, regardless of what specifically made the
+// BaseURL invalid - a stronger check than "the marker doesn't appear"
+// (the tests above), since it also catches a value unrelated to whatever
+// marker a test happens to choose. Added after this project had to
+// relearn, in two separate code paths across two consecutive
+// maintainability-assessment cycles (url.Parse failures in f4801ef, then
+// the unsupported-scheme check in eb62a41), that a rendered value
+// assumed "safe" needs to be checked against what it can actually
+// contain, not against one hand-picked example. If a future change
+// reintroduces any caller-derived value into one of these messages, this
+// test fails immediately regardless of which value or how it's shaped.
+func TestNewClientErrorMessagesAreFixed(t *testing.T) {
+	tests := []struct {
+		name    string
+		baseURL string
+		want    string
+	}{
+		{"parse failure: invalid escape", "https://example.com/%zz", "invalid base URL: malformed"},
+		{"parse failure: invalid port", "https://example.com:sk_live_123/path", "invalid base URL: malformed"},
+		{"invalid scheme", "ftp://example.com", "invalid base URL: scheme must be http or https"},
+		{"invalid scheme: secret-shaped", "sklive123://example.com", "invalid base URL: scheme must be http or https"},
+		{"missing host: empty authority", "https:///path", "invalid base URL: missing host"},
+		{"missing host: port only", "https://:443", "invalid base URL: missing host"},
+		{"userinfo", "https://user:pass@example.com", `invalid base URL: must not contain userinfo (e.g. "user:pass@") - configure authentication separately`},
+		{"query string", "https://example.com?x=1", "invalid base URL: must not contain a query string"},
+		{"fragment", "https://example.com#x", "invalid base URL: must not contain a fragment"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := NewClient(Config{BaseURL: tt.baseURL})
+			if err == nil {
+				t.Fatalf("NewClient(BaseURL: %q) succeeded, want an error", tt.baseURL)
+			}
+			if err.Error() != tt.want {
+				t.Errorf("NewClient(BaseURL: %q) error = %q, want %q", tt.baseURL, err.Error(), tt.want)
+			}
+		})
+	}
 }
 
 func TestClientHeaderMutationsAreSafeDuringRequests(t *testing.T) {
