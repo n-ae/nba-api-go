@@ -390,14 +390,33 @@ func FuzzNewClientErrorDoesNotEchoInput(f *testing.F) {
 			t.Skip()
 		}
 		for _, tmpl := range templates {
-			baseURL := strings.ReplaceAll(tmpl, "MARKER", marker)
-			baseURL = strings.ReplaceAll(baseURL, "SCHEME", validSchemeMarker(marker))
+			// The scheme template inserts a normalized value, not marker
+			// itself (scheme syntax excludes most characters a fuzzed
+			// marker can contain) - track what's actually inserted and
+			// assert against that, not the original marker. Checking the
+			// unnormalized marker here would only catch a regression by
+			// coincidence, for markers that happen to already be valid
+			// scheme syntax; a realistic secret shape like "sk_live_..."
+			// changes under normalization and would slip through
+			// undetected. Found by the 2026-07-22 (8e85a9c)
+			// maintainability assessment, confirmed by reintroducing the
+			// exact regression this template exists to catch and
+			// observing the old (marker-only) assertion miss it for
+			// exactly this seed's shape.
+			inserted := marker
+			var baseURL string
+			if strings.Contains(tmpl, "SCHEME") {
+				inserted = validSchemeMarker(marker)
+				baseURL = strings.ReplaceAll(tmpl, "SCHEME", inserted)
+			} else {
+				baseURL = strings.ReplaceAll(tmpl, "MARKER", marker)
+			}
 			_, err := NewClient(Config{BaseURL: baseURL})
 			if err == nil {
 				continue // a BaseURL this marker happens to make valid isn't this test's concern
 			}
-			if strings.Contains(err.Error(), marker) {
-				t.Fatalf("NewClient(BaseURL: %q) error = %q leaks marker %q", baseURL, err.Error(), marker)
+			if strings.Contains(err.Error(), inserted) {
+				t.Fatalf("NewClient(BaseURL: %q) error = %q leaks marker %q", baseURL, err.Error(), inserted)
 			}
 		}
 	})

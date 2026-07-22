@@ -1,0 +1,55 @@
+name: Fuzz
+
+# Scheduled coverage-guided fuzzing for pkg/client's BaseURL
+# secret-disclosure invariant (FuzzNewClientErrorDoesNotEchoInput), kept
+# out of the main CI workflow on purpose: ordinary `go test ./...` only
+# replays the fuzz target's seed corpus, not ongoing mutation, so it
+# can't find anything this job can. Recommended across three consecutive
+# maintainability-assessment cycles (f4801ef, eb62a41, 8e85a9c) before
+# finally being added here rather than carried forward a fourth time -
+# see docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT.md.
+on:
+  schedule:
+    - cron: "0 7 * * *" # daily 07:00 UTC
+  workflow_dispatch:
+
+# A red run here means the fuzzer found a BaseURL that makes NewClient
+# leak part of itself into the returned error - a real finding, not a
+# flaky test. To act on it: download the "fuzz-failure-corpus" artifact
+# from the failed run, copy its file into
+# pkg/client/testdata/fuzz/FuzzNewClientErrorDoesNotEchoInput/, fix the
+# underlying leak, and commit the corpus file alongside the fix - ordinary
+# `go test` always replays any file already present under testdata/fuzz/,
+# so the specific failing case is a permanent regression test from then on
+# without needing to fuzz again to rediscover it.
+jobs:
+  fuzz:
+    runs-on: ubuntu-latest
+    # Bounded so a stuck fuzz run can't occupy a runner indefinitely; -fuzztime
+    # below (60s) is the actual budget, this is just a hard backstop.
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+
+      - name: fuzz BaseURL error non-disclosure invariant
+        # -run=^$ skips ordinary tests in this invocation (they already
+        # run in ci.yml on every push/PR); -fuzztime bounds this to a
+        # fixed, predictable cost per run rather than running indefinitely.
+        # 60s found nothing across 2M+ local executions during this
+        # invariant's development (see CHANGELOG's v3.1.4-v3.1.7 entries),
+        # so this job exists to catch a *future* regression, not to
+        # re-discover already-fixed gaps.
+        working-directory: pkg/client
+        run: go test -run=^$ -fuzz=FuzzNewClientErrorDoesNotEchoInput -fuzztime=60s .
+
+      - name: upload failing corpus
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuzz-failure-corpus
+          path: pkg/client/testdata/fuzz/
+          retention-days: 30
