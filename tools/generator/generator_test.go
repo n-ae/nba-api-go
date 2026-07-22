@@ -38,24 +38,39 @@ func TestGenerateFromMetadata_ProducesValidGo(t *testing.T) {
 	for _, mf := range metadataFiles {
 		t.Run(filepath.Base(mf), func(t *testing.T) {
 			outDir := t.TempDir()
-			g := NewGenerator(outDir)
+			serverOutDir := t.TempDir()
+			g := NewGenerator(outDir, serverOutDir)
 			if err := g.GenerateFromMetadata(mf, false); err != nil {
 				t.Fatalf("GenerateFromMetadata(%s) failed: %v", mf, err)
 			}
 
-			entries, err := os.ReadDir(outDir)
-			if err != nil {
-				t.Fatalf("failed to read output dir: %v", err)
+			// SDK output (outDir) is empty for a metadata file whose
+			// entries are all handler_only (see
+			// metadata/handwritten_handlers.json) - by design,
+			// generateEndpoint is never called for those. Handler output
+			// (serverOutDir) always has at least one file regardless,
+			// since every entry gets a generated handler. Checking the
+			// combined total, not outDir alone, keeps this test's "did it
+			// silently no-op" guarantee for every metadata file without
+			// special-casing handler_only ones.
+			var paths []string
+			for _, dir := range []string{outDir, serverOutDir} {
+				entries, err := os.ReadDir(dir)
+				if err != nil {
+					t.Fatalf("failed to read output dir %s: %v", dir, err)
+				}
+				for _, entry := range entries {
+					paths = append(paths, filepath.Join(dir, entry.Name()))
+				}
 			}
-			if len(entries) == 0 {
-				t.Fatalf("%s produced no output files", mf)
+			if len(paths) == 0 {
+				t.Fatalf("%s produced no output files in either output directory", mf)
 			}
 
 			fset := token.NewFileSet()
-			for _, entry := range entries {
-				path := filepath.Join(outDir, entry.Name())
+			for _, path := range paths {
 				if _, err := parser.ParseFile(fset, path, nil, parser.AllErrors); err != nil {
-					t.Errorf("%s: generated file %s is not valid Go: %v", mf, entry.Name(), err)
+					t.Errorf("%s: generated file %s is not valid Go: %v", mf, path, err)
 				}
 			}
 		})
@@ -78,7 +93,7 @@ func TestGenerateSingleEndpointLoadsMetadata(t *testing.T) {
 	}
 
 	outDir := t.TempDir()
-	g := NewGenerator(outDir)
+	g := NewGenerator(outDir, t.TempDir())
 	if err := g.GenerateSingleEndpoint(endpointName, defaultMetadataDir(), false); err != nil {
 		t.Fatalf("GenerateSingleEndpoint(%q): %v", endpointName, err)
 	}
@@ -104,7 +119,7 @@ func TestGenerateSingleEndpointLoadsMetadata(t *testing.T) {
 // metadata gap fails rather than writing a compilable-but-empty endpoint.
 func TestGenerateSingleEndpointRejectsUnknownMetadata(t *testing.T) {
 	outDir := t.TempDir()
-	g := NewGenerator(outDir)
+	g := NewGenerator(outDir, t.TempDir())
 	if err := g.GenerateSingleEndpoint("NotARealEndpoint", defaultMetadataDir(), false); err == nil {
 		t.Fatal("GenerateSingleEndpoint() succeeded for an endpoint without metadata")
 	}

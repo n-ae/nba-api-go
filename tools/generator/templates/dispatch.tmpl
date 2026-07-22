@@ -1,0 +1,23 @@
+package main
+
+import "net/http"
+
+// generatedDispatch maps each lowercase HTTP route name to its handler
+// method, generated from every tools/generator/metadata/*.json file - see
+// tools/generator/templates/dispatch.tmpl. Do not hand-edit - regenerate
+// via `cd tools/generator && go run . -all-handlers` instead. Replaces
+// what used to be a hand-maintained switch statement in
+// StatsHandler.ServeHTTP.
+var generatedDispatch = map[string]func(*StatsHandler, http.ResponseWriter, *http.Request){
+{{- range .}}
+	"{{.NameLower}}": (*StatsHandler).handle{{.Name}},
+{{- end}}
+
+	// Legacy route alias, not derived from metadata: "playertrackingshotdashboard"
+	// was the original route name for what metadata now calls
+	// PlayerTrackingShootingEfficiency. Kept for backward compatibility with
+	// any caller still using the old path - see cmd/nba-api-server/main.go's
+	// EndpointsCount comment (http_exposed is 1 higher than sdk_total because
+	// of this single alias).
+	"playertrackingshotdashboard": (*StatsHandler).handlePlayerTrackingShootingEfficiency,
+}
