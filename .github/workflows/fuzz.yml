@@ -13,15 +13,23 @@ on:
     - cron: "0 7 * * *" # daily 07:00 UTC
   workflow_dispatch:
 
-# A red run here means the fuzzer found a BaseURL that makes NewClient
-# leak part of itself into the returned error - a real finding, not a
-# flaky test. To act on it: download the "fuzz-failure-corpus" artifact
-# from the failed run, copy its file into
+# If the "fuzz BaseURL error non-disclosure invariant" step below fails
+# with a "fuzz-failure-corpus" artifact attached, that's a real finding -
+# the fuzzer found a BaseURL that makes NewClient leak part of itself
+# into the returned error, not a flaky test. To act on it: download the
+# artifact, copy its file into
 # pkg/client/testdata/fuzz/FuzzNewClientErrorDoesNotEchoInput/, fix the
 # underlying leak, and commit the corpus file alongside the fix - ordinary
 # `go test` always replays any file already present under testdata/fuzz/,
 # so the specific failing case is a permanent regression test from then on
 # without needing to fuzz again to rediscover it.
+#
+# A red run with no artifact (checkout failed, setup-go failed, a runner
+# outage, the 5-minute timeout below) is an infrastructure failure, not an
+# invariant violation - triage it the same way as any other CI failure,
+# not as a security finding. Found by the 2026-07-22 (0e35c33)
+# maintainability assessment: the wording used to say "a red run here
+# means... a real finding" without this distinction.
 jobs:
   fuzz:
     runs-on: ubuntu-latest
@@ -36,6 +44,7 @@ jobs:
           go-version-file: go.mod
 
       - name: fuzz BaseURL error non-disclosure invariant
+        id: fuzz
         # -run=^$ skips ordinary tests in this invocation (they already
         # run in ci.yml on every push/PR); -fuzztime bounds this to a
         # fixed, predictable cost per run rather than running indefinitely.
@@ -47,7 +56,13 @@ jobs:
         run: go test -run=^$ -fuzz=FuzzNewClientErrorDoesNotEchoInput -fuzztime=60s .
 
       - name: upload failing corpus
-        if: failure()
+        # Scoped to this step's own outcome, not the job's overall
+        # failure() - a checkout or setup-go failure earlier in the job
+        # would also satisfy failure(), but pkg/client/testdata/fuzz/
+        # wouldn't contain a new failing case in that scenario, producing
+        # a misleading empty/stale artifact. Found by the 2026-07-22
+        # (0e35c33) maintainability assessment.
+        if: steps.fuzz.outcome == 'failure'
         uses: actions/upload-artifact@v4
         with:
           name: fuzz-failure-corpus
