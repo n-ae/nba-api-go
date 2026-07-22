@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.8] - 2026-07-22
+
+**Patch, test/CI only - no runtime source changes**: fixes a false-negative gap in the fuzz test protecting `NewClient`'s `BaseURL` error handling, and adds scheduled fuzzing so this class of gap is caught automatically going forward. No caller-visible behavior changed in this release. Closes the one finding from the `2026-07-22` (`8e85a9c`) maintainability assessment.
+
 ### Fixed
 - **`FuzzNewClientErrorDoesNotEchoInput`'s scheme-position template now asserts against the value actually inserted into the URL**, not the original fuzzed marker. The scheme template normalizes the marker (`validSchemeMarker`) before inserting it, since URI scheme syntax excludes most characters a fuzzed marker can contain, but the assertion still checked the unnormalized marker - so it only caught a regression by coincidence, for markers that happened to already be valid scheme syntax, and missed realistic secret shapes (e.g. `sk_live_...`, which strips to `skliveabcdef...` under normalization). Found by the `2026-07-22` (`8e85a9c`) maintainability assessment; confirmed to be a test-tooling gap only, not a runtime vulnerability - `TestNewClientErrorMessagesAreFixed` and a direct regression case both independently caught the same reintroduced regression correctly.
 
