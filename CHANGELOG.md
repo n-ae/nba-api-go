@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.7] - 2026-07-22
+
+**Patch, security-relevant**: closes the last known instance of `BaseURL` values being echoed into `NewClient`'s errors - no caller passing a valid `BaseURL` sees any behavior change; a caller who was passing an unsupported, token-shaped scheme no longer has it echoed into `NewClient`'s error. Also adds a regression test that inventories every rejection message `NewClient` can return, so this class of gap can't reappear silently in the future. Closes the one finding from the `2026-07-22` (`eb62a41`) maintainability assessment.
+
 ### Fixed
 - **`client.NewClient`'s unsupported-scheme error no longer echoes the rejected scheme.** Unchanged since `v3.1.2` and outside the `url.Parse`-failure branch entirely, this check echoed `baseURL.Scheme` on the assumption a scheme isn't secret-bearing - an assumption never checked against URI scheme grammar (RFC 3986: a letter, then letters, digits, `+`, `-`, `.`), which is permissive enough to hold a token- or secret-shaped string (e.g. `sklive123://host`). Found by the `2026-07-22` (`eb62a41`) maintainability assessment.
 
