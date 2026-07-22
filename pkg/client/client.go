@@ -94,6 +94,26 @@ func NewClient(config Config) (*Client, error) {
 	if baseURL.Host == "" {
 		return nil, fmt.Errorf("invalid base URL %q: missing host", config.BaseURL)
 	}
+	// Userinfo, a query string, and a fragment are all syntactically legal
+	// in a BaseURL but never a sensible way to configure one: userinfo
+	// (e.g. "https://user:pass@host") risks credentials leaking into logs,
+	// error messages, and metrics labels wherever BaseURL or a wrapping
+	// error gets printed; a query string is ambiguous with buildURL's own
+	// per-request query construction; a fragment is a client-side-only URL
+	// component that's never sent in an HTTP request at all, so one in a
+	// BaseURL is always either a copy-paste mistake or a misunderstanding
+	// of what BaseURL configures. Rejecting all three at construction
+	// means a caller finds out immediately, not via a confusing runtime
+	// symptom (a leaked credential, a silently-dropped fragment).
+	if baseURL.User != nil {
+		return nil, fmt.Errorf("invalid base URL %q: must not contain userinfo (e.g. \"user:pass@\") - configure authentication separately", config.BaseURL)
+	}
+	if baseURL.RawQuery != "" {
+		return nil, fmt.Errorf("invalid base URL %q: must not contain a query string", config.BaseURL)
+	}
+	if baseURL.Fragment != "" {
+		return nil, fmt.Errorf("invalid base URL %q: must not contain a fragment", config.BaseURL)
+	}
 
 	if config.HTTPClient == nil {
 		// Clone http.DefaultTransport rather than building one from a

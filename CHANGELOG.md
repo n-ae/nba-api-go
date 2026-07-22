@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - `README.md` and `docs/README.md` both still linked to `MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-22_180a3db.md` - the assessment of record moved to `..._9eb3a9a.md` when `v3.1.1` shipped, but (as that same `9eb3a9a` assessment predicted about itself) only `CLAUDE.md`'s pointer was kept current at the time; these two were never updated. Both now point at `..._9eb3a9a.md`.
+- **`client.NewClient` now also rejects a `BaseURL` containing userinfo, a query string, or a fragment** - all three are syntactically legal in an absolute `http`/`https` URL (so none were caught by `v3.1.2`'s scheme/host check), but none are a sensible way to configure a `BaseURL`: userinfo (`https://user:pass@host`) risks credentials leaking into logs/errors/metrics wherever `BaseURL` gets printed; a query string is ambiguous with `buildURL`'s own per-request query construction; a fragment is a client-side-only URL component never sent in an HTTP request at all. Found by the `2026-07-22` (`1b428f6`) maintainability assessment, itself following a lead from an external review of `v3.1.2`. Same patch-level reasoning as `v3.1.2`'s original scheme/host check: every newly-rejected value was already nonsensical as a `BaseURL`, so no caller passing a real, plain `https://host/path` sees any behavior change.
 
 ## [3.1.2] - 2026-07-22
 

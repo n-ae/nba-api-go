@@ -178,6 +178,26 @@ func TestNewClientRejectsUnusableBaseURL(t *testing.T) {
 	}
 }
 
+// TestNewClientRejectsBaseURLWithUserinfoQueryOrFragment covers three
+// BaseURL shapes that are syntactically valid absolute http(s) URLs -
+// passing every check TestNewClientRejectsUnusableBaseURL exercises - but
+// are never a sensible way to configure a BaseURL. Found by the
+// 2026-07-22 (1b428f6) maintainability assessment, itself following a
+// lead from an external review of v3.1.2.
+func TestNewClientRejectsBaseURLWithUserinfoQueryOrFragment(t *testing.T) {
+	for _, baseURL := range []string{
+		"https://user:pass@example.com",
+		"https://example.com?token=secret",
+		"https://example.com#fragment",
+	} {
+		t.Run(baseURL, func(t *testing.T) {
+			if _, err := NewClient(Config{BaseURL: baseURL}); err == nil {
+				t.Fatalf("NewClient(BaseURL: %q) succeeded, want an error", baseURL)
+			}
+		})
+	}
+}
+
 func TestClientHeaderMutationsAreSafeDuringRequests(t *testing.T) {
 	client := mustNewClient(t, Config{
 		BaseURL: "https://api.example.com",
