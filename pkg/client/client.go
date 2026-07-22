@@ -23,7 +23,7 @@ const (
 	// exported for callers who construct client.Client directly and want
 	// a reasonable fallback. Major-version-only (not "2.1.2") so it needn't
 	// change on every patch release.
-	DefaultUserAgent = "nba-api-go/2"
+	DefaultUserAgent = "nba-api-go/3"
 	DefaultTimeout   = 30 * time.Second
 
 	// DefaultMaxResponseBytes bounds how much of a response body Get reads

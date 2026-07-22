@@ -133,6 +133,245 @@ func TestGenerateSingleEndpointRejectsUnknownMetadata(t *testing.T) {
 	}
 }
 
+// TestProcessHandlerMetadata directly exercises the field resolution
+// templates/handler.tmpl and templates/dispatch.tmpl depend on, rather
+// than only observing it indirectly through generated output (as
+// TestGenerateFromMetadata_ProducesValidGo does). Regression coverage for
+// the defaulting rules: NameLower, EffectiveSDKFunction's "Get"+Name
+// fallback, EffectiveResponseWrapped's true-when-nil default, each
+// parameter's HandlerGoType resolution, EffectivePointer's
+// !Required-when-nil fallback, and NeedsParametersImport's two triggers
+// (a recognized special name, or any non-string HandlerGoType).
+func TestProcessHandlerMetadata(t *testing.T) {
+	g := NewGenerator(t.TempDir(), t.TempDir())
+
+	original := EndpointMetadata{
+		Name: "FooBar",
+		Parameters: []ParameterMetadata{
+			{Name: "Season", Type: "Season", Required: true},
+			{Name: "PlayerID", Type: "string", Required: true},
+			{Name: "PerMode", Type: "PerMode", Required: false},
+		},
+	}
+
+	got := g.processHandlerMetadata(original)
+
+	if got.NameLower != "foobar" {
+		t.Errorf("NameLower = %q, want %q", got.NameLower, "foobar")
+	}
+	if got.EffectiveSDKFunction != "GetFooBar" {
+		t.Errorf("EffectiveSDKFunction = %q, want %q (empty SDKFunction should default to \"Get\"+Name)", got.EffectiveSDKFunction, "GetFooBar")
+	}
+	if !got.EffectiveResponseWrapped {
+		t.Error("EffectiveResponseWrapped = false, want true (nil ResponseWrapped should default true)")
+	}
+	if !got.NeedsParametersImport {
+		t.Error("NeedsParametersImport = false, want true (Season/PerMode are recognized special names)")
+	}
+
+	wantEffectivePointer := map[string]bool{
+		"Season":   false, // Required: true -> !Required
+		"PlayerID": false,
+		"PerMode":  true, // Required: false -> !Required
+	}
+	if len(got.Parameters) != len(original.Parameters) {
+		t.Fatalf("got %d parameters, want %d", len(got.Parameters), len(original.Parameters))
+	}
+	for _, p := range got.Parameters {
+		// toHandlerParamType is the oracle, not a repeated literal: this
+		// checks processHandlerMetadata actually calls it per parameter,
+		// not a hardcoded copy of its mapping table that could drift from
+		// the real one independently.
+		if want := toHandlerParamType(p.Type); p.HandlerGoType != want {
+			t.Errorf("%s.HandlerGoType = %q, want %q (toHandlerParamType(%q))", p.Name, p.HandlerGoType, want, p.Type)
+		}
+		if want := wantEffectivePointer[p.Name]; p.EffectivePointer != want {
+			t.Errorf("%s.EffectivePointer = %v, want %v", p.Name, p.EffectivePointer, want)
+		}
+	}
+
+	// Deep-copy invariant (see processHandlerMetadata's doc comment):
+	// the input's Parameters slice must not be mutated. HandlerGoType and
+	// EffectivePointer are only ever set by this function, so if the
+	// original still shows their zero values, the copy was real.
+	for _, p := range original.Parameters {
+		if p.HandlerGoType != "" {
+			t.Errorf("original metadata's %s.HandlerGoType was mutated to %q - processHandlerMetadata must not mutate its input", p.Name, p.HandlerGoType)
+		}
+	}
+}
+
+// TestProcessHandlerMetadataExplicitOverrides covers the three fields a
+// caller can set explicitly to override processHandlerMetadata's
+// defaults: SDKFunction, ResponseWrapped, and a parameter's Pointer -
+// needed by the hand-written-SDK (HandlerOnly) endpoints whose Request
+// structs don't uniformly follow the SDK generator's own conventions.
+func TestProcessHandlerMetadataExplicitOverrides(t *testing.T) {
+	g := NewGenerator(t.TempDir(), t.TempDir())
+	explicitFalse := false
+
+	metadata := EndpointMetadata{
+		Name:            "Baz",
+		SDKFunction:     "CustomGetBaz",
+		ResponseWrapped: &explicitFalse,
+		Parameters: []ParameterMetadata{
+			// Required: false would normally default EffectivePointer to
+			// true; an explicit Pointer: false must win instead.
+			{Name: "LeagueID", Type: "LeagueID", Required: false, Pointer: &explicitFalse},
+		},
+	}
+
+	got := g.processHandlerMetadata(metadata)
+
+	if got.EffectiveSDKFunction != "CustomGetBaz" {
+		t.Errorf("EffectiveSDKFunction = %q, want explicit override %q", got.EffectiveSDKFunction, "CustomGetBaz")
+	}
+	if got.EffectiveResponseWrapped {
+		t.Error("EffectiveResponseWrapped = true, want explicit override false")
+	}
+	if len(got.Parameters) != 1 {
+		t.Fatalf("got %d parameters, want 1", len(got.Parameters))
+	}
+	if got.Parameters[0].EffectivePointer {
+		t.Error("LeagueID.EffectivePointer = true, want explicit override false (ignoring the Required=false default)")
+	}
+}
+
+// TestGenerateHandler directly exercises generateHandler - the actual
+// write path templates/handler.tmpl renders through - rather than only
+// observing it indirectly through GenerateFromMetadata/
+// GenerateSingleEndpoint (which also call it, but bundle it with SDK
+// generation). Checks the file lands at the expected path, parses as
+// valid Go, and contains the specific control flow a required string
+// parameter should produce.
+func TestGenerateHandler(t *testing.T) {
+	serverOutDir := t.TempDir()
+	g := NewGenerator(t.TempDir(), serverOutDir)
+
+	metadata := g.processHandlerMetadata(EndpointMetadata{
+		Name: "FooBar",
+		Parameters: []ParameterMetadata{
+			{Name: "PlayerID", Type: "string", Required: true},
+		},
+	})
+
+	if err := g.generateHandler(metadata, false); err != nil {
+		t.Fatalf("generateHandler() error = %v", err)
+	}
+
+	path := filepath.Join(serverOutDir, "generated_foobar.go")
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("expected generated handler at %s: %v", path, err)
+	}
+
+	fset := token.NewFileSet()
+	if _, err := parser.ParseFile(fset, path, data, parser.AllErrors); err != nil {
+		t.Errorf("generated handler is not valid Go: %v\n%s", err, data)
+	}
+
+	content := string(data)
+	if !strings.Contains(content, "func (h *StatsHandler) handleFooBar(") {
+		t.Errorf("generated handler missing expected function signature, got:\n%s", content)
+	}
+	if !strings.Contains(content, `writeError(w, http.StatusBadRequest, "missing_parameter", "PlayerID is required")`) {
+		t.Errorf("generated handler missing required-parameter validation for PlayerID, got:\n%s", content)
+	}
+}
+
+// TestGenerateDispatchTable directly exercises GenerateDispatchTable
+// against a small fixture metadata directory, rather than only relying on
+// the real, 141-endpoint tools/generator/metadata/ being correct by
+// accident. Covers the documented dedup behavior for a Name appearing in
+// more than one metadata file (several real endpoints do this - see the
+// function's own doc comment): the first file encountered (alphabetical,
+// per filepath.Glob's sorted order) must win, both in the dispatch
+// table's map entries and in which file's parameters got rendered into
+// the deduped handler.
+func TestGenerateDispatchTable(t *testing.T) {
+	metadataDir := t.TempDir()
+	serverOutDir := t.TempDir()
+
+	writeMetadata := func(filename string, endpoints []EndpointMetadata) {
+		t.Helper()
+		data, err := json.MarshalIndent(endpoints, "", "  ")
+		if err != nil {
+			t.Fatalf("failed to marshal fixture metadata: %v", err)
+		}
+		if err := os.WriteFile(filepath.Join(metadataDir, filename), data, 0o600); err != nil {
+			t.Fatalf("failed to write fixture metadata: %v", err)
+		}
+	}
+
+	writeMetadata("a.json", []EndpointMetadata{
+		{Name: "AlphaEndpoint", Parameters: []ParameterMetadata{{Name: "ID", Type: "string", Required: true}}},
+		{Name: "DupeEndpoint", Parameters: []ParameterMetadata{{Name: "First", Type: "string", Required: true}}},
+	})
+	writeMetadata("b.json", []EndpointMetadata{
+		{Name: "BetaEndpoint", Parameters: []ParameterMetadata{{Name: "ID", Type: "string", Required: true}}},
+		// Same Name as a.json's DupeEndpoint but a different parameter -
+		// GenerateDispatchTable must keep whichever file's entry it saw
+		// first (a.json, alphabetically earlier), not silently produce a
+		// duplicate map key or overwrite with this one instead.
+		{Name: "DupeEndpoint", Parameters: []ParameterMetadata{{Name: "Second", Type: "string", Required: true}}},
+	})
+
+	g := NewGenerator(t.TempDir(), serverOutDir)
+	if err := g.GenerateDispatchTable(metadataDir, false); err != nil {
+		t.Fatalf("GenerateDispatchTable() error = %v", err)
+	}
+
+	dispatchPath := filepath.Join(serverOutDir, "generated_dispatch.go")
+	dispatchData, err := os.ReadFile(dispatchPath)
+	if err != nil {
+		t.Fatalf("expected dispatch table at %s: %v", dispatchPath, err)
+	}
+
+	fset := token.NewFileSet()
+	if _, err := parser.ParseFile(fset, dispatchPath, dispatchData, parser.AllErrors); err != nil {
+		t.Errorf("generated dispatch table is not valid Go: %v\n%s", err, dispatchData)
+	}
+
+	dispatchContent := string(dispatchData)
+	for _, want := range []string{
+		`"alphaendpoint": (*StatsHandler).handleAlphaEndpoint,`,
+		`"betaendpoint": (*StatsHandler).handleBetaEndpoint,`,
+		`"dupeendpoint": (*StatsHandler).handleDupeEndpoint,`,
+	} {
+		if !strings.Contains(dispatchContent, want) {
+			t.Errorf("dispatch table missing expected entry %q, got:\n%s", want, dispatchContent)
+		}
+	}
+	if strings.Count(dispatchContent, `"dupeendpoint":`) != 1 {
+		t.Errorf("dispatch table should have exactly one %q entry despite the name appearing in two metadata files, got:\n%s", "dupeendpoint", dispatchContent)
+	}
+
+	// The deduped handler file must reflect a.json's entry (parameter
+	// "First"), not b.json's ("Second").
+	handlerPath := filepath.Join(serverOutDir, "generated_dupeendpoint.go")
+	handlerData, err := os.ReadFile(handlerPath)
+	if err != nil {
+		t.Fatalf("expected handler file at %s: %v", handlerPath, err)
+	}
+	handlerContent := string(handlerData)
+	if !strings.Contains(handlerContent, "vFirst") {
+		t.Errorf("generated_dupeendpoint.go should reflect a.json's entry (parameter First, first-encountered), got:\n%s", handlerContent)
+	}
+	if strings.Contains(handlerContent, "vSecond") {
+		t.Errorf("generated_dupeendpoint.go should NOT reflect b.json's entry (parameter Second) - first-encountered should win, got:\n%s", handlerContent)
+	}
+}
+
+// TestGenerateDispatchTableRequiresMetadataFiles guards the explicit
+// error GenerateDispatchTable returns for an empty metadata directory,
+// rather than silently writing an empty (and useless) dispatch table.
+func TestGenerateDispatchTableRequiresMetadataFiles(t *testing.T) {
+	g := NewGenerator(t.TempDir(), t.TempDir())
+	if err := g.GenerateDispatchTable(t.TempDir(), false); err == nil {
+		t.Fatal("GenerateDispatchTable() succeeded against an empty metadata directory")
+	}
+}
+
 // TestGoFieldName documents goFieldName's camelCase-to-exported-Go-identifier
 // conversion using real field names from committed metadata. Most metadata
 // field names are already valid, exported Go identifiers
