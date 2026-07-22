@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.0] - 2026-07-22
+
+**Minor, not patch**: no Go `pkg/` API changed (the stability promise this project's Versioning section makes), but this release changes real, observable HTTP-API behavior for `cmd/nba-api-server` consumers - see the two `**Breaking (HTTP API)**` entries below - so it's treated as a real behavior change, not a bug-for-bug patch, matching how `[2.2.0]`'s `Config.Timeout` fix was bumped minor for the same reason. Three pieces: a correctness fix (10 endpoints were silently sending requests to nonexistent URL paths), a structural one (the server's 4,358 lines of hand-written HTTP handlers are now generated from the same metadata the SDK already generates from, closing the "decide the server's fate" item carried in every maintainable-architect-v4 assessment), and a coverage one (`pkg/stats/endpoints` goes from 5.2% to 75.1% via generated response-parsing tests). This also closes out the "tag lag" left by `v3.0.0`: these three pieces landed on `main` immediately after `v3.0.0` was tagged and sat unreleased for several commits before this tag.
+
 ### Fixed
 - **10 of 141 endpoints were sending requests to URL paths that don't exist on `stats.nba.com`, silently 404ing (or equivalent) on every call.** Found via a systematic self-consistency check prompted by a live-endpoint audit: for every endpoint, does the URL path string it sends match its own file/type name? 10 didn't. Confirmed against the authoritative Python `nba_api` reference project's own endpoint definitions where a corresponding file exists there (`LeagueHustleStatsPlayer`, `LeagueHustleStatsTeam`, `PlayerCareerByCollegeRollup`, `PlayerDashboardByLastNGames`, `PlayerNextNGames` - all confirmed all-lowercase, no spaces); the remaining 5 (`LeagueHustleStatsTeamLeaders`, `PlayerTrackingRebounding`, `TeamDashboardByLastNGames`, `TeamNextNGames`, `CommonPlayerInfoV2`) have no `nba_api` precedent but were fixed by strong internal-consistency analogy - every other endpoint in this codebase, without exception, uses an all-lowercase URL path, and each of these 5 is either a direct sibling of an already-confirmed case (e.g. `LeagueHustleStatsTeamLeaders` next to the now-confirmed `LeagueHustleStatsTeam`/`Player`) or one of 10 otherwise-identical `v2`-suffixed endpoints where the other 9 all use lowercase `v2`.
   - Two had a literal embedded space in the URL path (`"leaguehustlestatsp layer"`, `"leaguehustlestats team"`) - Go's URL encoding turns this into `%20`, guaranteeing a 404.
@@ -598,7 +602,8 @@ This project follows [Semantic Versioning](https://semver.org/):
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to suggest changes or report issues.
 
-[Unreleased]: https://github.com/n-ae/nba-api-go/compare/v3.0.0...HEAD
+[Unreleased]: https://github.com/n-ae/nba-api-go/compare/v3.1.0...HEAD
+[3.1.0]: https://github.com/n-ae/nba-api-go/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/n-ae/nba-api-go/compare/v2.2.0...v3.0.0
 [2.2.0]: https://github.com/n-ae/nba-api-go/compare/v2.1.2...v2.2.0
 [2.1.2]: https://github.com/n-ae/nba-api-go/compare/v2.1.1...v2.1.2
