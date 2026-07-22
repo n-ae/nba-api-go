@@ -52,6 +52,15 @@ type EndpointMetadata struct {
 	HasParameterTypes bool                `json:"-"`
 	HasRequiredParams bool                `json:"-"`
 
+	// RequiredParamsNeedParametersImport is true iff at least one
+	// *required* parameter resolves to a non-string type. Distinct from
+	// HasParameterTypes (which considers every parameter, required or
+	// not) because templates/endpoint_test.tmpl only ever sets required
+	// parameters in its Request struct literal - importing "parameters"
+	// because an optional field happens to need it would be an unused
+	// import, since that field is never referenced.
+	RequiredParamsNeedParametersImport bool `json:"-"`
+
 	// HandlerOnly marks a metadata entry that exists solely to drive HTTP
 	// handler generation (see generateHandler), for an endpoint whose SDK
 	// code is intentionally hand-written - pkg/stats/endpoints has no
@@ -161,6 +170,9 @@ func (g *Generator) GenerateFromMetadata(metadataFile string, dryRun bool) error
 			if err := g.generateEndpoint(endpoint, dryRun); err != nil {
 				return fmt.Errorf("failed to generate %s: %w", endpoint.Name, err)
 			}
+			if err := g.generateEndpointTest(endpoint, dryRun); err != nil {
+				return fmt.Errorf("failed to generate parsing test for %s: %w", endpoint.Name, err)
+			}
 		}
 		if err := g.generateHandler(handlerMeta, dryRun); err != nil {
 			return fmt.Errorf("failed to generate handler for %s: %w", endpoint.Name, err)
@@ -197,6 +209,9 @@ func (g *Generator) GenerateSingleEndpoint(name, metadataDir string, dryRun bool
 	metadata = g.processMetadata(metadata)
 	if !metadata.HandlerOnly {
 		if err := g.generateEndpoint(metadata, dryRun); err != nil {
+			return err
+		}
+		if err := g.generateEndpointTest(metadata, dryRun); err != nil {
 			return err
 		}
 	}
@@ -265,6 +280,45 @@ func (g *Generator) generateEndpoint(metadata EndpointMetadata, dryRun bool) (er
 	return tmpl.Execute(f, metadata)
 }
 
+// generateEndpointTest renders templates/endpoint_test.tmpl for metadata,
+// writing <outputDir>/generated_<lowercase name>_test.go - a response-
+// parsing test synthesized from the endpoint's own result-set field
+// names/types, exercising findResultSet/validateHeaders/toInt/toFloat/
+// toString against real generated code instead of the request-building-
+// only coverage cmd/nba-api-server's TestGeneratedHandlers gets
+// cross-package. Silently skips (not an error) a HandlerOnly entry (hand-
+// written SDK code - generateEndpoint already refuses those, so this
+// would have nothing to test against) or one with no result sets (nothing
+// meaningful to assert beyond what TestGeneratedHandlers already covers).
+func (g *Generator) generateEndpointTest(metadata EndpointMetadata, dryRun bool) (err error) {
+	if metadata.HandlerOnly || len(metadata.ResultSets) == 0 {
+		return nil
+	}
+
+	tmpl, err := g.loadTemplate("endpoint_test")
+	if err != nil {
+		return err
+	}
+
+	filename := filepath.Join(g.outputDir, "generated_"+strings.ToLower(metadata.Name)+"_test.go")
+
+	if dryRun {
+		return tmpl.Execute(os.Stdout, metadata)
+	}
+
+	f, err := os.Create(filename)
+	if err != nil {
+		return fmt.Errorf("failed to create file: %w", err)
+	}
+	defer func() {
+		if cerr := f.Close(); cerr != nil && err == nil {
+			err = fmt.Errorf("failed to close %s: %w", filename, cerr)
+		}
+	}()
+
+	return tmpl.Execute(f, metadata)
+}
+
 func (g *Generator) loadTemplate(name string) (*template.Template, error) {
 	if tmpl, ok := g.templates[name]; ok {
 		return tmpl, nil
@@ -297,11 +351,15 @@ func toParamType(paramType string) string {
 func (g *Generator) processMetadata(metadata EndpointMetadata) EndpointMetadata {
 	hasParameterTypes := false
 	hasRequiredParams := false
+	requiredParamsNeedParametersImport := false
 	for i := range metadata.Parameters {
 		originalType := metadata.Parameters[i].Type
 		metadata.Parameters[i].Type = toParamType(originalType)
 		if metadata.Parameters[i].Type != goTypeString && metadata.Parameters[i].Type != originalType {
 			hasParameterTypes = true
+			if metadata.Parameters[i].Required {
+				requiredParamsNeedParametersImport = true
+			}
 		}
 		if metadata.Parameters[i].Required {
 			hasRequiredParams = true
@@ -309,6 +367,7 @@ func (g *Generator) processMetadata(metadata EndpointMetadata) EndpointMetadata 
 	}
 	metadata.HasParameterTypes = hasParameterTypes
 	metadata.HasRequiredParams = hasRequiredParams
+	metadata.RequiredParamsNeedParametersImport = requiredParamsNeedParametersImport
 
 	// Process result sets to infer field types
 	for i := range metadata.ResultSets {
