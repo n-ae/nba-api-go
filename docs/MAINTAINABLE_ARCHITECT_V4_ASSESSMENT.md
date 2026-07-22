@@ -1,113 +1,124 @@
 # Maintainable-Architect-v4 Assessment: nba-api-go
 
 **Date:** 2026-07-22
-**Revision assessed:** `b3c605d` (`main`, tag `v3.1.3`), go1.26.5 darwin/arm64
+**Revision assessed:** `0e400d1` (`main`, tag `v3.1.4`), go1.26.5 darwin/arm64
 **Assessor:** maintainable-architect-v4
-**Method:** Direct verification against source at HEAD, not against `CHANGELOG.md`'s prose or an unsolicited external review's prose - file reads of `pkg/client/client.go`, `pkg/client/client_test.go`, `CHANGELOG.md`, `go.mod`; a throwaway `net/url` script reproducing `url.Parse`'s exact behavior on adversarial inputs; `git rev-parse`/`git log`; `go build ./...`, `go vet ./...`, `go test ./...`, `golangci-lint run ./...` (root and `tools/generator` modules, run separately); and `gh pr list`/`gh api repos/.../commits/b3c605d/check-runs`/`gh run list` against the real `n-ae/nba-api-go` GitHub repository to independently check every checkable citation in an external review supplied for this cycle (see §0). All green. No production code was modified while writing this file.
+**Method:** Direct verification against source at HEAD, not against `CHANGELOG.md`'s prose or an unsolicited external review's prose - file reads of `pkg/client/client.go`, `pkg/client/client_test.go`; two throwaway Go programs reproducing `net/url.Parse`'s exact behavior on adversarial inputs, one calling `url.Parse` directly and one calling the real `client.NewClient` from a scratch scope to confirm the leak reaches the actual returned error, not just the standard library's; `git rev-parse`/`git log`; `go build ./...`, `go vet ./...`, `go test ./...`, `golangci-lint run ./...` (root and `tools/generator` modules, run separately); and `gh pr list`/`gh api repos/.../commits/0e400d1/check-runs`/`gh api repos/.../actions/runs/<id>` against the real `n-ae/nba-api-go` GitHub repository to independently check every checkable citation in an external review supplied for this cycle (see §0). All green except the two findings below. No production code was modified while writing this file.
 
-**Why now:** the prior assessment of record (this same file, then covering revision `1b428f6`/tag `v3.1.2`, grade A-) closed with three open findings: `BaseURL` didn't reject userinfo/query/fragment, no positive-case `BaseURL` test existed, and the assessment-link staleness pattern had recurred three cycles running. `v3.1.3` (tag `b3c605d`) closed all three in one small patch release. This cycle's external review, supplied for `v3.1.3`, surfaced a genuinely new, real, and somewhat ironic finding in the fix that closed the first of those three - see §0 and §2.
+**Why now:** the prior assessment of record (this same file, then covering revision `b3c605d`/tag `v3.1.3`, grade A-) closed with one open finding: `NewClient`'s five explicit `BaseURL` validation checks echoed the complete, unredacted input in their errors. `v3.1.4` (tag `0e400d1`) closed it. This cycle's external review, supplied for `v3.1.4`, found that the fix's own stated scope - "all five rejection paths" - undercounted by one: `NewClient` has a sixth error-return path (the initial `url.Parse` failure, one function call above the five explicit checks) that still leaks. See §0 and §2.
 
-> **Naming convention, unchanged from the last cycle:** this file stays at this exact path forever - no date, no revision hash. It is always the current assessment of record; every external pointer to it (`CLAUDE.md`, `README.md`, `docs/README.md`, `tests/contract/README.md`) links here once and never needs updating again. **When the next assessment cycle happens:** move *this file's current content* to `docs/archive/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_<date>_<revision>.md` (using this file's own `Date`/`Revision assessed` header values above), prepend the usual supersession banner to that archived copy, and then overwrite *this path* with the new cycle's content. Do not create a new hash-suffixed file for the new cycle - the hash suffix is exclusively an archive-naming convention now.
+> **Naming convention, unchanged from the last two cycles:** this file stays at this exact path forever - no date, no revision hash. It is always the current assessment of record; every external pointer to it (`CLAUDE.md`, `README.md`, `docs/README.md`, `tests/contract/README.md`) links here once and never needs updating again. **When the next assessment cycle happens:** move *this file's current content* to `docs/archive/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_<date>_<revision>.md` (using this file's own `Date`/`Revision assessed` header values above), prepend the usual supersession banner to that archived copy, and then overwrite *this path* with the new cycle's content. Do not create a new hash-suffixed file for the new cycle - the hash suffix is exclusively an archive-naming convention now.
 
 ---
 
 ## 0. Reconciling against the external review supplied for this cycle
 
-The user supplied an unsolicited "Senior Software Engineering Review" of `v3.1.3` (8.8/10), consistent with this lineage's standing practice of verifying rather than trusting such input.
+The user supplied an unsolicited "Senior Software Engineering Review" of `v3.1.4` (8.9/10), consistent with this lineage's standing practice of verifying rather than trusting such input.
 
 ### 0.1 Citations, checked directly
 
 | Review cites | Checked | Verdict |
 |---|---|---|
-| Tag `v3.1.3` → commit `b3c605d` | `git rev-parse v3.1.3^{commit}` | **Correct.** (`git rev-parse v3.1.3` alone returns the annotated tag object's hash, `913b1e4`, not the commit - same tag-object-vs-commit distinction this lineage flagged as easy to get wrong last cycle, and the review gets it right again.) |
-| PRs #53 (BaseURL hardening), #54 (positive tests), #55 (stable assessment path), #56 (release) | `gh pr list --state merged --limit 6` | **Correct**, all four merged with matching titles and merge commits, in the order described. |
-| `verify`/`apidiff`/`install-smoke-test` all green at `b3c605d` | `gh api repos/n-ae/nba-api-go/commits/b3c605d/check-runs`, `gh run list --branch v3.1.3` | **Correct.** All four checks (`verify`, `apidiff`, `install-smoke-test`, Socket Security) report `success` at the exact tag commit. |
-| Workflow filenames `ci.yml`, `apidiff.yml`, `release-install-smoke.yml` | `ls .github/workflows/` | **Correct**, exact filenames. |
-| `go.mod`'s `go 1.26.5` | `go.mod:3` | **Correct.** |
-| `DefaultMaxResponseBytes` = 50 MiB | `pkg/client/client.go:33` | **Correct**, `50 * 1024 * 1024`. |
-| `TestNewClientAcceptsValidBaseURL`'s six cases, including `http://[::1]:8080` | `pkg/client/client_test.go:191-216` read in full | **Correct**, all six cases match verbatim, including the IPv6 case. |
-| **The central claim: rejected `BaseURL`s can leak credentials/secrets through error messages** | `pkg/client/client.go:92,95,109,112,115` read in full | **Correct, and worse than described - see §0.2.** |
+| Tag `v3.1.4` → commit `0e400d1` | `git rev-parse v3.1.4^{commit}` | **Correct.** (Tag object itself is `c77f13b`, distinct from the commit - same distinction this lineage has flagged as easy to get wrong for three cycles running; the review cites the commit correctly again.) |
+| PRs #58 (secret-echo fix), #59 (release) | `gh pr list --state merged --limit 4` | **Correct**, both merged with matching titles and merge commits. |
+| `verify`/`apidiff`/`install-smoke-test` green at `0e400d1`; CI run IDs `29939602666`, `29939602513`, `29939620870` | `gh api repos/n-ae/nba-api-go/commits/0e400d1/check-runs`; `gh api repos/n-ae/nba-api-go/actions/runs/<id>` for each of the three cited IDs | **Correct.** All three named runs are real, `head_sha` `0e400d1`, `conclusion: success`, matching the review's stated run names (`CI`, `API Compatibility`, `Release Install Smoke Test`) and durations. |
+| **The central claim: `url.Parse` failures still leak the raw `BaseURL` through the wrapped parser error** | `pkg/client/client.go:82-85` read directly; reproduced with `https://admin:hunter2@example.com/%zz` and `https://example.com/%zz?token=hunter2` against both raw `url.Parse` and the actual `client.NewClient` | **Correct, exactly as described - see §0.2.** |
+| **The secondary claim: `https://:443` passes construction because `Host != ""` while `Hostname()` is empty** | `pkg/client/client.go:104` (`baseURL.Host == ""` check) read directly; reproduced with `url.Parse("https://:443")` and `client.NewClient(Config{BaseURL: "https://:443"})` | **Correct, exactly as described - see §0.2.** |
 
-Every specific, checkable citation held up, matching last cycle's outcome (the `v3.1.2` review also checked out on every claim, a different result from the `v3.1.1` review before it, which had four categories of fabricated citations). This lineage verifies every time regardless of track record, and this is another cycle where that discipline confirms a reliable input.
+Every specific, checkable citation held up, for a third cycle running. This lineage verifies every time regardless of track record; this is another cycle where that discipline confirms a reliable input, and this time both of the review's substantive findings reproduce byte-for-byte against the actual `NewClient` return value, not just against the standard library in isolation.
 
-### 0.2 The central claim, verified and found broader than described
+### 0.2 Both substantive claims, reproduced directly against `NewClient`
 
-The review's headline finding: `NewClient`'s new userinfo/query/fragment rejection (added in `v3.1.3` to close `#3`) interpolates the complete, unredacted `config.BaseURL` into the returned error via `fmt.Errorf("...%q...", config.BaseURL)`. A caller passing `https://admin:secret@example.com` gets back an error containing the literal string `https://admin:secret@example.com` - the exact credential the check exists to keep out of use, now disclosed in whatever logs, error trackers, or CI output capture that error.
-
-Confirmed directly by reading `pkg/client/client.go:108-116`:
+**Finding A - the wrapped parser error.** `pkg/client/client.go:82-85`:
 
 ```go
-if baseURL.User != nil {
-    return nil, fmt.Errorf("invalid base URL %q: must not contain userinfo (e.g. \"user:pass@\") - configure authentication separately", config.BaseURL)
-}
-if baseURL.RawQuery != "" {
-    return nil, fmt.Errorf("invalid base URL %q: must not contain a query string", config.BaseURL)
+baseURL, err := url.Parse(config.BaseURL)
+if err != nil {
+    return nil, fmt.Errorf("invalid base URL: %w", err)
 }
 ```
 
-What makes this worth calling out precisely: the doc comment two lines above these checks (`client.go:98-100`) already names the exact risk being reintroduced - *"userinfo... risks credentials leaking into logs, error messages, and metrics labels wherever BaseURL or a wrapping error gets printed"* - as the stated justification for adding the check. The fix's own comment predicts the bug it ships in the very next line. No test in `TestNewClientRejectsBaseURLWithUserinfoQueryOrFragment` (`client_test.go:227-239`) asserts anything about the error's content, only that construction fails - so this shipped with full test coverage of "rejects" and zero coverage of "doesn't also leak what it rejects."
-
-**Independently found, beyond what the review states:** this is not new in `v3.1.3` - it's a latent property of the `v3.1.2` scheme/host checks too, and `v3.1.3` just added two more call sites with the same defect. Verified directly with a throwaway script reproducing `url.Parse`:
+`url.Parse`'s own error type renders as `parse "<input>": <reason>` - the complete input is part of `Error()`, and `%w` preserves it verbatim. Reproduced directly against the real `client.NewClient`, not just `url.Parse` in isolation:
 
 ```
-url.Parse("ftp://user:pass@example.com") → scheme="ftp" host="example.com" user="user:pass" err=nil
+NewClient(Config{BaseURL: "https://admin:hunter2@example.com/%zz"})
+  → invalid base URL: parse "https://admin:hunter2@example.com/%zz": invalid URL escape "%zz"
+
+NewClient(Config{BaseURL: "https://example.com/%zz?token=hunter2"})
+  → invalid base URL: parse "https://example.com/%zz?token=hunter2": invalid URL escape "%zz"
 ```
 
-`ftp://user:pass@example.com` fails the *scheme* check at `client.go:92` (`v3.1.2`'s original check, not `v3.1.3`'s), which also interpolates `config.BaseURL` unredacted - so a credential-bearing `BaseURL` with a typo'd scheme has leaked via this code path since `v3.1.2` shipped, one full release before the review's stated scope. All five `fmt.Errorf` call sites in `NewClient` (`client.go:92,95,109,112,115`) share the same pattern and need the same fix, not just the three the review names.
+Both `hunter2` and the surrounding credential/token structure are present in the actual error `NewClient` returns today. This is the same failure mode `v3.1.4` was supposed to close - a rejected, potentially secret-bearing `BaseURL` disclosed via the error raised to reject it - just via a sixth call site the `v3.1.4` fix didn't reach. **This is worth stating plainly rather than softening: the `v3.1.4` fix, its regression test (`TestNewClientRejectionErrorsDoNotLeakBaseURL`), its commit message, and last cycle's assessment (this same document, then covering `b3c605d`) all described the fix as covering "all five rejection paths" in `NewClient`. There are six.** The fifth-and-newly-counted path - `url.Parse`'s own error - is structurally different from the other five (it's a wrapped standard-library error, not a hand-written `fmt.Errorf` string this project controls the wording of), which is plausibly why an enumeration that looked at "the five checks added across `v3.1.2`/`v3.1.3`" missed the parse call sitting one line above them, but the practical effect for a caller is identical either way.
+
+**Finding B - `Host` vs `Hostname()`.** `pkg/client/client.go:104`:
+
+```go
+if baseURL.Host == "" {
+    return nil, fmt.Errorf("invalid base URL: missing host")
+}
+```
+
+`url.URL.Host` includes an optional port; `url.URL.Hostname()` strips it. Reproduced directly:
+
+```
+url.Parse("https://:443") → Host=":443" Hostname="" Port="443"
+NewClient(Config{BaseURL: "https://:443"}) → succeeds, err == nil
+```
+
+A `BaseURL` with no actual destination hostname constructs a working-looking `Client` today; the caller only discovers the problem on the first real `Get`, exactly the class of confusing-runtime-failure-instead-of-construction-time-failure this whole validation chain (`v3.1.2` onward) exists to prevent. Lower severity than Finding A - no secret is disclosed, it's a missed validation case, not a leak - but real and cheap to fix (`baseURL.Hostname() == ""` in place of `baseURL.Host == ""`).
 
 ### 0.3 Bottom line on the external review
 
-Accurate on every checkable claim, and its central finding is real, well-reasoned, and - on independent investigation - understates its own scope (pre-existing since `v3.1.2`, not introduced fresh in `v3.1.3`). Its P2 items beyond what's re-verified above (typed error values, HTTP-server independent versioning, ecosystem-maturity commentary, endpoint-confidence tiers, raw-fixture replay infrastructure) restate positions this lineage has already taken and explained in `9eb3a9a`'s §0.2 and `1b428f6`'s §0.3 - not re-litigated here since nothing in this review's version of those sections presents new evidence changing that reasoning.
+Accurate on every checkable claim for a third cycle running, and both of its substantive findings reproduce exactly as stated against the real `NewClient`, not an approximation. Its P2 items beyond what's re-verified above (typed `ConfigError`, HTTP-server independent versioning, ecosystem-maturity commentary, endpoint-confidence tiers, a fuzz-testing recommendation) mostly restate positions this lineage has already taken and explained in `9eb3a9a`'s §0.2, `1b428f6`'s §0.3, and `b3c605d`'s §0.3 - not re-litigated here, **except the fuzz-testing suggestion, which this assessment is promoting to §5 as the right structural response to Finding A** (see below for why).
 
 ---
 
 ## 1. Executive verdict
 
-**Grade: A- (unchanged, fourth consecutive cycle).** All three findings the prior assessment named were closed with direct, verifiable evidence, and this cycle's external review found one genuinely new, real defect - not a process failure, but a legitimate secret-disclosure bug in code that was itself written to fix a security-adjacent gap. That irony doesn't change the grade calculus this lineage has applied every cycle: small, real, cheap-to-fix findings surfaced by rigorous verification are what a healthy solo-maintained project's assessment cycle should produce, not evidence of decline.
+**Grade: A- (unchanged, fifth consecutive cycle) - held deliberately, not automatically; see the caveat below.** The prior finding was closed, but closed incompletely, and the incompleteness was caught the same way everything else in this lineage gets caught: a second, independent look at the same code. That's the system working, but it's also the second cycle running where the specific defect class is "a `BaseURL` rejection path leaks the secret it's rejecting" - first found in `b3c605d` (the explicit checks), now found again in `0e400d1` (the parser-error path the first fix didn't enumerate). One recurrence of a defect class is a normal finding. Two, in immediate succession, on the same function, is the kind of pattern this lineage has previously treated as a signal to fix structurally rather than patch again (see the assessment-link staleness precedent: three recurrences before a structural fix was recommended, grade held throughout). This is only the second recurrence, so the grade holds one more cycle under that same precedent - but the remedy this cycle is explicitly the structural one (an invariant-based test), not another manually-enumerated patch, to try to close this out before a third recurrence would be needed to justify it.
 
 **What went right:**
-- All three `1b428f6` findings closed and independently reproduced: `NewClient` now rejects userinfo/query/fragment (`client.go:108-116`), `TestNewClientAcceptsValidBaseURL` covers six positive cases including IPv6 (`client_test.go:191-216`), and the assessment now lives at a stable path that `README.md`/`docs/README.md`/`CLAUDE.md` already point at permanently - no link-staleness fix was needed *this* cycle, closing the loop the structural fix was built for.
-- Release engineering reproduced exactly as claimed: `verify`/`apidiff`/`install-smoke-test` all green at the exact tag commit `b3c605d`, four PRs (#53-#56) merged in the described order with matching content.
+- The prior finding's explicit-check half was genuinely closed: none of the five hand-written `fmt.Errorf` calls in `NewClient` echo `config.BaseURL` anymore, confirmed by reading `client.go:102-125` directly.
+- Release engineering reproduced exactly as claimed: `verify`/`apidiff`/`install-smoke-test` all green at the exact tag commit `0e400d1`, and for the first time this lineage independently re-ran a review's cited CI run IDs directly against the GitHub API (not just checked they existed) and confirmed name, `head_sha`, and conclusion all match.
 - `go build`/`go vet`/`go test`/`golangci-lint` (both modules, checked separately) all clean, reproduced directly this session.
-- The external review checked out on every citable claim for a second cycle running, and its central substantive finding is real - verified independently rather than taken on the review's word, and found to be broader in scope than the review itself claimed (§0.2).
+- The external review checked out on every citable claim for a third cycle running, and both of its substantive findings reproduce byte-for-byte against the real `NewClient`, not an approximation - the strongest verification outcome yet in this lineage.
 
-**What keeps this at A- rather than moving it up:**
-1. **A real secret-disclosure defect shipped in the exact code meant to reduce that risk.** `NewClient`'s five `BaseURL` validation error sites (two from `v3.1.2`, three from `v3.1.3`) all interpolate the complete, unredacted input string - so a rejected credential- or token-bearing `BaseURL` is disclosed via the very error raised to prevent its use. Low-likelihood in this project's own documented use case (NBA Stats requires no auth, so no legitimate caller has a reason to put a secret in `BaseURL` today), but real, evidenced, and cheap to fix (§2, §5).
-2. Nothing else new this cycle - the remaining P2 commentary in the external review restates already-considered, already-declined architectural proposals (see §0.3).
+**What keeps this at A- rather than moving it down:**
+1. **A second instance of the same defect class, in the same function, one cycle after the first was "closed."** This is a legitimate process signal, not a coincidence: enumerating "the rejection checks I just wrote" instead of "every error-return path in this function" undercounted by one, and the undercounting was stated confidently (a regression test named after "all... paths", a commit message and an assessment repeating the same framing) rather than hedged. See §2, §5 for the fix and the structural remedy.
+2. **Both severities are still low-likelihood in practice** for the same reason named every cycle since `b3c605d`: this project's own documented use case (NBA Stats, no auth) gives no caller a reason to put a secret in `BaseURL` today. Real, evidenced, cheap to fix - not a sign of runtime harm having occurred.
 
 ---
 
 ## 2. Verification ledger
 
-Status legend: **CONFIRMED** (reproduced/read directly at `b3c605d`), **CLOSED** (carried from a prior assessment, now genuinely done), **NEW** (found independently this cycle).
+Status legend: **CONFIRMED** (reproduced/read directly at `0e400d1`), **CLOSED** (carried from a prior assessment, now genuinely done), **PARTIALLY CLOSED** (the fix landed but didn't cover the full scope of the finding), **NEW** (found independently this cycle).
 
-### Closed this cycle (all three findings from `1b428f6`)
+### From `b3c605d`
 
-| # | Item (carried since `1b428f6`) | Status | Evidence |
+| # | Item (carried since `b3c605d`) | Status | Evidence |
 |---|---|---|---|
-| 1 | `NewClient` doesn't reject `BaseURL` userinfo, query string, or fragment | **CLOSED** | `pkg/client/client.go:108-116`, three checks, each read directly. `TestNewClientRejectsBaseURLWithUserinfoQueryOrFragment` covers all three shapes. |
-| 2 | No positive-case `BaseURL` test matrix | **CLOSED** | `TestNewClientAcceptsValidBaseURL`, six cases (bare host, host+path, port, IPv4, IPv6, subdomain+port+path), each asserting both successful construction and correct `buildURL` output. |
-| 3 | Assessment-link staleness pattern (recurred three cycles running) | **CLOSED** | `README.md`/`docs/README.md`/`CLAUDE.md` all already point at this stable path; no link-fix commit was needed this cycle - the structural fix from last cycle is working as designed. |
+| 4 | `NewClient`'s `BaseURL` validation errors echo the complete, unredacted input across all rejection sites | **PARTIALLY CLOSED** | The five explicit `fmt.Errorf` checks (`client.go:102,105,119,122,125`) no longer interpolate `config.BaseURL` - confirmed by reading the source. The sixth path, the wrapped `url.Parse` error at `client.go:84`, still does - see finding #6 below, which is the uncovered remainder of this same finding, not a new independent one. |
 
-### New this cycle, via the external review's lead and independent extension (§0.2)
+### New this cycle, via the external review (§0.2)
 
 | # | Finding | Severity | Evidence |
 |---|---|---|---|
-| 4 | `NewClient`'s `BaseURL` validation errors echo the complete, unredacted input string across all five error sites (`client.go:92,95,109,112,115`), disclosing exactly the credentials/tokens the userinfo/query checks exist to keep out of use. Pre-existing since `v3.1.2` (the scheme/host checks), not introduced fresh in `v3.1.3`. | Medium (a real disclosure, not just a validation gap - the failure is loud *and* leaks, versus prior cycles' "loud but silent-on-secrets" findings; likelihood is low today given no documented use case puts secrets in `BaseURL`, but the defect is unconditional whenever one does) | §0.2. Read `client.go` in full; reproduced the pre-`v3.1.3` leak path (`ftp://user:pass@example.com` failing the `v3.1.2` scheme check) with a throwaway `net/url` script. No test in `client_test.go` asserts anything about error *content*, only that construction fails. |
+| 6 | `NewClient`'s `url.Parse` failure path (`client.go:82-85`) wraps the standard library's parse error with `%w`, and that error's `Error()` string contains the complete original input - so a malformed, credential- or token-bearing `BaseURL` (e.g. one with an invalid percent-escape) still discloses the secret, via the one error-return path in `NewClient` the `v3.1.4` fix didn't enumerate. | Medium - same disclosure mechanism and same low-likelihood-today caveat as `b3c605d`'s finding #4, but notable for being the *second* instance of the identical failure mode in as many cycles, in the same function | §0.2, Finding A. Reproduced directly against `client.NewClient` (not just `url.Parse`) with two malformed credential/token-bearing inputs; both secrets present verbatim in the returned error. |
+| 7 | `baseURL.Host == ""` (`client.go:104`) doesn't catch a host with no actual hostname, e.g. `https://:443` (`Host=":443"`, `Hostname()=""`) - construction succeeds with no real destination. | Low (no secret disclosed; a missed validation case that fails on the first `Get` instead of at construction, the same category of confusing-runtime-symptom every check in this chain since `v3.1.2` exists to prevent) | §0.2, Finding B. Reproduced directly against `client.NewClient("https://:443")`: succeeds, `err == nil`. |
 
 ---
 
 ## 3. C4 model
 
-Level 1 unchanged. Level 2 nearly identical to `1b428f6`'s - another small cycle - with the three closed boxes turning green and one new, narrowly-scoped caution box on the core client.
+Level 1 unchanged. Level 2 nearly identical to `b3c605d`'s, with the core-client box still in caution (finding recurred rather than fully closing) and one new low-severity annotation for the hostname gap.
 
 ```mermaid
 flowchart TD
     subgraph runtime["nba-api-go runtime"]
         server["HTTP API Server\n[cmd/nba-api-server]\n76.8% coverage - unchanged"]
         facades["Facades\n[pkg/stats, pkg/live]\nunchanged, fine"]
-        endpoints["Generated + hand-written Endpoints\n[pkg/stats/endpoints]\n75.1% coverage - unchanged,\noutbound path tested two ways (fine)"]
-        core["Core Client\n[pkg/client]\nBaseURL userinfo/query/fragment\nnow rejected (CLOSED, #1); all 5\nrejection error sites echo the raw,\nunredacted input incl. secrets\n(NEW, #4, medium severity)"]
+        endpoints["Generated + hand-written Endpoints\n[pkg/stats/endpoints]\n75.1% coverage - unchanged, fine"]
+        core["Core Client\n[pkg/client]\n5 of 6 BaseURL rejection paths no\nlonger leak (PARTIAL, #4); the 6th -\nwrapped url.Parse error - still does\n(NEW, #6, medium); Host!=\"\" check\nmisses hostname-less URLs like\nhttps://:443 (NEW, #7, low)"]
         mw["Middleware\n[pkg/client/middleware]\nunchanged, fine"]
         static["Static Data\n[pkg/stats/static]\nunchanged, fine"]
         models["Models/Errors\n[pkg/models]\nunchanged, fine"]
@@ -116,12 +127,12 @@ flowchart TD
     subgraph devtime["Development-time"]
         gen["Code Generator\n[tools/generator]\nunchanged this cycle, fine"]
         contract["Contract Tests\n[tests/contract]\nunchanged, fine"]
-        ci["CI\n[ci.yml, apidiff.yml,\nrelease-install-smoke.yml]\nall three green at the exact\nv3.1.3 release commit, verified\ndirectly via gh api"]
+        ci["CI\n[ci.yml, apidiff.yml,\nrelease-install-smoke.yml]\nall three green at the exact\nv3.1.4 release commit; 3 cited run\nIDs independently re-verified\nvia gh api this cycle"]
         drift["Live-drift workflow\nunchanged this cycle - fine"]
     end
 
     subgraph docs["Self-representation"]
-        readme["README.md, docs/README.md, CLAUDE.md\n[all point at the stable assessment\npath - CLOSED, #3, structural fix\nfrom last cycle holding as designed]"]
+        readme["README.md, docs/README.md, CLAUDE.md\n[all point at the stable assessment\npath - holding, no action needed]"]
         internal["This file\n[stable path, current as of this cycle]"]
     end
 
@@ -135,7 +146,7 @@ flowchart TD
     gen -.->|"generates"| endpoints
     gen -.->|"generates"| server
     contract -.-> endpoints
-    ci -.->|"verifies build + API compat +\ninstall, all green at b3c605d"| runtime
+    ci -.->|"verifies build + API compat +\ninstall, all green at 0e400d1"| runtime
     drift -.->|"weekly, narrow allowlist"| nba2
     endpoints --> models
     core --> models
@@ -155,13 +166,13 @@ flowchart TD
 
 ## 4. Where the complexity budget goes (updated)
 
-**Well spent, unchanged:** everything `1b428f6` already called well-spent - the two-layer outbound-path testing design, proportionate `BaseURL` validation, the stable-plus-archive documentation pattern (now proven working a cycle later with zero link-staleness to fix).
+**Well spent, unchanged:** everything prior cycles already called well-spent - the two-layer outbound-path testing design, the stable-plus-archive documentation pattern, `v3.1.4`'s clean release engineering.
 
-**Newly well spent:** closing all three prior findings in one small, focused patch (`v3.1.3`), each with dedicated test coverage for the closure itself.
+**Genuinely closed this cycle:** the five hand-written `BaseURL` checks no longer echo raw input - real progress, confirmed by direct read, not undone by the finding below.
 
-**Newly leaking, small, precisely evidenced:** the `BaseURL` error-message secret echo (finding #4) - cheap to fix (sanitize the interpolated value or drop it from the message; the informative part of each error is *which* component is disallowed, not a verbatim echo of the disallowed input), and now evidenced with the exact line numbers and a reproduction of the pre-`v3.1.3` instance of the same pattern.
+**Recurred, worth a different kind of attention than "fix and move on":** the `BaseURL`-secret-echo defect class, now found twice in two cycles in the same function. The individual fix (§5 #1) is as cheap as last cycle's. What's worth budgeting differently is *how* the next fix is verified - an enumerated, hand-written test list is exactly the technique that undercounted last cycle, so repeating it a third time carries the same risk of missing a seventh path nobody's looked at yet. §5 promotes the external review's fuzz-testing suggestion for this specific reason: it tests the invariant ("no `NewClient` failure ever echoes a canary planted in `BaseURL`") rather than a fixed list of paths, so it doesn't need a human to have first enumerated every way `NewClient` can fail.
 
-**Structurally resolved, worth naming as a completed pattern:** the assessment-link staleness cycle. Three prior cycles each fixed two stale links and predicted the next staleness; this cycle required zero link fixes because the stable-path convention introduced last cycle did exactly what it was designed to do. Worth calling out explicitly since it's the first structural fix in this lineage's history that's been verified to hold for a full cycle after being introduced, not just proposed.
+**Newly found, low severity, cheap:** the `Host`/`Hostname()` validation gap (finding #7) - unrelated defect class, one-line fix.
 
 ---
 
@@ -169,15 +180,19 @@ flowchart TD
 
 Budget reality unchanged: ~1.6h/week core maintenance.
 
-### Immediate (~15-20 min)
+### Immediate (~20-25 min)
 
-1. **Stop echoing the raw `BaseURL` in all five `NewClient` validation errors** (`client.go:92,95,109,112,115`). The component-level messages ("scheme must be http or https", "missing host", "must not contain userinfo", etc.) are already informative without the verbatim input; drop `%q, config.BaseURL` from all five `fmt.Errorf` calls, or - if a diagnostic string is worth keeping - build a sanitized copy (`sanitized := *baseURL; sanitized.User = nil; sanitized.RawQuery = ""; sanitized.Fragment = ""`) and print that instead. Closes finding #4, and along with it the latent `v3.1.2`-era instance of the same pattern in the scheme/host checks, not just the three `v3.1.3` checks the external review named.
-2. **Add a regression test proving the fix**: construct `NewClient` with a credential- and token-bearing `BaseURL` for each of the five rejection paths, and assert the returned error's `.Error()` string does not contain the injected secret. This is the one test class currently missing from `client_test.go`'s otherwise-thorough `BaseURL` coverage.
+1. **Stop wrapping the raw `url.Parse` error in `NewClient`** (`client.go:82-85`). `%w` preserves the parser's own `Error()` string, which contains the complete original input. Replace with a message that doesn't retain the input - e.g. `fmt.Errorf("invalid base URL: %s", err)` still leaks (same reason), so either drop the parser detail entirely (`errors.New("invalid base URL: malformed")`) or, if the specific parse failure reason is worth keeping for debugging, extract just `err.(*url.Error).Err` (the underlying reason, e.g. `invalid URL escape "%zz"`) rather than the whole `*url.Error`, which is the piece that doesn't contain the input. Closes finding #6, the uncovered remainder of `b3c605d`'s finding #4.
+2. **Fix the `Host`/`Hostname()` gap**: change `if baseURL.Host == ""` to `if baseURL.Hostname() == ""` at `client.go:104`. Closes finding #7.
+3. **Add regression tests for both**, extending `TestNewClientRejectionErrorsDoNotLeakBaseURL` with the parse-failure cases (`https://admin:hunter2@example.com/%zz`, `https://example.com/%zz?token=hunter2`) and adding a new case to `TestNewClientRejectsUnusableBaseURL` for `https://:443`.
+
+### Next (~20-30 min, the structural remedy for the recurrence, not just the patch)
+
+4. **Add an invariant-based (fuzz) test for the secret-echo defect class**, per the external review's suggestion: seed `testing.F` with credential-bearing URLs, query tokens, malformed percent-escapes, and IPv6 edge cases, each containing a high-entropy marker string, and assert the single invariant - *if `NewClient` returns an error, the marker never appears in `err.Error()`* - regardless of which internal path rejected it. This is deliberately not another manually-enumerated list: the whole reason this defect class has now recurred once is that "enumerate every rejection path by hand" already missed one path twice (implicitly, by never being asked to look at the parse-error path at all, until an external review did). An invariant test doesn't need the enumeration to be complete to catch the next unenumerated path.
 
 ### Not urgent, explicitly not a backlog item to keep re-budgeting for
 
-- Everything `9eb3a9a`/`180a3db`/`1b428f6` already marked not-urgent (live-verifying the 136 unreachable endpoints, HTTP-server independent versioning policy, ecosystem-maturity commentary) remains not-urgent for the same reasons already given in those assessments.
-- The external review's broader proposals restated again this cycle (typed `InvalidBaseURLError` values, endpoint confidence tiers, raw-fixture replay infrastructure, a pre-tag consumer build gate, fuzz testing of `BaseURL` parsing) are real ideas but not backed by a defect found in this codebase this cycle; consistent with this lineage's standing skepticism of scope-expanding suggestions without a specific source-grounded case. The one exception already promoted to §5 Immediate is the secret-echo fix, which *is* backed by a specific, reproduced defect.
+- Everything `9eb3a9a`/`180a3db`/`1b428f6`/`b3c605d` already marked not-urgent (live-verifying the 136 unreachable endpoints, HTTP-server independent versioning policy, ecosystem-maturity commentary, a typed `ConfigError`) remains not-urgent for the same reasons already given in those assessments. The one item promoted out of that bucket this cycle is the fuzz test (#4 above), specifically because it's the direct structural response to a now-twice-recurred, source-grounded defect - not a speculative addition.
 
 ---
 
@@ -185,10 +200,10 @@ Budget reality unchanged: ~1.6h/week core maintenance.
 
 | File | Action taken by this assessment |
 |---|---|
-| `docs/archive/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-22_1b428f6.md` | New: outgoing content of this file (as of revision `1b428f6`) archived here in the same changeset, with a supersession banner matching the existing convention |
-| This file | Overwritten with the new assessment of record (revision `b3c605d`, tag `v3.1.3`) |
-| `CLAUDE.md`, `README.md`, `docs/README.md`, `tests/contract/README.md` | **Not touched by this assessment** - all four already point at this file's stable path from last cycle's structural fix; no update needed, which is the point of that fix |
-| `CHANGELOG.md`, `go.mod`, version constants | **Not touched** - no new user-facing change is being shipped by this assessment itself; the recommended fix in §5 is a follow-up commit, not part of this document |
+| `docs/archive/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-22_b3c605d.md` | New: outgoing content of this file (as of revision `b3c605d`) archived here in the same changeset, with a supersession banner matching the existing convention |
+| This file | Overwritten with the new assessment of record (revision `0e400d1`, tag `v3.1.4`) |
+| `CLAUDE.md`, `README.md`, `docs/README.md`, `tests/contract/README.md` | **Not touched by this assessment** - all four already point at this file's stable path; no update needed |
+| `CHANGELOG.md`, `go.mod`, version constants | **Not touched** - no new user-facing change is being shipped by this assessment itself; the recommended fixes in §5 are follow-up commits, not part of this document |
 
 No docs sprawl introduced this cycle - `docs/` still holds exactly one active assessment plus `adr/`/`archive/`.
 
@@ -196,16 +211,16 @@ No docs sprawl introduced this cycle - `docs/` still holds exactly one active as
 
 ## 7. Is this too complex for one person?
 
-**Verdict unchanged: no, at the core, and the edges remain small.** Four consecutive small, clean cycles now: findings closed, verified independently, zero regressions, proportionate fixes. This cycle also validates last cycle's structural bet - the stable-assessment-path fix for the link-staleness pattern held for a full cycle with zero link-fix commits needed, exactly as designed.
+**Verdict unchanged: no, at the core.** Five consecutive cycles where verification, not blind trust, is what caught every real finding - including, this cycle, a gap in this lineage's *own* prior closure claim. That's worth stating without spin: last cycle's assessment (this same document, then covering `b3c605d`) said the fix closed "all five" `BaseURL` rejection paths, and a sixth existed the whole time. The value of running this process every cycle, on an external review or otherwise, is precisely that it catches exactly this kind of thing - a confidently-stated but incomplete closure - rather than letting the confident statement stand unchallenged until something in production surfaces it.
 
-The one item worth naming plainly: this cycle's external review found a real bug in code this project shipped four days ago specifically to reduce a security-adjacent risk, and the bug is a version of the exact risk that code's own comment names. That's not a sign the project is poorly run - it's what a solo maintainer inviting outside verification on every cycle is supposed to catch, and it was caught, precisely, with line numbers, before it had any chance to matter in practice (no real caller has ever put a secret in this project's `BaseURL`, per the "not urgent" reasoning above). The fix is a 15-minute change; the value was in finding it via a rigorous second look rather than not looking.
+The one item worth a different kind of attention than "close it and move on": this is the second cycle running the same defect class (secret-bearing `BaseURL` leaking through a `NewClient` error) has been found. §5's structural remedy (an invariant fuzz test, not another enumerated list) is offered for the same reason the assessment-link staleness eventually got a structural fix rather than a fourth manual patch - the individual fix is cheap, but paying it repeatedly by the same error-prone method (manual enumeration) is the actual cost worth removing.
 
 ---
 
 ## 8. Bottom line
 
-`1b428f6` → `b3c605d`: a fourth consecutive small, clean cycle. All three findings the prior assessment named - userinfo/query/fragment rejection, positive-case `BaseURL` tests, assessment-link staleness - closed with direct, independently-reproduced evidence, and the structural fix for the link-staleness pattern held for a full cycle with zero follow-up needed. An unsolicited external review supplied for this cycle checked out on every citable claim for a second cycle running; its central finding - `NewClient`'s `BaseURL` validation errors echo unredacted secrets - is real, and independent investigation found it's broader than the review itself claimed (present since `v3.1.2`, not introduced fresh in `v3.1.3`). Grade holds at A- - proportionate execution on a small cycle, one real and precisely-scoped new finding, no structural change in either direction.
+`b3c605d` → `0e400d1`: the prior finding was closed, but incompletely - `v3.1.4` fixed five of `NewClient`'s six `BaseURL`-rejection error paths, and the sixth (the wrapped `url.Parse` error) still discloses secrets in malformed input, found by this cycle's external review and independently reproduced directly against the real `NewClient` return value. A second, lower-severity gap (`Host` vs `Hostname()` letting `https://:443` construct successfully) was found the same way. Both are cheap fixes, both are low-likelihood in this project's actual documented use case, and both are now precisely evidenced with line numbers and reproductions. Grade holds at A- for a fifth cycle - deliberately, following the same precedent this lineage applied to the assessment-link staleness pattern (hold through the second recurrence, fix structurally rather than patch a third time) - with the recommended remedy this cycle explicitly promoted from "patch the leak" to "add an invariant test that doesn't depend on a human having enumerated every path."
 
 ---
 
-*Assessment of record for revision `b3c605d` (tag `v3.1.3`), 2026-07-22. Supersedes this file's own prior content (revision `1b428f6`, one commit past tag `v3.1.2`, grade A-) as the current maintainability assessment. That prior content moves to `docs/archive/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-22_1b428f6.md` in the same changeset as this file.*
+*Assessment of record for revision `0e400d1` (tag `v3.1.4`), 2026-07-22. Supersedes this file's own prior content (revision `b3c605d`, tag `v3.1.3`, grade A-) as the current maintainability assessment. That prior content moves to `docs/archive/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-22_b3c605d.md` in the same changeset as this file.*
