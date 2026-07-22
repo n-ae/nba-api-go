@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **`client.NewClient`'s unsupported-scheme error no longer echoes the rejected scheme.** Unchanged since `v3.1.2` and outside the `url.Parse`-failure branch entirely, this check echoed `baseURL.Scheme` on the assumption a scheme isn't secret-bearing - an assumption never checked against URI scheme grammar (RFC 3986: a letter, then letters, digits, `+`, `-`, `.`), which is permissive enough to hold a token- or secret-shaped string (e.g. `sklive123://host`). Found by the `2026-07-22` (`eb62a41`) maintainability assessment.
+
+### Added
+- `TestNewClientErrorMessagesAreFixed` inventories every distinct rejection `NewClient` can return and asserts each is a fixed string, byte-for-byte, regardless of what made the `BaseURL` invalid - a stronger check than "the marker doesn't appear," since it also catches a value unrelated to whatever marker a test happens to choose. `TestNewClientRejectionErrorsDoNotLeakBaseURL` gained a secret-shaped-scheme case, and `FuzzNewClientErrorDoesNotEchoInput` gained a scheme-position template (via a new `validSchemeMarker` normalization helper, since an arbitrary marker isn't valid scheme syntax unmodified). Confirmed all new cases fail against the pre-fix code and pass against the fix; fuzzed 2M+ executions with the expanded template set with no false negatives.
+
 ## [3.1.6] - 2026-07-22
 
 **Patch, security-relevant**: closes the `BaseURL` secret-disclosure defect class structurally, ending three consecutive cycles of partial fixes for the same underlying issue - no caller passing a valid `BaseURL` sees any behavior change; a caller who was passing a malformed, credential- or token-bearing `BaseURL` (regardless of the specific way it was malformed) no longer has any part of it echoed into `NewClient`'s error. Closes the one finding from the `2026-07-22` (`f4801ef`) maintainability assessment.

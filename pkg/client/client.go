@@ -108,17 +108,29 @@ func NewClient(config Config) (*Client, error) {
 	// "not-a-url" or "" finds out at construction, not as a confusing
 	// failure on the first Get.
 	//
-	// None of the checks below echo config.BaseURL into the returned
-	// error. A rejected BaseURL may legitimately contain a credential or
-	// token (that's exactly what the userinfo/query checks reject), and
-	// NewClient's error is routinely surfaced in startup logs, error
-	// trackers, and CI output - printing the raw input back would leak
-	// the very secret the check exists to keep out of use. Found by the
-	// 2026-07-22 (b3c605d) maintainability assessment, which also noted
-	// this predates these two new checks: the scheme/host checks below
-	// had the same defect since v3.1.2.
+	// None of the checks below echo config.BaseURL, or any value parsed
+	// from it, into the returned error. A rejected BaseURL may
+	// legitimately contain a credential or token (that's exactly what
+	// the userinfo/query checks reject), and NewClient's error is
+	// routinely surfaced in startup logs, error trackers, and CI output -
+	// printing the raw input, or any field parsed from it, back would
+	// leak the very secret the check exists to keep out of use. Found by
+	// the 2026-07-22 (b3c605d) maintainability assessment, which also
+	// noted this predates these two new checks: the scheme/host checks
+	// below had the same defect since v3.1.2.
+	//
+	// The scheme check below previously included baseURL.Scheme in its
+	// error (e.g. `got "ftp"`) on the assumption that a scheme isn't
+	// secret-bearing. That assumption was never checked against the
+	// actual URI scheme grammar (RFC 3986: a letter, then any mix of
+	// letters, digits, '+', '-', '.'), which is permissive enough to
+	// hold a token- or secret-shaped string (e.g. "sklive123" in
+	// "sklive123://host"). Found by the 2026-07-22 (eb62a41)
+	// maintainability assessment; fixed by dropping baseURL.Scheme from
+	// the message, the same treatment already applied to every other
+	// check in this function.
 	if baseURL.Scheme != "http" && baseURL.Scheme != "https" {
-		return nil, fmt.Errorf("invalid base URL: scheme must be http or https, got %q", baseURL.Scheme)
+		return nil, errors.New("invalid base URL: scheme must be http or https")
 	}
 	// baseURL.Host (not baseURL.Hostname()) includes an optional port, so
 	// a host-less BaseURL like "https://:443" has a non-empty Host
