@@ -1,10 +1,13 @@
 > **Superseded.** This assessed revision `9eb3a9a` (grade A-). The current assessment of record is
-> [`docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-22_1b428f6.md`](../MAINTAINABLE_ARCHITECT_V4_ASSESSMENT_2026-07-22_1b428f6.md),
-> covering revision `1b428f6` and later (one commit past tag `v3.1.2`, grade A-, unchanged). Retained
-> here for history; see that document's section 2 ("Verification ledger") for the item-by-item status
-> of both findings below - both closed in `v3.1.2`, and section 0 of the new document independently
-> verifies an unsolicited external review supplied for that cycle (unlike this file's own §0, that
-> review's citations checked out).
+> [`docs/MAINTAINABLE_ARCHITECT_V4_ASSESSMENT.md`](../MAINTAINABLE_ARCHITECT_V4_ASSESSMENT.md) - as of
+> the follow-up cycle that archived this file, that stable, hash-free path is permanent (see that
+> document's naming-convention note near the top): it covered revision `1b428f6` and later (one commit
+> past tag `v3.1.2`, grade A-, unchanged) at the time it was written, and will cover whatever the
+> current cycle is by the time you're reading this. Retained here for history; see that document's
+> section 2 ("Verification ledger") for the item-by-item status of both findings below - both closed in
+> `v3.1.2`, and section 0 of that document (as first written) independently verifies an unsolicited
+> external review supplied for that cycle (unlike this file's own §0, that review's citations checked
+> out).
 
 # Maintainable-Architect-v4 Assessment: nba-api-go
 
