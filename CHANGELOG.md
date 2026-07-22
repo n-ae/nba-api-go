@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.6] - 2026-07-22
+
+**Patch, security-relevant**: closes the `BaseURL` secret-disclosure defect class structurally, ending three consecutive cycles of partial fixes for the same underlying issue - no caller passing a valid `BaseURL` sees any behavior change; a caller who was passing a malformed, credential- or token-bearing `BaseURL` (regardless of the specific way it was malformed) no longer has any part of it echoed into `NewClient`'s error. Closes the one finding from the `2026-07-22` (`f4801ef`) maintainability assessment.
+
 ### Fixed
 - **`client.NewClient`'s `url.Parse` failure path now returns a fixed, input-free message, closing the `BaseURL` secret-disclosure defect class for good.** `v3.1.5`'s fix unwrapped `*url.Error` to what its own comment called an "input-free" reason - that claim was false. `net/url` builds several of its own error reasons (an invalid port, a malformed IPv6 host) directly from the input, so a credential- or token-bearing `BaseURL` like `https://example.com:sk_live_123/path` still disclosed the secret via the unwrapped reason. This is the third consecutive cycle this defect class recurred (`v3.1.3`'s explicit checks, `v3.1.4`'s wrapped outer error, `v3.1.5`'s unwrapped inner reason); fixed this time by not rendering any parser-derived text at all - any `url.Parse` failure now returns `invalid base URL: malformed`, regardless of why parsing failed, closing every current and future variant of this defect in `net/url`'s error construction, not just the ones found so far. Found by the `2026-07-22` (`f4801ef`) maintainability assessment.
 
