@@ -12,11 +12,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/n-ae/nba-api-go/v2/pkg/client"
-	"github.com/n-ae/nba-api-go/v2/pkg/stats"
+	"github.com/n-ae/nba-api-go/v3/pkg/client"
+	"github.com/n-ae/nba-api-go/v3/pkg/stats"
 )
 
-const version = "2.2.0"
+const version = "3.0.0"
 
 var (
 	buildTime = "unknown"

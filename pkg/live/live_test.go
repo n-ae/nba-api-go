@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/n-ae/nba-api-go/v2/pkg/client"
-	"github.com/n-ae/nba-api-go/v2/pkg/client/middleware"
+	"github.com/n-ae/nba-api-go/v3/pkg/client"
+	"github.com/n-ae/nba-api-go/v3/pkg/client/middleware"
 )
 
 // withHeader is a small test middleware that sets a fixed header on every

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/n-ae/nba-api-go/v2/pkg/models"
-	"github.com/n-ae/nba-api-go/v2/pkg/stats"
+	"github.com/n-ae/nba-api-go/v3/pkg/models"
+	"github.com/n-ae/nba-api-go/v3/pkg/stats"
 )
 
 // BoxScoreDefensiveV2Request contains parameters for the BoxScoreDefensiveV2 endpoint

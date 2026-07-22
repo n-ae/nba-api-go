@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
-	"github.com/n-ae/nba-api-go/v2/pkg/live"
-	"github.com/n-ae/nba-api-go/v2/pkg/live/endpoints"
-	"github.com/n-ae/nba-api-go/v2/pkg/stats"
-	statsep "github.com/n-ae/nba-api-go/v2/pkg/stats/endpoints"
-	"github.com/n-ae/nba-api-go/v2/pkg/stats/parameters"
+	"github.com/n-ae/nba-api-go/v3/pkg/live"
+	"github.com/n-ae/nba-api-go/v3/pkg/live/endpoints"
+	"github.com/n-ae/nba-api-go/v3/pkg/stats"
+	statsep "github.com/n-ae/nba-api-go/v3/pkg/stats/endpoints"
+	"github.com/n-ae/nba-api-go/v3/pkg/stats/parameters"
 )
 
 // TestSimpleSmokeTests runs basic smoke tests for the most critical endpoints

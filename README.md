@@ -57,7 +57,7 @@ This isn't a claim that generated code is now defect-free everywhere - it's spec
 
 ### Go SDK
 ```bash
-go get github.com/n-ae/nba-api-go/v2
+go get github.com/n-ae/nba-api-go/v3
 ```
 
 ### HTTP API Server
@@ -78,7 +78,7 @@ This project provides **two ways** to access NBA data:
 Best for: Type-safety, performance, direct Go integration
 
 ```go
-import "github.com/n-ae/nba-api-go/v2/pkg/stats"
+import "github.com/n-ae/nba-api-go/v3/pkg/stats"
 ```
 
 ### Pattern 2: HTTP API (For Any Language)
@@ -109,9 +109,9 @@ import (
     "fmt"
     "log"
 
-    "github.com/n-ae/nba-api-go/v2/pkg/stats"
-    "github.com/n-ae/nba-api-go/v2/pkg/stats/endpoints"
-    "github.com/n-ae/nba-api-go/v2/pkg/stats/parameters"
+    "github.com/n-ae/nba-api-go/v3/pkg/stats"
+    "github.com/n-ae/nba-api-go/v3/pkg/stats/endpoints"
+    "github.com/n-ae/nba-api-go/v3/pkg/stats/parameters"
 )
 
 func main() {
@@ -186,8 +186,8 @@ import (
     "fmt"
     "log"
 
-    "github.com/n-ae/nba-api-go/v2/pkg/live"
-    "github.com/n-ae/nba-api-go/v2/pkg/live/endpoints"
+    "github.com/n-ae/nba-api-go/v3/pkg/live"
+    "github.com/n-ae/nba-api-go/v3/pkg/live/endpoints"
 )
 
 func main() {
@@ -216,7 +216,7 @@ import (
     "fmt"
     "log"
 
-    "github.com/n-ae/nba-api-go/v2/pkg/stats/static"
+    "github.com/n-ae/nba-api-go/v3/pkg/stats/static"
 )
 
 func main() {
@@ -301,9 +301,9 @@ import (
     "net/http"
     "time"
 
-    "github.com/n-ae/nba-api-go/v2/pkg/client"
-    "github.com/n-ae/nba-api-go/v2/pkg/client/middleware"
-    "github.com/n-ae/nba-api-go/v2/pkg/stats"
+    "github.com/n-ae/nba-api-go/v3/pkg/client"
+    "github.com/n-ae/nba-api-go/v3/pkg/client/middleware"
+    "github.com/n-ae/nba-api-go/v3/pkg/stats"
 )
 
 // A custom middleware - written entirely with exported types.
@@ -360,7 +360,7 @@ The library includes embedded static data for all NBA players and teams:
 All NBA API parameters are strongly typed with validation:
 
 ```go
-import "github.com/n-ae/nba-api-go/v2/pkg/stats/parameters"
+import "github.com/n-ae/nba-api-go/v3/pkg/stats/parameters"
 
 // Season types
 parameters.SeasonTypeRegular
