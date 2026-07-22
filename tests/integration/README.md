@@ -85,6 +85,49 @@ endpoints, check whether it's one of these known-blocked cases before
 assuming SDK/schema drift or environment-specific bad luck; if NBA.com's
 blocking behavior changes, revisit the `-run` filter in that workflow.
 
+### Full 141-endpoint reachability sweep (2026-07-22)
+
+The pattern above was characterized from a handful of endpoints. A full sweep
+was run against all 141 endpoint URL paths (raw `curl`, no SDK involved, one
+request per endpoint - `GET https://stats.nba.com/stats/<path>` with no
+query params, 10s timeout, minimal browser-style headers) from the same
+residential/business ISP IP as above. Result: **only 5 of 141 responded at
+all; 136 hung to a hard timeout.** Reproduced twice - once with 8-way
+parallel requests, once fully serial with 3s gaps between each - identical
+split both times, ruling out both a rate-limit ramp and a parallel-burst
+side effect as the explanation.
+
+Reachable (fast HTTP response, any status - reachability, not necessarily
+valid-without-params):
+
+| Endpoint | Status (no params) |
+|---|---|
+| `leagueleaders` | 500 |
+| `playoffpicture` | 200 |
+| `assisttracker` | 200 |
+| `internationalbroadcasterschedule` | 200 |
+| `assistleaders` | 400 |
+
+Everything else - all 136 remaining endpoints, including every one of the
+141 files under `pkg/stats/endpoints/` not listed above - hung to the full
+10s timeout with no response at all. This includes both `LeagueLeaders`
+siblings tested individually above (`PlayerCareerStats`, `PlayerGameLog`,
+`CommonPlayerInfo`, `TeamGameLog`) and every generated endpoint, with no
+exceptions found. **Revises the prior characterization in this file
+significantly**: this isn't "a handful of specific endpoints are blocked,"
+it's "the overwhelming majority of the `stats.nba.com` surface is currently
+unreachable from every network tested so far, with a small, specific
+allowlist of exceptions." Whatever NBA.com's bot-detection is keying on, it
+defends nearly the entire API by default rather than a short blocklist of
+sensitive paths.
+
+Practical consequence: live-verifying any endpoint not in the 5-item table
+above isn't currently possible from a normal developer machine or from
+GitHub Actions - both hit the same wall. If NBA.com's blocking posture
+changes, this sweep is worth re-running (the probe script's logic: one
+`curl` per endpoint slug, `--max-time 10`, no query params, checking for a
+non-`000` `%{http_code}`).
+
 ## Known Test IDs
 
 ```go
