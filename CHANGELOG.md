@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.5] - 2026-07-22
+
+**Patch, security-relevant**: closes the remainder of `v3.1.4`'s `BaseURL` secret-disclosure fix - no caller passing a valid, non-secret-bearing `BaseURL` sees any behavior change; a caller who was passing a credential- or token-bearing `BaseURL` that failed to parse no longer has that secret echoed into `NewClient`'s error. Also closes a low-severity validation gap (`https://:443` no longer constructs successfully). Closes both findings from the `2026-07-22` (`0e400d1`) maintainability assessment.
+
 ### Fixed
 - **`client.NewClient`'s `url.Parse` failure path no longer leaks the raw `BaseURL`.** `v3.1.4` fixed five of `NewClient`'s six `BaseURL`-rejection error paths; the sixth - the initial `url.Parse` failure, wrapped with `%w` - still embedded the complete input via `*url.Error`'s own `Error()` method, so a malformed, credential- or token-bearing `BaseURL` (e.g. one with an invalid percent-escape) still disclosed the secret. Now unwraps to just the parse failure reason, which never contains the input. Found by the `2026-07-22` (`0e400d1`) maintainability assessment, the uncovered remainder of `v3.1.4`'s fix.
 - **`client.NewClient` now rejects a `BaseURL` with a port but no hostname** (e.g. `https://:443`). The prior check (`baseURL.Host == ""`) missed this because `Host` includes an optional port; now checks `baseURL.Hostname() == ""`, which correctly reports empty. Found by the same assessment.
