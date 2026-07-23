@@ -38,7 +38,19 @@ jobs:
     # bound each individual command so a stall in one step can't silently
     # eat this entire budget either. Found by the 2026-07-23 (7d6702b)
     # maintainability assessment (finding #16).
-    timeout-minutes: 10
+    #
+    # Raised from 10 to 22: with the go-mod-tidy retry step added below
+    # (also finding #16's residual gap, closed in v3.1.14), the sum of
+    # this job's own step-level worst cases (8min go get + 1min writing
+    # the smoke program + 8min go mod tidy + 2min build/run = 19min, plus
+    # checkout/setup-go/tag-resolution overhead) already exceeded the old
+    # 10-minute job ceiling on paper - a self-inflicted mismatch this
+    # file's own 2026-07-23 (31842b6) maintainability assessment found
+    # (finding #23) and this fix closes, with a few minutes of margin
+    # above the 19-minute step-level sum for checkout/setup-go/tag-
+    # resolution overhead, rather than making the job-level bound just
+    # barely cover the steps it contains.
+    timeout-minutes: 22
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -79,42 +91,70 @@ jobs:
         # assessment (finding #15) - latent in every real dispatch so far,
         # since each one has passed an explicit tag.
         id: tag
-        # INPUT_TAG is passed via env:, not interpolated directly into
-        # this script via `${{ }}` - the manual dispatch input is a
-        # semi-trusted value (free-form text from anyone with write
-        # access), and substituting it straight into the generated shell
-        # source is the exact script-injection-prone pattern GitHub's own
-        # Actions security-hardening guidance warns against. Reading it
-        # as a normal shell variable instead means a stray quote, `$(...)`,
-        # or newline in the input can't alter the script GitHub actually
-        # runs. Found by the 2026-07-23 (fc58431) maintainability
-        # assessment (finding #21).
+        # INPUT_TAG and REF_NAME are passed via env:, not interpolated
+        # directly into this script via `${{ }}` - a manually-dispatched
+        # tag input is free-form text from anyone with write access, and a
+        # pushed tag's ref_name is likewise attacker-influenced (Git's own
+        # ref-name rules permit shell metacharacters like `$(...)`,
+        # backticks, and `;` in a tag name - confirmed directly via `git
+        # check-ref-format` - so a maliciously-named tag could execute
+        # arbitrary shell during the assignment itself, before any
+        # downstream validation ever runs). Substituting either straight
+        # into the generated shell source is the exact script-injection-
+        # prone pattern GitHub's own Actions security-hardening guidance
+        # warns against. Reading them as normal shell variables instead
+        # means a stray quote, `$(...)`, or newline in either value can't
+        # alter the script GitHub actually runs. Found by the 2026-07-23
+        # (fc58431) maintainability assessment (finding #21, closed for
+        # INPUT_TAG only) and the 2026-07-23 (31842b6) maintainability
+        # assessment (finding #22, closing the REF_NAME gap #21 left open -
+        # independently reproduced with a working command-substitution
+        # proof-of-concept against the prior `tag="${{ github.ref_name
+        # }}"` form). EVENT_NAME is mediated too for consistency, though
+        # unlike the other two it was never actually attacker-influenced -
+        # it's one of a small, fixed set of strings GitHub itself sets
+        # based on which trigger fired the workflow.
         env:
           INPUT_TAG: ${{ github.event.inputs.tag }}
+          REF_NAME: ${{ github.ref_name }}
+          EVENT_NAME: ${{ github.event_name }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
             tag="$INPUT_TAG"
             if [ -z "$tag" ]; then
               tag="$(git describe --tags --abbrev=0)"
             fi
           else
-            tag="${{ github.ref_name }}"
+            tag="$REF_NAME"
           fi
 
-          # A manual dispatch's tag input is free-form text - nothing
-          # upstream of this step confirms it's an actual release tag
-          # rather than a branch name, a commit SHA, or a typo. A bare
-          # `v*)` prefix check (finding #19's original fix) still let a
-          # value merely *starting* with "v" - e.g. a hypothetical branch
-          # named "vfeature" - through, since go get can resolve a
-          # non-tag ref via pseudo-versioning. Two checks now: the shape
-          # must be a real semantic version, and it must resolve to an
-          # actual local tag ref, not just a matching string. Found by
-          # the 2026-07-23 (fc58431) maintainability assessment (finding
-          # #20), which also traced this to finding #19's fix (7d6702b's
-          # own recommendation was `v[0-9]*)`, not the looser `v*)` that
-          # actually shipped).
-          if ! printf '%s\n' "$tag" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z.-]+)?$'; then
+          # A manual dispatch's tag input (or a pushed tag's ref name) is
+          # free-form text - nothing upstream of this step confirms it's
+          # an actual release tag rather than a branch name, a commit SHA,
+          # or a typo. A bare `v*)` prefix check (finding #19's original
+          # fix) still let a value merely *starting* with "v" - e.g. a
+          # hypothetical branch named "vfeature" - through, since go get
+          # can resolve a non-tag ref via pseudo-versioning. Two checks
+          # now: the shape must be a real semantic version, and it must
+          # resolve to an actual local tag ref, not just a matching
+          # string. Found by the 2026-07-23 (fc58431) maintainability
+          # assessment (finding #20), which also traced this to finding
+          # #19's fix (7d6702b's own recommendation was `v[0-9]*)`, not
+          # the looser `v*)` that actually shipped).
+          #
+          # This is the full SemVer 2.0.0 grammar (semver.org's own
+          # published regex, translated from PCRE's `(?:...)` non-
+          # capturing groups to plain POSIX ERE groups since grep -E
+          # doesn't support the `?:` syntax), not the earlier looser
+          # approximation - which rejected valid build-metadata tags like
+          # "v1.2.3+build.1" and accepted SemVer-invalid ones like
+          # "v01.02.03" (leading zero) or "v1.2.3-foo..bar" (empty
+          # dot-separated identifier). The git show-ref check below is
+          # still the check that actually gates a non-tag value from
+          # proceeding; this one just makes "looks like a real version"
+          # mean what SemVer itself means by that. Found by the
+          # 2026-07-23 (31842b6) maintainability assessment (finding #24).
+          if ! printf '%s\n' "$tag" | grep -Eq '^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$'; then
             echo "::error::expected a semantic version tag (vX.Y.Z), got: '$tag'" >&2
             exit 1
           fi
@@ -153,6 +193,14 @@ jobs:
         # this step (and this job, absent the job-level timeout-minutes
         # above) far longer than "~2.5 minutes" ever implied. Found by the
         # 2026-07-23 (7d6702b) maintainability assessment (finding #16).
+        #
+        # timeout-minutes: 8 makes this step's own worst case (5 * 60s +
+        # 15+30+45+60s sleep = 450s = 7.5min) an explicit, self-documented
+        # bound instead of relying on however much of the job's overall
+        # timeout-minutes happens to be left when this step starts - the
+        # same self-consistency gap finding #23 found in the go-mod-tidy
+        # step below, fixed here too before it could bite the same way.
+        timeout-minutes: 8
         run: |
           mkdir -p /tmp/install-smoke
           cd /tmp/install-smoke
@@ -170,16 +218,17 @@ jobs:
             sleep $((attempt * 15))
           done
 
-      - name: Build and run a program against the fetched module
-        # Bounds go mod tidy (which can itself hit the module
-        # proxy/checksum database - the same class of network dependency
-        # the go get step above retries against) plus go build and running
-        # the smoke binary, none of which had any bound before. Found by
-        # the 2026-07-23 (7d6702b) maintainability assessment (finding
-        # #16); unlike go get above, these steps aren't retried - a
-        # deterministic build/run failure shouldn't be retried, only a
-        # network stall needs a bound rather than a retry here.
-        timeout-minutes: 3
+      - name: Write the smoke-test program
+        # Split out from the build/run step (and now from the go-mod-tidy
+        # step below it too) so each step's timeout-minutes actually
+        # matches what that step alone can take - a fast, deterministic
+        # file write needs no meaningful bound of its own. Found by the
+        # 2026-07-23 (31842b6) maintainability assessment (finding #23),
+        # which found the prior single combined step's timeout-minutes: 3
+        # couldn't fit the go-mod-tidy retry loop's own advertised worst
+        # case (450s) plus go build/the smoke run, even before accounting
+        # for this step's own (small) share of the budget.
+        timeout-minutes: 1
         run: |
           cat > /tmp/install-smoke/main.go <<'EOF'
           package main
@@ -210,27 +259,42 @@ jobs:
                   fmt.Printf("install smoke test OK: %d player(s) matched, client constructed\n", len(players))
           }
           EOF
+
+      - name: Resolve transitive dependencies (go mod tidy)
+        # go get above only adds the direct requirement; go mod tidy pulls
+        # in the transitive go.sum entries (golang.org/x/text,
+        # golang.org/x/time) a real consumer's own `go mod tidy` would add
+        # on first build - without it, `go build` fails on missing go.sum
+        # entries that have nothing to do with this module's own health.
+        #
+        # Retried with the same backoff shape as the go get step above:
+        # go mod tidy can hit the same sum.golang.org/module-proxy
+        # checksum lookups for these transitive deps, so it's exposed to
+        # the identical propagation-delay class of transient failure -
+        # bounding it with a timeout alone doesn't self-heal from that,
+        # just fails a bit faster. Found by the 2026-07-23 (fc58431)
+        # maintainability assessment (finding #16, residual gap predicted
+        # by the prior 7d6702b cycle's own review notes).
+        #
+        # Split into its own step with timeout-minutes: 8, matching the go
+        # get step above - the prior version bundled this retry loop into
+        # the same step as go build/the smoke run under a single
+        # timeout-minutes: 3, which the loop's own worst case (5 * 60s +
+        # 15+30+45+60s sleep = 450s = 7.5min) could never actually fit
+        # regardless of how fast the rest of the step ran. That mismatch
+        # was a self-inflicted regression this same v3.1.14 change
+        # introduced while closing the residual gap above - found by the
+        # 2026-07-23 (31842b6) maintainability assessment (finding #23)
+        # and fixed here by giving this retry loop a budget consistent
+        # with its own advertised worst case, in its own step for clearer
+        # diagnostics (a timeout now unambiguously means "dependency
+        # resolution stalled," not "something in this bundle stalled").
+        timeout-minutes: 8
+        run: |
           cd /tmp/install-smoke
-          # go get above only adds the direct requirement; go mod tidy pulls
-          # in the transitive go.sum entries (golang.org/x/text,
-          # golang.org/x/time) a real consumer's own `go mod tidy` would add
-          # on first build - without it, `go build` fails on missing go.sum
-          # entries that have nothing to do with this module's own health.
-          #
-          # Retried with the same backoff shape as the go get step above:
-          # go mod tidy can hit the same sum.golang.org/module-proxy
-          # checksum lookups for these transitive deps, so it's exposed to
-          # the identical propagation-delay class of transient failure -
-          # bounding it with timeout-minutes: 3 alone (as originally
-          # shipped) doesn't self-heal from that, just fails a bit faster.
-          # go build/./smoke-test are deliberately NOT retried below - a
-          # compile or runtime failure there is deterministic and retrying
-          # it would only mask a real break. Found by the 2026-07-23
-          # (fc58431) maintainability assessment (finding #16, residual
-          # gap predicted by the prior 7d6702b cycle's own review notes).
           for attempt in 1 2 3 4 5; do
             if timeout 60s go mod tidy; then
-              break
+              exit 0
             fi
             if [ "$attempt" -eq 5 ]; then
               echo "go mod tidy failed after $attempt attempts" >&2
@@ -240,5 +304,15 @@ jobs:
             sleep $((attempt * 15))
           done
 
+      - name: Build and run the smoke-test program
+        # go build/./smoke-test are deliberately NOT retried - a compile
+        # or runtime failure here is deterministic and retrying it would
+        # only mask a real break. Split from the go-mod-tidy retry step
+        # above (finding #23) so this step's own timeout only has to cover
+        # a compile and a no-network binary run, not a multi-minute retry
+        # loop it was never sized for.
+        timeout-minutes: 2
+        run: |
+          cd /tmp/install-smoke
           go build -o smoke-test .
           ./smoke-test
