@@ -131,7 +131,25 @@ jobs:
           if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
             tag="$INPUT_TAG"
             if [ -z "$tag" ]; then
-              tag="$(git describe --tags --abbrev=0)"
+              # --match 'v3.*' scopes this to the same v3.x.y release
+              # line the rest of this job is hardcoded to (module path,
+              # smoke imports, the ^v3\. guard below) - without it,
+              # `git describe --tags --abbrev=0` returns the nearest tag
+              # of ANY major reachable from HEAD, which today happens to
+              # always be a v3 tag (this repo has never had a v4, or an
+              # out-of-order earlier-major hotfix tag, nearer to main
+              # than the latest v3 release) but wasn't actually scoped to
+              # v3 the way this input's own description below promises.
+              # A prerelease tag (e.g. v3.2.0-rc.1) matches this pattern
+              # too and would be selected as "nearest" if one existed and
+              # were closer than the latest stable release - no
+              # prerelease tag has ever been pushed here, so this is
+              # believed-intended but untested behavior, not a
+              # deliberately chosen policy. Found by the 2026-07-23
+              # (4ab1ce1) maintainability assessment (finding #26) -
+              # never yet fired in this repository's history, since every
+              # workflow_dispatch run to date has passed an explicit tag.
+              tag="$(git describe --tags --match 'v3.*' --abbrev=0)"
             fi
           else
             tag="$REF_NAME"

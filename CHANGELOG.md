@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **`.github/workflows/release-install-smoke.yml`'s empty-input manual dispatch fallback wasn't actually scoped to v3, despite `v3.1.16` rewriting its description to promise "the nearest reachable v3 tag."** `git describe --tags --abbrev=0` resolves the nearest tag reachable from HEAD of *any* major version, not just v3 - harmless today since every tag in this repository has been v3.x.y, but once a `v4.0.0` (or an out-of-order earlier-major hotfix) tag became nearer to `main` than the latest v3 release, an empty-input dispatch would have resolved to it and then failed the `v3.1.16`-added `^v3\.` guard, rather than actually falling back to the nearest v3 tag as documented. Verified both the original gap and the fix in a throwaway clone: an unscoped `git describe` picks up a simulated later `v4.0.0` tag exactly as predicted; `--match 'v3.*'` correctly stays on the latest real v3 release. Now: `git describe --tags --match 'v3.*' --abbrev=0`. Found by the `2026-07-23` (`4ab1ce1`) maintainability assessment (finding #26).
+
 ## [3.1.16] - 2026-07-23
 
 **Patch, CI only - no runtime or test source changes**: scopes the release install-smoke workflow's tag trigger to `v3.*` and adds an explicit major-version guard, so a wrong-major tag fails fast instead of burning its retry budget - live-reproduced and fixed. No caller-visible behavior changed in this release. Closes the one finding from the `2026-07-23` (`168190f`) maintainability assessment.
