@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **`.github/workflows/release-install-smoke.yml`'s advertised "~2.5 minutes worst case" retry budget was only the sum of its sleeps, not a real bound.** The job had no `timeout-minutes:`, and neither the per-attempt `go get`, `go mod tidy`, `go build`, nor the smoke binary had any timeout - a stalled (not failed) command could occupy the job far longer, up to GitHub's ~6-hour hosted-runner ceiling. Now: `timeout-minutes: 10` on the job, each `go get` attempt wrapped in `timeout 60s`, and the build/tidy/run step bounded to `timeout-minutes: 3`. Found by the `2026-07-23` (`7d6702b`) maintainability assessment (finding #16).
+- **`.github/workflows/release-install-smoke.yml`'s manual `tag` dispatch input was passed straight to `go get` with no format validation** - a branch name, commit SHA, or typo would silently be treated as a release tag. Now rejects anything not matching `v*` before proceeding. Found by the `2026-07-23` (`7d6702b`) maintainability assessment (finding #19).
+
+### Changed
+- **`.github/workflows/fuzz.yml`'s `concurrency` block comment (added in `v3.1.12`) inaccurately claimed concurrent runs could race on a shared `testdata/fuzz/` corpus directory.** GitHub-hosted jobs each execute in a fresh, isolated VM, so two separate workflow runs never share a local filesystem path in the first place - that specific race is structurally impossible. The `concurrency` group itself is still worth keeping (avoids duplicate Actions minutes and overlapping "is this real?" triage signals), just not for the reason originally stated; corrected the comment rather than removing the group. Found by the `2026-07-23` (`7d6702b`) maintainability assessment (finding #17) - the inaccurate rationale was introduced in the same session's prior workflow-hardening pass.
+- **`golangci/golangci-lint-action@v9` is now SHA-pinned**, matching the `actions/checkout`/`actions/setup-go`/`actions/upload-artifact` pins added in the prior cycle - it was the one action left on a mutable major-version tag after that pass. Found by the `2026-07-23` (`7d6702b`) maintainability assessment (finding #18).
+
 ## [3.1.12] - 2026-07-23
 
 **Patch, CI only - no runtime or test source changes**: repo-wide workflow hardening (explicit permissions, SHA-pinned actions, fuzz concurrency, upload-artifact upgrade) plus retry/backoff for the release install-smoke workflow's exact-tag `go get` against `sum.golang.org` propagation delay. No caller-visible behavior changed in this release. Closes the P2 findings carried across several `2026-07-2x` maintainability assessments (repo-wide permissions/SHA-pinning/concurrency scoping) plus the release-time propagation race first observed in the `v3.1.10`/`v3.1.11` cycles.

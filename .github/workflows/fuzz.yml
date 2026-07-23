@@ -19,12 +19,21 @@ on:
 permissions:
   contents: read
 
-# Scheduled daily plus manually dispatchable - without this, an ad-hoc
-# manual dispatch could overlap the next day's scheduled run (or another
-# manual one) and race on the same testdata/fuzz/ corpus directory.
-# cancel-in-progress: false, not true - a fuzz run that's found something
-# and is mid-upload shouldn't be killed by a newer run starting; queueing
-# behind it is cheap given the 5-minute timeout below.
+# Scheduled daily plus manually dispatchable - serializes an ad-hoc
+# manual dispatch against the next day's scheduled run (or another manual
+# one) so they don't consume duplicate Actions minutes and don't produce
+# two overlapping "is this a real invariant failure or not" signals to
+# triage at once. This is NOT preventing a shared-filesystem race on
+# testdata/fuzz/ - GitHub-hosted jobs each run in their own fresh VM (see
+# https://docs.github.com/en/actions/reference/runners/github-hosted-runners),
+# so two separate workflow runs never share a local corpus directory in
+# the first place; an earlier version of this comment claimed otherwise,
+# which was wrong. cancel-in-progress: false, not true - a fuzz run
+# that's found something and is mid-upload shouldn't be killed by a newer
+# run starting; queueing behind it is cheap given the 5-minute timeout
+# below. Found by the 2026-07-23 (7d6702b) maintainability assessment
+# (finding #17) - the inaccurate rationale was introduced in this same
+# session's PR #81, which added this block in the first place.
 concurrency:
   group: baseurl-fuzz
   cancel-in-progress: false
