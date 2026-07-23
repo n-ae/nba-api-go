@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **`.github/workflows/release-install-smoke.yml`'s exact-tag `go get` had no tolerance for `sum.golang.org` propagation delay.** Twice in a row (`v3.1.10`, `v3.1.11`), the tag-triggered run hit a transient `500 Internal Server Error` from the checksum database's `lookup` endpoint for the freshly-pushed tag, resolving on its own within about a minute both times (confirmed by curling `proxy.golang.org`/`sum.golang.org` directly moments later, not just by re-running the job) - an ordinary release-time propagation race, not a structural fetchability defect, but a single-attempt gate turned it into a spurious failure requiring a manual rerun every release. Now retries the `go get` step up to 5 times with 15/30/45/60s backoff (~2.5 minutes worst case) before failing for real, so a genuinely unfetchable release still fails this job.
+
 ## [3.1.11] - 2026-07-23
 
 **Patch, CI only - no runtime or test source changes**: fixes the release install-smoke workflow's manual-dispatch tag resolution, including a second bug the fix itself surfaced on first real dispatch. No caller-visible behavior changed in this release. Closes the one finding from the `2026-07-23` (`04537f4`) maintainability assessment.
