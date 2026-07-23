@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-**CI only - no runtime or test source changes**: closes the two new findings (#20, #21) from the `2026-07-23` (`fc58431`) maintainability assessment plus the residual `go mod tidy` retry gap that assessment cycle's own review predicted, all in `.github/workflows/release-install-smoke.yml`. No caller-visible behavior changed.
+## [3.1.14] - 2026-07-23
+
+**Patch, CI only - no runtime or test source changes**: closes the two new findings (#20, #21) from the `2026-07-23` (`fc58431`) maintainability assessment plus the residual `go mod tidy` retry gap that assessment cycle's own review predicted, all in `.github/workflows/release-install-smoke.yml`. No caller-visible behavior changed in this release.
 
 ### Fixed
 - **`release-install-smoke.yml`'s manual `tag` dispatch input was only prefix-matched (`v*)`), not proven to be an actual release tag.** A hypothetical branch merely named e.g. `vfeature` would have passed the `v3.1.13` guard and could resolve via `go get`'s pseudo-version handling, so "Verifying tag: ..." in the job log wasn't actually proof of a real tag. Now validated in two steps: the input must match a semantic-version shape (`vX.Y.Z`, optional pre-release/build suffix), then must resolve via `git show-ref --verify` to an existing `refs/tags/` ref - the resolved commit is echoed into the log so the verification claim is self-evidently backed by a real tag. Found by the `2026-07-23` (`fc58431`) maintainability assessment (finding #20), which traced the gap back to the `v3.1.13` cycle's own fix for finding #19 shipping a looser check (`v*)`) than the prior assessment cycle had actually recommended (`v[0-9]*)`).
