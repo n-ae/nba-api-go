@@ -38,15 +38,21 @@ on:
 # for local/manual runs, where a developer's residential/office IP may not be
 # blocked - see tests/integration/README.md's "Known live-traffic blocks"
 # section. Re-evaluate this narrowing if NBA.com's blocking behavior changes.
+
+# Least-privilege default: this job only reads the checkout and runs tests
+# against an external API - it never writes anything back to the repository.
+permissions:
+  contents: read
+
 jobs:
   live-smoke:
     runs-on: ubuntu-latest
     # Bounded so a hung upstream request can't keep a runner busy indefinitely.
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: actions/setup-go@v7
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: go.mod
 
