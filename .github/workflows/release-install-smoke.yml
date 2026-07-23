@@ -2,12 +2,21 @@ name: Release Install Smoke Test
 
 on:
   push:
+    # Scoped to v3.*, not the broader v* this repo's own tags used to
+    # match - this workflow's go get/import lines are hardcoded to the
+    # /v3 module path (Go's semantic-import-versioning requires the
+    # module path itself to carry the major version), so a v* trigger
+    # would auto-fire this same v3-only workflow on a future v4.0.0 tag
+    # push and fail it for a structural reason having nothing to do with
+    # that release's actual health. Found by the 2026-07-23 (168190f)
+    # maintainability assessment (finding #25) - latent so far, since
+    # every tag ever pushed to this repo has been v3.x.y or earlier.
     tags:
-      - 'v*'
+      - 'v3.*'
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Tag to verify (e.g. v2.2.0) - defaults to the latest tag when run manually'
+        description: 'Existing v3.x.y release tag to verify (e.g. v3.1.15) - defaults to the nearest reachable v3 tag when run manually'
         required: false
 
 # Verifies the module is actually fetchable and usable by an external
@@ -156,6 +165,25 @@ jobs:
           # 2026-07-23 (31842b6) maintainability assessment (finding #24).
           if ! printf '%s\n' "$tag" | grep -Eq '^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\+[0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)?$'; then
             echo "::error::expected a semantic version tag (vX.Y.Z), got: '$tag'" >&2
+            exit 1
+          fi
+
+          # This workflow's go get/import lines are hardcoded to the /v3
+          # module path - Go's semantic import versioning requires the
+          # module path itself, not just the tag, to carry the major
+          # version, so a v2.x.y or (future) v4.x.y tag can never
+          # correctly resolve here regardless of whether it exists.
+          # Checked before the tag-existence check below and before any
+          # network call, so a wrong-major manual dispatch fails
+          # immediately instead of burning all 5 of the go get retry
+          # loop's attempts (up to 155s) on a deterministic mismatch that
+          # was never going to succeed no matter how many times it's
+          # retried - reproduced live by dispatching this workflow with
+          # tag=v2.2.0 before this fix, which did exactly that. Found by
+          # the 2026-07-23 (168190f) maintainability assessment (finding
+          # #25).
+          if ! printf '%s\n' "$tag" | grep -Eq '^v3\.'; then
+            echo "::error::this workflow only verifies v3.x.y releases (module path github.com/n-ae/nba-api-go/v3), got: '$tag'" >&2
             exit 1
           fi
 
