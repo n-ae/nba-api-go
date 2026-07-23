@@ -7,8 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.10] - 2026-07-23
+
+**Patch, CI only - no runtime or test source changes**: fixes the corpus-upload condition `v3.1.9` shipped broken, so the scheduled fuzz workflow's failure-artifact mechanism actually works on a genuine invariant violation. No caller-visible behavior changed in this release. Closes the one finding from the `2026-07-23` (`e3ee47c`) maintainability assessment.
+
 ### Fixed
-- **`.github/workflows/fuzz.yml`'s corpus-upload step could never actually run.** `v3.1.9` scoped the `if:` condition to `steps.fuzz.outcome == 'failure'`, but GitHub Actions implicitly ANDs a bare `if:` with `success()` unless the expression contains an explicit status-check function - so the effective condition was `success() && steps.fuzz.outcome == 'failure'`, which is never true, since the fuzz step failing already puts the job in a failed state by the time the upload step evaluates. The one real CI run cited when `v3.1.9` shipped only exercised the success path (upload skipped, as expected), so this went unnoticed. Now `if: failure() && steps.fuzz.outcome == 'failure'`. Found by the `2026-07-22` (`e3ee47c`) maintainability assessment.
+- **`.github/workflows/fuzz.yml`'s corpus-upload step could never actually run.** `v3.1.9` scoped the `if:` condition to `steps.fuzz.outcome == 'failure'`, but GitHub Actions implicitly ANDs a bare `if:` with `success()` unless the expression contains an explicit status-check function - so the effective condition was `success() && steps.fuzz.outcome == 'failure'`, which is never true, since the fuzz step failing already puts the job in a failed state by the time the upload step evaluates. The one real CI run cited when `v3.1.9` shipped only exercised the success path (upload skipped, as expected), so this went unnoticed. Now `if: failure() && steps.fuzz.outcome == 'failure'`. Found by the `2026-07-22` (`e3ee47c`) maintainability assessment. Verified live on both paths, not just YAML-validated: a throwaway branch with the fuzz step swapped for one that writes a sentinel corpus file and exits 1 confirmed the upload step now runs and the resulting artifact contains exactly that sentinel file; a second real run on `main` confirmed the success path still correctly skips the upload.
 
 ## [3.1.9] - 2026-07-22
 
