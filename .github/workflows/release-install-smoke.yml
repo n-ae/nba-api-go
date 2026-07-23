@@ -30,6 +30,15 @@ permissions:
 jobs:
   install-smoke-test:
     runs-on: ubuntu-latest
+    # The retry loop below advertised a "~2.5 minutes worst case" that was
+    # only the sum of its sleeps (150s) - nothing bounded how long a single
+    # stalled (not failed) go get/go mod tidy/go build/smoke-run could
+    # block, so the real worst case was GitHub's ~6-hour hosted-runner job
+    # ceiling. This bounds the whole job; the per-step timeouts below
+    # bound each individual command so a stall in one step can't silently
+    # eat this entire budget either. Found by the 2026-07-23 (7d6702b)
+    # maintainability assessment (finding #16).
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -69,6 +78,22 @@ jobs:
           else
             tag="${{ github.ref_name }}"
           fi
+
+          # A manual dispatch's tag input is free-form text - nothing
+          # upstream of this step confirms it's an actual release tag
+          # rather than a branch name, a commit SHA, or a typo. Failing
+          # fast on an unexpected shape here means "verified tag vX.Y.Z"
+          # in this job's log is trustworthy on its own, without having to
+          # cross-reference the dispatch inputs. Found by the 2026-07-23
+          # (7d6702b) maintainability assessment (finding #19).
+          case "$tag" in
+            v*) ;;
+            *)
+              echo "::error::expected a 'v*' release tag, got: '$tag'" >&2
+              exit 1
+              ;;
+          esac
+
           echo "Verifying tag: $tag"
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
@@ -87,15 +112,23 @@ jobs:
         # by re-running this job). A single-attempt gate turns that
         # ordinary propagation delay into a spurious release-time failure
         # requiring a manual rerun every release. Bounded at 5 attempts
-        # (15/30/45/60s backoff, ~2.5 minutes worst case) so a genuinely
-        # unfetchable release still fails this job, not retries forever.
+        # (15/30/45/60s backoff between them) so a genuinely unfetchable
+        # release still fails this job, not retries forever.
+        #
+        # Each attempt is itself wrapped in `timeout 60s` - without that,
+        # the 15/30/45/60s figures only bound the sleeps *between*
+        # attempts, not a single attempt that stalls (hangs, not fails)
+        # rather than returning an error; an unbounded stall could occupy
+        # this step (and this job, absent the job-level timeout-minutes
+        # above) far longer than "~2.5 minutes" ever implied. Found by the
+        # 2026-07-23 (7d6702b) maintainability assessment (finding #16).
         run: |
           mkdir -p /tmp/install-smoke
           cd /tmp/install-smoke
           go mod init smoke-test
 
           for attempt in 1 2 3 4 5; do
-            if go get "github.com/n-ae/nba-api-go/v3@${{ steps.tag.outputs.tag }}"; then
+            if timeout 60s go get "github.com/n-ae/nba-api-go/v3@${{ steps.tag.outputs.tag }}"; then
               exit 0
             fi
             if [ "$attempt" -eq 5 ]; then
@@ -107,6 +140,15 @@ jobs:
           done
 
       - name: Build and run a program against the fetched module
+        # Bounds go mod tidy (which can itself hit the module
+        # proxy/checksum database - the same class of network dependency
+        # the go get step above retries against) plus go build and running
+        # the smoke binary, none of which had any bound before. Found by
+        # the 2026-07-23 (7d6702b) maintainability assessment (finding
+        # #16); unlike go get above, these steps aren't retried - a
+        # deterministic build/run failure shouldn't be retried, only a
+        # network stall needs a bound rather than a retry here.
+        timeout-minutes: 3
         run: |
           cat > /tmp/install-smoke/main.go <<'EOF'
           package main

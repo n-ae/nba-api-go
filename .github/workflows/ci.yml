@@ -44,7 +44,13 @@ jobs:
         # v2.x version string outright; .golangci.yml here is the v2
         # config schema, so v7+ is required, not optional. (Bumped 7->9
         # by Dependabot, PR #1 - all checks passed before merge.)
-        uses: golangci/golangci-lint-action@v9
+        #
+        # SHA-pinned like actions/checkout and actions/setup-go elsewhere
+        # in this repo, not left on the mutable @v9 major tag - the same
+        # repo-wide supply-chain-consistency gap PR #81 closed for the
+        # other three actions but missed for this one. Found by the
+        # 2026-07-23 (7d6702b) maintainability assessment (finding #18).
+        uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
         with:
           # Pinned, not "latest": on v6, "latest" silently resolved to
           # the newest *v1.x* release (v1.64.8, built with Go 1.24),
@@ -82,7 +88,7 @@ jobs:
         run: go test ./...
 
       - name: generator golangci-lint
-        uses: golangci/golangci-lint-action@v9
+        uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
         with:
           version: v2.12.2
           working-directory: tools/generator
