@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.13] - 2026-07-23
+
+**Patch, CI only - no runtime or test source changes**: bounds the release install-smoke workflow's retry loop with real timeouts, validates its manual tag input, corrects a technically-inaccurate comment on the fuzz workflow's concurrency group, and SHA-pins the one remaining unpinned GitHub Action. No caller-visible behavior changed in this release. Closes findings #16-#19 from the `2026-07-23` (`7d6702b`) maintainability assessment.
+
 ### Fixed
 - **`.github/workflows/release-install-smoke.yml`'s advertised "~2.5 minutes worst case" retry budget was only the sum of its sleeps, not a real bound.** The job had no `timeout-minutes:`, and neither the per-attempt `go get`, `go mod tidy`, `go build`, nor the smoke binary had any timeout - a stalled (not failed) command could occupy the job far longer, up to GitHub's ~6-hour hosted-runner ceiling. Now: `timeout-minutes: 10` on the job, each `go get` attempt wrapped in `timeout 60s`, and the build/tidy/run step bounded to `timeout-minutes: 3`. Found by the `2026-07-23` (`7d6702b`) maintainability assessment (finding #16).
 - **`.github/workflows/release-install-smoke.yml`'s manual `tag` dispatch input was passed straight to `go get` with no format validation** - a branch name, commit SHA, or typo would silently be treated as a release tag. Now rejects anything not matching `v*` before proceeding. Found by the `2026-07-23` (`7d6702b`) maintainability assessment (finding #19).
