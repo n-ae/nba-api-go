@@ -55,6 +55,16 @@ jobs:
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: go.mod
+          # This job's whole point is proving the tagged module is
+          # fetchable/buildable exactly as a first-time external consumer
+          # would see it - setup-go's default (cache: true) would restore
+          # a GitHub-managed Go module/build cache, which doesn't
+          # currently mask anything (a just-published tag can't already be
+          # cache-populated) but weakens that framing's accuracy. Disabled
+          # so the verification claim matches what's actually being
+          # tested. Found by the 2026-07-23 (fc58431) maintainability
+          # assessment (§0.3, informational).
+          cache: false
 
       - name: Resolve tag under test
         # Keyed off github.event_name, not an empty-string fallback chain:
@@ -69,9 +79,21 @@ jobs:
         # assessment (finding #15) - latent in every real dispatch so far,
         # since each one has passed an explicit tag.
         id: tag
+        # INPUT_TAG is passed via env:, not interpolated directly into
+        # this script via `${{ }}` - the manual dispatch input is a
+        # semi-trusted value (free-form text from anyone with write
+        # access), and substituting it straight into the generated shell
+        # source is the exact script-injection-prone pattern GitHub's own
+        # Actions security-hardening guidance warns against. Reading it
+        # as a normal shell variable instead means a stray quote, `$(...)`,
+        # or newline in the input can't alter the script GitHub actually
+        # runs. Found by the 2026-07-23 (fc58431) maintainability
+        # assessment (finding #21).
+        env:
+          INPUT_TAG: ${{ github.event.inputs.tag }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            tag="${{ github.event.inputs.tag }}"
+            tag="$INPUT_TAG"
             if [ -z "$tag" ]; then
               tag="$(git describe --tags --abbrev=0)"
             fi
@@ -81,20 +103,29 @@ jobs:
 
           # A manual dispatch's tag input is free-form text - nothing
           # upstream of this step confirms it's an actual release tag
-          # rather than a branch name, a commit SHA, or a typo. Failing
-          # fast on an unexpected shape here means "verified tag vX.Y.Z"
-          # in this job's log is trustworthy on its own, without having to
-          # cross-reference the dispatch inputs. Found by the 2026-07-23
-          # (7d6702b) maintainability assessment (finding #19).
-          case "$tag" in
-            v*) ;;
-            *)
-              echo "::error::expected a 'v*' release tag, got: '$tag'" >&2
-              exit 1
-              ;;
-          esac
+          # rather than a branch name, a commit SHA, or a typo. A bare
+          # `v*)` prefix check (finding #19's original fix) still let a
+          # value merely *starting* with "v" - e.g. a hypothetical branch
+          # named "vfeature" - through, since go get can resolve a
+          # non-tag ref via pseudo-versioning. Two checks now: the shape
+          # must be a real semantic version, and it must resolve to an
+          # actual local tag ref, not just a matching string. Found by
+          # the 2026-07-23 (fc58431) maintainability assessment (finding
+          # #20), which also traced this to finding #19's fix (7d6702b's
+          # own recommendation was `v[0-9]*)`, not the looser `v*)` that
+          # actually shipped).
+          if ! printf '%s\n' "$tag" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z.-]+)?$'; then
+            echo "::error::expected a semantic version tag (vX.Y.Z), got: '$tag'" >&2
+            exit 1
+          fi
 
-          echo "Verifying tag: $tag"
+          if ! git show-ref --verify --quiet "refs/tags/${tag}"; then
+            echo "::error::'$tag' is not an existing tag in this repository" >&2
+            exit 1
+          fi
+
+          commit="$(git rev-list -n 1 "$tag")"
+          echo "Verifying tag: $tag (resolves to commit $commit)"
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
       - name: go get the tagged module into a scratch module
@@ -185,6 +216,29 @@ jobs:
           # golang.org/x/time) a real consumer's own `go mod tidy` would add
           # on first build - without it, `go build` fails on missing go.sum
           # entries that have nothing to do with this module's own health.
-          go mod tidy
+          #
+          # Retried with the same backoff shape as the go get step above:
+          # go mod tidy can hit the same sum.golang.org/module-proxy
+          # checksum lookups for these transitive deps, so it's exposed to
+          # the identical propagation-delay class of transient failure -
+          # bounding it with timeout-minutes: 3 alone (as originally
+          # shipped) doesn't self-heal from that, just fails a bit faster.
+          # go build/./smoke-test are deliberately NOT retried below - a
+          # compile or runtime failure there is deterministic and retrying
+          # it would only mask a real break. Found by the 2026-07-23
+          # (fc58431) maintainability assessment (finding #16, residual
+          # gap predicted by the prior 7d6702b cycle's own review notes).
+          for attempt in 1 2 3 4 5; do
+            if timeout 60s go mod tidy; then
+              break
+            fi
+            if [ "$attempt" -eq 5 ]; then
+              echo "go mod tidy failed after $attempt attempts" >&2
+              exit 1
+            fi
+            echo "go mod tidy failed (attempt $attempt/5), retrying in $((attempt * 15))s..." >&2
+            sleep $((attempt * 15))
+          done
+
           go build -o smoke-test .
           ./smoke-test
