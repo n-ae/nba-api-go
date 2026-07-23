@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **`.github/workflows/release-install-smoke.yml`'s manual-dispatch tag resolution silently defaulted to the branch it ran on, not the "latest tag" its own input description promised.** The fallback chain (explicit `tag` input -> `github.ref_name` -> `git describe --tags --abbrev=0`) never reached the `git describe` fallback on a `workflow_dispatch` with no `tag` input, since `github.ref_name` is the triggering branch (e.g. `main`) on that event type and is therefore never empty - so an omitted input silently tested `main` instead of the latest release. Now keyed off `github.event_name`: a `workflow_dispatch` with no `tag` input falls back directly to `git describe`, skipping `ref_name` entirely; a real tag push still uses `ref_name`, which is correctly the tag name on that event. Found by the `2026-07-23` (`04537f4`) maintainability assessment (finding #15) - latent so far, since every real dispatch to date has passed an explicit tag.
+
 ## [3.1.10] - 2026-07-23
 
 **Patch, CI only - no runtime or test source changes**: fixes the corpus-upload condition `v3.1.9` shipped broken, so the scheduled fuzz workflow's failure-artifact mechanism actually works on a genuine invariant violation. No caller-visible behavior changed in this release. Closes the one finding from the `2026-07-23` (`e3ee47c`) maintainability assessment.

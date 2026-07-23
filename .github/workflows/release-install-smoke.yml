@@ -31,14 +31,26 @@ jobs:
           go-version-file: go.mod
 
       - name: Resolve tag under test
+        # Keyed off github.event_name, not an empty-string fallback chain:
+        # on a workflow_dispatch, github.ref_name is the branch it was run
+        # on (e.g. "main"), not a tag - it's only ever empty on a tag push,
+        # where ref_name is correctly the tag name itself. The prior
+        # fallback chain (input -> ref_name -> git describe) meant a manual
+        # dispatch with no tag input silently used ref_name ("main") and
+        # never reached the "latest tag" fallback its own input description
+        # promises, since ref_name is never actually empty on a
+        # workflow_dispatch. Found by the 2026-07-23 (04537f4) maintainability
+        # assessment (finding #15) - latent in every real dispatch so far,
+        # since each one has passed an explicit tag.
         id: tag
         run: |
-          tag="${{ github.event.inputs.tag }}"
-          if [ -z "$tag" ]; then
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            tag="${{ github.event.inputs.tag }}"
+            if [ -z "$tag" ]; then
+              tag="$(git describe --tags --abbrev=0)"
+            fi
+          else
             tag="${{ github.ref_name }}"
-          fi
-          if [ -z "$tag" ]; then
-            tag="$(git describe --tags --abbrev=0)"
           fi
           echo "Verifying tag: $tag"
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
