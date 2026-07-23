@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.15] - 2026-07-23
+
+**Patch, CI only - no runtime or test source changes**: closes three findings from the `2026-07-23` (`31842b6`) maintainability assessment, all in `.github/workflows/release-install-smoke.yml`. No caller-visible behavior changed in this release.
+
+### Fixed
+- **The tag-push branch's `tag="${{ github.ref_name }}"` was still directly interpolated into shell source**, the same script-injection-prone pattern `v3.1.14` closed only for the manual-dispatch input (finding #21). Independently reproduced as a working command-substitution injection: `git check-ref-format` accepts tag names containing `$(...)`, backticks, and semicolons, and simulating the generated assignment executed an injected command while leaving the resulting variable looking clean enough to pass the semver/existence checks that run after it. Now mediated through `env: REF_NAME`, same as `INPUT_TAG`; `EVENT_NAME` is mediated too for consistency, though it was never actually attacker-influenced. Found by the `2026-07-23` (`31842b6`) maintainability assessment (finding #22).
+- **The `go mod tidy` retry loop added in `v3.1.14` (closing a residual gap from finding #16) had a worst case (450s: 5 attempts × 60s timeout + 150s of backoff sleep) exceeding the `timeout-minutes: 3` of the step containing it** - a self-inflicted regression introduced while closing that gap, since the step also had to fit `go build` and the smoke-binary run in the same budget. Split into its own step (`timeout-minutes: 8`, matching `go get`), separate from writing the smoke program (`timeout-minutes: 1`) and building/running it (`timeout-minutes: 2`). The `go get` step also gained an explicit `timeout-minutes: 8` instead of relying on the job's remaining budget. Job-level `timeout-minutes` raised from 10 to 22 so it actually covers the sum of its own steps' worst cases (19 minutes) plus checkout/setup-go/tag-resolution overhead. Found by the `2026-07-23` (`31842b6`) maintainability assessment (finding #23).
+- **The version-shape regex added to close finding #20 approximated but didn't fully implement SemVer 2.0.0**: it rejected valid build-metadata suffixes (`v1.2.3+build.1`) and accepted SemVer-invalid strings (leading zeros like `v01.02.03`; empty dot-separated identifiers like `v1.2.3-foo..bar`). Replaced with the full SemVer 2.0.0 grammar (semver.org's own published regex, translated from PCRE non-capturing groups to plain POSIX ERE groups). The separate `git show-ref` existence check remains the check that actually gates a non-tag value from proceeding. Found by the `2026-07-23` (`31842b6`) maintainability assessment (finding #24).
+
 ## [3.1.14] - 2026-07-23
 
 **Patch, CI only - no runtime or test source changes**: closes the two new findings (#20, #21) from the `2026-07-23` (`fc58431`) maintainability assessment plus the residual `go mod tidy` retry gap that assessment cycle's own review predicted, all in `.github/workflows/release-install-smoke.yml`. No caller-visible behavior changed in this release.
