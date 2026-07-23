@@ -71,11 +71,33 @@ jobs:
         # already having this exact code, GOFLAGS - can mask a real
         # fetchability problem. This has to look exactly like an external
         # consumer's first `go get`.
+        #
+        # Retries with backoff: sum.golang.org has, twice in a row
+        # (v3.1.10, v3.1.11), returned a transient 500 for the freshly
+        # pushed tag's checksum for roughly a minute immediately after tag
+        # push, resolving on its own both times (confirmed by directly
+        # curling proxy.golang.org/sum.golang.org moments later, not just
+        # by re-running this job). A single-attempt gate turns that
+        # ordinary propagation delay into a spurious release-time failure
+        # requiring a manual rerun every release. Bounded at 5 attempts
+        # (15/30/45/60s backoff, ~2.5 minutes worst case) so a genuinely
+        # unfetchable release still fails this job, not retries forever.
         run: |
           mkdir -p /tmp/install-smoke
           cd /tmp/install-smoke
           go mod init smoke-test
-          go get "github.com/n-ae/nba-api-go/v3@${{ steps.tag.outputs.tag }}"
+
+          for attempt in 1 2 3 4 5; do
+            if go get "github.com/n-ae/nba-api-go/v3@${{ steps.tag.outputs.tag }}"; then
+              exit 0
+            fi
+            if [ "$attempt" -eq 5 ]; then
+              echo "go get failed after $attempt attempts" >&2
+              exit 1
+            fi
+            echo "go get failed (attempt $attempt/5), retrying in $((attempt * 15))s..." >&2
+            sleep $((attempt * 15))
+          done
 
       - name: Build and run a program against the fetched module
         run: |
