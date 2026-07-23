@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **`.github/workflows/release-install-smoke.yml` triggered on any `v`-prefixed tag, but its `go get`/import lines are hardcoded to the `/v3` module path.** A wrong-major tag (e.g. `v2.2.0`, which actually exists in this repository) passed both the semver-shape check and the tag-existence check - neither validates the major version - then failed deterministically at `go get`, burning the full 5-attempt/150s-backoff retry budget on a permanent structural mismatch the retry logic couldn't distinguish from the transient `sum.golang.org` propagation delays it exists for. A future `v4.0.0` tag push would have auto-triggered this same v3-only workflow and failed it for a structural reason unrelated to that release's actual health. Live-reproduced this cycle via an actual dispatched run (`tag=v2.2.0`, run `30016046624`) before fixing: "Resolve tag under test" passed cleanly, then "go get" failed identically on all 5 attempts, burning 155 seconds before the job failed. Now: the tag-push trigger is scoped to `v3.*` (not `v*`), and an explicit major-version guard (`^v3\.`) rejects any non-`v3.x.y` tag immediately after the semver-shape check, before the tag-existence check or any network call. The `workflow_dispatch` input's description no longer suggests a `v2.2.0` example. Found by the `2026-07-23` (`168190f`) maintainability assessment (finding #25).
+
 ## [3.1.15] - 2026-07-23
 
 **Patch, CI only - no runtime or test source changes**: closes three findings from the `2026-07-23` (`31842b6`) maintainability assessment, all in `.github/workflows/release-install-smoke.yml`. No caller-visible behavior changed in this release.
