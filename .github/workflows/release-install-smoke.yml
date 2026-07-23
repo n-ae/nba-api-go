@@ -25,6 +25,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          # Full history, not the default shallow (fetch-depth: 1) clone -
+          # the "Resolve tag under test" step's `git describe --tags
+          # --abbrev=0` fallback needs tag history reachable from HEAD to
+          # find anything. A shallow checkout has none, so that fallback
+          # failed with "fatal: No names found, cannot describe anything."
+          # on the first real workflow_dispatch-with-no-input run after
+          # finding #15's fix made this fallback reachable at all - it was
+          # never actually exercised before, so this was latent too.
+          fetch-depth: 0
 
       - uses: actions/setup-go@v7
         with:
