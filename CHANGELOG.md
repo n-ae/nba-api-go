@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.12] - 2026-07-23
+
+**Patch, CI only - no runtime or test source changes**: repo-wide workflow hardening (explicit permissions, SHA-pinned actions, fuzz concurrency, upload-artifact upgrade) plus retry/backoff for the release install-smoke workflow's exact-tag `go get` against `sum.golang.org` propagation delay. No caller-visible behavior changed in this release. Closes the P2 findings carried across several `2026-07-2x` maintainability assessments (repo-wide permissions/SHA-pinning/concurrency scoping) plus the release-time propagation race first observed in the `v3.1.10`/`v3.1.11` cycles.
+
 ### Changed
 - **All five `.github/workflows/*.yml` files gain explicit `permissions: contents: read`, and every `actions/checkout`/`actions/setup-go` reference is pinned to its release commit SHA** (with a `# vX.Y.Z` comment for readability) rather than the mutable major-version tag (`@v7`) previously used - repo-wide CI supply-chain hardening carried as a not-urgent, "scope as a repo-wide decision" P2 across several maintainability-assessment cycles. `.github/dependabot.yml` already covers the `github-actions` ecosystem, so these pins will still get automatic update PRs rather than going stale. No behavior change - each pin resolves to the exact same commit the previous major tag currently pointed at (verified via `gh api repos/<owner>/<repo>/git/refs/tags/<tag>` for each).
 - **`.github/workflows/fuzz.yml` gains a `concurrency` group** (`baseurl-fuzz`, `cancel-in-progress: false`) so an ad-hoc manual dispatch can't race the next scheduled run (or another manual one) against the same `testdata/fuzz/` corpus directory; queues behind an in-progress run instead, bounded by the job's existing 5-minute timeout.
